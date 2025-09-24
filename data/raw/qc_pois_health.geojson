@@ -1,0 +1,4084 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-09-13T12:55:00Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/84614",
+        "addr:city": "Quezon City",
+        "addr:street": "Quezon Avenue",
+        "amenity": "hospital",
+        "building": "hospital",
+        "building:levels": "4",
+        "capacity:persons": "210",
+        "healthcare": "hospital",
+        "height": "15",
+        "name": "Lung Center of the Philippines",
+        "operator:type": "government",
+        "ref:doh": "6028",
+        "type": "multipolygon",
+        "wikidata": "Q6704245",
+        "wikipedia": "en:Lung Center of the Philippines"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0463421,
+              14.6477078
+            ],
+            [
+              121.0461737,
+              14.6476048
+            ],
+            [
+              121.0462406,
+              14.6479551
+            ],
+            [
+              121.0461855,
+              14.6480298
+            ],
+            [
+              121.0462548,
+              14.6480749
+            ],
+            [
+              121.0462016,
+              14.6481583
+            ],
+            [
+              121.0461489,
+              14.6482411
+            ],
+            [
+              121.0454484,
+              14.6484016
+            ],
+            [
+              121.0453466,
+              14.6483361
+            ],
+            [
+              121.0452163,
+              14.647795
+            ],
+            [
+              121.0451428,
+              14.647746
+            ],
+            [
+              121.0451159,
+              14.6476035
+            ],
+            [
+              121.0452375,
+              14.6474236
+            ],
+            [
+              121.0453149,
+              14.6473972
+            ],
+            [
+              121.0455667,
+              14.6469943
+            ],
+            [
+              121.0453049,
+              14.6468273
+            ],
+            [
+              121.0452805,
+              14.6468618
+            ],
+            [
+              121.045158,
+              14.6467817
+            ],
+            [
+              121.0451298,
+              14.6466381
+            ],
+            [
+              121.0452526,
+              14.6464496
+            ],
+            [
+              121.0461605,
+              14.6470062
+            ],
+            [
+              121.046124,
+              14.6470655
+            ],
+            [
+              121.0462958,
+              14.6471708
+            ],
+            [
+              121.0463281,
+              14.6471233
+            ],
+            [
+              121.0465952,
+              14.6472948
+            ],
+            [
+              121.0463421,
+              14.6477078
+            ]
+          ],
+          [
+            [
+              121.0459691,
+              14.6472954
+            ],
+            [
+              121.0460035,
+              14.6472526
+            ],
+            [
+              121.0457638,
+              14.6471159
+            ],
+            [
+              121.0455722,
+              14.6473989
+            ],
+            [
+              121.0459691,
+              14.6472954
+            ]
+          ],
+          [
+            [
+              121.0453226,
+              14.647489
+            ],
+            [
+              121.0452195,
+              14.6476459
+            ],
+            [
+              121.0453018,
+              14.6476965
+            ],
+            [
+              121.0454049,
+              14.6475397
+            ],
+            [
+              121.0453226,
+              14.647489
+            ]
+          ],
+          [
+            [
+              121.0456775,
+              14.6479924
+            ],
+            [
+              121.0455318,
+              14.6482085
+            ],
+            [
+              121.045906,
+              14.6481282
+            ],
+            [
+              121.0456775,
+              14.6479924
+            ]
+          ],
+          [
+            [
+              121.0453983,
+              14.6478111
+            ],
+            [
+              121.0454895,
+              14.6481798
+            ],
+            [
+              121.0456342,
+              14.6479617
+            ],
+            [
+              121.0453983,
+              14.6478111
+            ]
+          ],
+          [
+            [
+              121.0460033,
+              14.647857
+            ],
+            [
+              121.0459352,
+              14.6475345
+            ],
+            [
+              121.0456155,
+              14.647608
+            ],
+            [
+              121.0460033,
+              14.647857
+            ]
+          ]
+        ]
+      },
+      "id": "relation/84614"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/5768040",
+        "addr:city": "Quezon City",
+        "addr:street": "Laurel Avenue",
+        "addr:street:corner": "Agoncillo",
+        "addr:village": "UP Campus",
+        "amenity": "hospital",
+        "building": "hospital",
+        "healthcare": "hospital",
+        "name": "UP Health Service",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.070583,
+              14.6601324
+            ],
+            [
+              121.0705863,
+              14.6596236
+            ],
+            [
+              121.071516,
+              14.6596323
+            ],
+            [
+              121.0715091,
+              14.6601114
+            ],
+            [
+              121.0713488,
+              14.6601109
+            ],
+            [
+              121.0713489,
+              14.6600662
+            ],
+            [
+              121.0711515,
+              14.6600655
+            ],
+            [
+              121.0711511,
+              14.660192
+            ],
+            [
+              121.0709861,
+              14.6601913
+            ],
+            [
+              121.0709863,
+              14.6601339
+            ],
+            [
+              121.0709012,
+              14.6601336
+            ],
+            [
+              121.0709014,
+              14.6600869
+            ],
+            [
+              121.0707725,
+              14.6600864
+            ],
+            [
+              121.0707723,
+              14.660133
+            ],
+            [
+              121.070583,
+              14.6601324
+            ]
+          ],
+          [
+            [
+              121.0707373,
+              14.6598989
+            ],
+            [
+              121.0709809,
+              14.6598999
+            ],
+            [
+              121.0709811,
+              14.6598373
+            ],
+            [
+              121.0707376,
+              14.6598363
+            ],
+            [
+              121.0707373,
+              14.6598989
+            ]
+          ]
+        ]
+      },
+      "id": "relation/5768040"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/12235444",
+        "addr:street": "Pedro Tuazon Boulevard",
+        "alt_name": "PNP Hospital",
+        "amenity": "hospital",
+        "name": "Camp Panopio Hospital",
+        "operator": "Philippine National Police",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0515561,
+              14.6161172
+            ],
+            [
+              121.0513935,
+              14.6148928
+            ],
+            [
+              121.0521401,
+              14.6148724
+            ],
+            [
+              121.0521863,
+              14.6164212
+            ],
+            [
+              121.051847,
+              14.6164442
+            ],
+            [
+              121.0516049,
+              14.6164629
+            ],
+            [
+              121.0515561,
+              14.6161172
+            ]
+          ]
+        ]
+      },
+      "id": "relation/12235444"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14523456",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "264",
+        "addr:street": "E. Rodriguez Sr. Avenue",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "mapillary": "160659545915004",
+        "name": "National Children's Hospital",
+        "type": "multipolygon",
+        "website": "http://nch.doh.gov.ph/"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.02085,
+              14.6198749
+            ],
+            [
+              121.0212063,
+              14.6199795
+            ],
+            [
+              121.0213206,
+              14.620014
+            ],
+            [
+              121.0212568,
+              14.6202119
+            ],
+            [
+              121.0212177,
+              14.620333
+            ],
+            [
+              121.0212103,
+              14.620346
+            ],
+            [
+              121.0214839,
+              14.6204277
+            ],
+            [
+              121.0215556,
+              14.6204554
+            ],
+            [
+              121.0213388,
+              14.6207961
+            ],
+            [
+              121.0206329,
+              14.6205297
+            ],
+            [
+              121.02085,
+              14.6198749
+            ]
+          ]
+        ]
+      },
+      "id": "relation/14523456"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14582129",
+        "addr:city": "Quezon City",
+        "addr:street": "Seminary Road",
+        "addr:zip": "1100",
+        "amenity": "hospital",
+        "beds": "250",
+        "contact:phone": "+632 8630800",
+        "healthcare": "hospital",
+        "name": "Quezon City General Hospital",
+        "operator": "Department of Health",
+        "operator:type": "government",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0183029,
+              14.6628758
+            ],
+            [
+              121.0173735,
+              14.6628901
+            ],
+            [
+              121.017381,
+              14.6624299
+            ],
+            [
+              121.0171187,
+              14.662419
+            ],
+            [
+              121.0172041,
+              14.6614856
+            ],
+            [
+              121.0174184,
+              14.6607402
+            ],
+            [
+              121.0175157,
+              14.6606546
+            ],
+            [
+              121.0184699,
+              14.660652
+            ],
+            [
+              121.0186026,
+              14.6607006
+            ],
+            [
+              121.0187153,
+              14.6609887
+            ],
+            [
+              121.0187334,
+              14.6613542
+            ],
+            [
+              121.0184638,
+              14.6624775
+            ],
+            [
+              121.0183029,
+              14.6628758
+            ]
+          ]
+        ]
+      },
+      "id": "relation/14582129"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14604339",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1400",
+        "addr:street": "M. Pascual Street",
+        "amenity": "hospital",
+        "name": "Pascual General Hospital",
+        "previously": "node:255069320",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0093456,
+              14.6670103
+            ],
+            [
+              121.0092826,
+              14.6671727
+            ],
+            [
+              121.009121,
+              14.6672931
+            ],
+            [
+              121.0088283,
+              14.6669988
+            ],
+            [
+              121.0089936,
+              14.6668287
+            ],
+            [
+              121.0090285,
+              14.6668099
+            ],
+            [
+              121.0091069,
+              14.6668284
+            ],
+            [
+              121.0092481,
+              14.6669072
+            ],
+            [
+              121.0093456,
+              14.6670103
+            ]
+          ]
+        ]
+      },
+      "id": "relation/14604339"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14612224",
+        "addr:city": "Quezon City",
+        "addr:street": "Mindanao Avenue",
+        "amenity": "hospital",
+        "capacity:persons": "100",
+        "healthcare": "hospital",
+        "mapillary": "s3uzWOEeotnt3LyYfwcBLO",
+        "name": "Pacific Global Medical Center",
+        "operator:type": "private",
+        "ref:doh": "29741",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0298379,
+              14.6882239
+            ],
+            [
+              121.0301806,
+              14.6883763
+            ],
+            [
+              121.0299962,
+              14.6886896
+            ],
+            [
+              121.0296519,
+              14.6885562
+            ],
+            [
+              121.0296631,
+              14.6885362
+            ],
+            [
+              121.0298379,
+              14.6882239
+            ]
+          ]
+        ]
+      },
+      "id": "relation/14612224"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14713258",
+        "addr:city": "Quezon City",
+        "addr:street": "General Luis Street",
+        "amenity": "hospital",
+        "mapillary": "729456954920727",
+        "name": "Divine Heart",
+        "previously": "node:9500993920",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0357793,
+              14.7221227
+            ],
+            [
+              121.0358134,
+              14.7219251
+            ],
+            [
+              121.0359297,
+              14.7219296
+            ],
+            [
+              121.0358869,
+              14.7221848
+            ],
+            [
+              121.0357793,
+              14.7221227
+            ]
+          ]
+        ]
+      },
+      "id": "relation/14713258"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/14906319",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1101",
+        "addr:street": "East Avenue",
+        "amenity": "hospital",
+        "capacity:persons": "315",
+        "healthcare": "hospital",
+        "name": "National Kidney and Transplant Institute",
+        "note": "improve hospital compound boundary with better knowledge/imagery",
+        "operator:type": "public",
+        "ref": "1557652",
+        "ref:doh": "1981",
+        "type": "multipolygon",
+        "website": "https://www.nkti.gov.ph/",
+        "wikipedia": "en:National Kidney and Transplant Institute"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0476675,
+              14.6451797
+            ],
+            [
+              121.0483197,
+              14.6479075
+            ],
+            [
+              121.0483546,
+              14.6480488
+            ],
+            [
+              121.0483648,
+              14.6480923
+            ],
+            [
+              121.0483695,
+              14.6481279
+            ],
+            [
+              121.0483791,
+              14.6482014
+            ],
+            [
+              121.0483828,
+              14.648239
+            ],
+            [
+              121.0483801,
+              14.6483022
+            ],
+            [
+              121.0483714,
+              14.6483664
+            ],
+            [
+              121.0483565,
+              14.6484308
+            ],
+            [
+              121.0483313,
+              14.6485012
+            ],
+            [
+              121.048316,
+              14.6485381
+            ],
+            [
+              121.0482894,
+              14.648597
+            ],
+            [
+              121.0482727,
+              14.6486307
+            ],
+            [
+              121.0482451,
+              14.6486798
+            ],
+            [
+              121.0482062,
+              14.648739
+            ],
+            [
+              121.0481637,
+              14.648793
+            ],
+            [
+              121.0480357,
+              14.6488755
+            ],
+            [
+              121.0476983,
+              14.6482105
+            ],
+            [
+              121.047551,
+              14.6481612
+            ],
+            [
+              121.047315,
+              14.648108
+            ],
+            [
+              121.0468535,
+              14.6482227
+            ],
+            [
+              121.0467301,
+              14.6476543
+            ],
+            [
+              121.0467367,
+              14.6475633
+            ],
+            [
+              121.0466157,
+              14.6470396
+            ],
+            [
+              121.0461367,
+              14.6467063
+            ],
+            [
+              121.045306,
+              14.6461098
+            ],
+            [
+              121.0454817,
+              14.646045
+            ],
+            [
+              121.0456064,
+              14.6459022
+            ],
+            [
+              121.0457092,
+              14.645786
+            ],
+            [
+              121.0461539,
+              14.6456505
+            ],
+            [
+              121.046733,
+              14.645474
+            ],
+            [
+              121.0476675,
+              14.6451797
+            ]
+          ]
+        ]
+      },
+      "id": "relation/14906319"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/16999339",
+        "addr2:street": "P. Tuazon Boulevard",
+        "addr:street": "Jose P. Rizal Street",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Quirino Memorial Medical Center",
+        "name:abbr": "QMMC",
+        "ref": "DOH000000000007520",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0735104,
+              14.6224307
+            ],
+            [
+              121.0725164,
+              14.6228692
+            ],
+            [
+              121.0723678,
+              14.6233264
+            ],
+            [
+              121.0716331,
+              14.6231332
+            ],
+            [
+              121.0716929,
+              14.6228944
+            ],
+            [
+              121.0717002,
+              14.6228655
+            ],
+            [
+              121.0719229,
+              14.6220095
+            ],
+            [
+              121.071991,
+              14.6217045
+            ],
+            [
+              121.0720503,
+              14.621506
+            ],
+            [
+              121.0720852,
+              14.6214191
+            ],
+            [
+              121.0721605,
+              14.6213387
+            ],
+            [
+              121.072851,
+              14.621022
+            ],
+            [
+              121.0729486,
+              14.6212305
+            ],
+            [
+              121.0729714,
+              14.6212792
+            ],
+            [
+              121.0732518,
+              14.6218778
+            ],
+            [
+              121.0734994,
+              14.6224063
+            ],
+            [
+              121.0735104,
+              14.6224307
+            ]
+          ]
+        ]
+      },
+      "id": "relation/16999339"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/17888343",
+        "addr2:street": "Roma Avenue",
+        "addr:street": "Regalado Highway",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Commonwealth Hospital and Medical Center",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0602017,
+              14.7314175
+            ],
+            [
+              121.0602014,
+              14.7313617
+            ],
+            [
+              121.0601987,
+              14.7309811
+            ],
+            [
+              121.060474,
+              14.7309793
+            ],
+            [
+              121.0607469,
+              14.7309775
+            ],
+            [
+              121.0610763,
+              14.7309753
+            ],
+            [
+              121.0610796,
+              14.7314157
+            ],
+            [
+              121.0610823,
+              14.7318248
+            ],
+            [
+              121.0604893,
+              14.7318225
+            ],
+            [
+              121.0604858,
+              14.7314164
+            ],
+            [
+              121.0602017,
+              14.7314175
+            ]
+          ]
+        ]
+      },
+      "id": "relation/17888343"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/17896272",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1116",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "beds": "30",
+        "mapillary": "754740731906371",
+        "name": "Novaliches District Hospital",
+        "operator": "Quezon City General Hospital",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.034076,
+              14.7005022
+            ],
+            [
+              121.0345263,
+              14.7002716
+            ],
+            [
+              121.0346905,
+              14.7005816
+            ],
+            [
+              121.0342468,
+              14.7008043
+            ],
+            [
+              121.034076,
+              14.7005022
+            ]
+          ]
+        ]
+      },
+      "id": "relation/17896272"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/25795096",
+        "addr:postcode": "1101",
+        "addr:street": "East Avenue",
+        "amenity": "hospital",
+        "building": "hospital",
+        "healthcare": "hospital",
+        "name": "National Kidney and Transplant Institute",
+        "phone": "+63 2 981 0300",
+        "website": "https://www.nkti.gov.ph/"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0467737,
+              14.6475482
+            ],
+            [
+              121.0466932,
+              14.6472188
+            ],
+            [
+              121.0470598,
+              14.6471365
+            ],
+            [
+              121.0471213,
+              14.6470988
+            ],
+            [
+              121.0471758,
+              14.6470215
+            ],
+            [
+              121.0472683,
+              14.6466956
+            ],
+            [
+              121.0476179,
+              14.646783
+            ],
+            [
+              121.0475086,
+              14.6471773
+            ],
+            [
+              121.0475258,
+              14.6472686
+            ],
+            [
+              121.0478046,
+              14.6475588
+            ],
+            [
+              121.0477948,
+              14.6475674
+            ],
+            [
+              121.0475294,
+              14.6477984
+            ],
+            [
+              121.0472597,
+              14.6475261
+            ],
+            [
+              121.0471996,
+              14.6474762
+            ],
+            [
+              121.047131,
+              14.6474679
+            ],
+            [
+              121.0467737,
+              14.6475482
+            ]
+          ]
+        ]
+      },
+      "id": "way/25795096"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/25943731",
+        "amenity": "hospital",
+        "building": "yes",
+        "emergency": "yes",
+        "name": "Fairview General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0719449,
+              14.7055597
+            ],
+            [
+              121.0721033,
+              14.7055581
+            ],
+            [
+              121.0721056,
+              14.7057859
+            ],
+            [
+              121.0719471,
+              14.7057874
+            ],
+            [
+              121.0719449,
+              14.7055597
+            ]
+          ]
+        ]
+      },
+      "id": "way/25943731"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/32596622",
+        "amenity": "hospital",
+        "building": "yes",
+        "historic:building": "hospital",
+        "name": "Quezon Institute"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0128044,
+              14.617491
+            ],
+            [
+              121.0128302,
+              14.6173722
+            ],
+            [
+              121.0129984,
+              14.6174065
+            ],
+            [
+              121.0129725,
+              14.6175252
+            ],
+            [
+              121.0129613,
+              14.6175597
+            ],
+            [
+              121.0129586,
+              14.6175831
+            ],
+            [
+              121.0130176,
+              14.6175526
+            ],
+            [
+              121.0130444,
+              14.6175558
+            ],
+            [
+              121.0130612,
+              14.6175662
+            ],
+            [
+              121.0130685,
+              14.6175857
+            ],
+            [
+              121.0130672,
+              14.617609
+            ],
+            [
+              121.0130139,
+              14.6176574
+            ],
+            [
+              121.013031,
+              14.61767
+            ],
+            [
+              121.0130735,
+              14.617693
+            ],
+            [
+              121.0134872,
+              14.6177848
+            ],
+            [
+              121.0134514,
+              14.6179357
+            ],
+            [
+              121.0130377,
+              14.6178439
+            ],
+            [
+              121.01298,
+              14.6178244
+            ],
+            [
+              121.0129418,
+              14.6178069
+            ],
+            [
+              121.0129016,
+              14.6177849
+            ],
+            [
+              121.0128741,
+              14.6177621
+            ],
+            [
+              121.0128459,
+              14.6177375
+            ],
+            [
+              121.0128191,
+              14.6176999
+            ],
+            [
+              121.012807,
+              14.6176609
+            ],
+            [
+              121.012799,
+              14.6176337
+            ],
+            [
+              121.0127936,
+              14.6175921
+            ],
+            [
+              121.0127976,
+              14.617548
+            ],
+            [
+              121.0128044,
+              14.617491
+            ]
+          ]
+        ]
+      },
+      "id": "way/32596622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/35567304",
+        "addr:city": "San Juan",
+        "addr:postcode": "2514",
+        "addr:province": "Metro Manila",
+        "addr:street": "Aurora Boulevard",
+        "amenity": "hospital",
+        "building": "yes",
+        "capacity:persons": "307",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "University of the East - Ramon Magsaysay Memorial Medical Center",
+        "operator:type": "private",
+        "ref:doh": "5683"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.020184,
+              14.6068624
+            ],
+            [
+              121.020736,
+              14.6063238
+            ],
+            [
+              121.0209118,
+              14.6064926
+            ],
+            [
+              121.0208525,
+              14.6065504
+            ],
+            [
+              121.0209692,
+              14.6066624
+            ],
+            [
+              121.0207914,
+              14.6068358
+            ],
+            [
+              121.0206315,
+              14.6066823
+            ],
+            [
+              121.0203165,
+              14.6069896
+            ],
+            [
+              121.020184,
+              14.6068624
+            ]
+          ]
+        ]
+      },
+      "id": "way/35567304"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/46332952",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1117",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "mapillary": "273196031165978",
+        "name": "Novaliches General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0392019,
+              14.7097385
+            ],
+            [
+              121.0385083,
+              14.7097541
+            ],
+            [
+              121.0385451,
+              14.7092423
+            ],
+            [
+              121.0390974,
+              14.7092662
+            ],
+            [
+              121.0392019,
+              14.7097385
+            ]
+          ]
+        ]
+      },
+      "id": "way/46332952"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/85238912",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:street": "V. Luna Road",
+        "alt_name": "AFP Medical Center",
+        "amenity": "hospital",
+        "duplicate": "node:255070475",
+        "healthcare": "hospital",
+        "name": "Armed Forces of the Philippines Medical Center",
+        "operator": "Armed Forces of the Philippines",
+        "operator:type": "military",
+        "wikidata": "Q17013128",
+        "wikimedia_commons": "Category:Armed Forces of the Philippines Medical Center",
+        "wikipedia": "en:Victoriano Luna General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0496566,
+              14.6326702
+            ],
+            [
+              121.0540863,
+              14.6338903
+            ],
+            [
+              121.0540587,
+              14.6341339
+            ],
+            [
+              121.0540574,
+              14.6344474
+            ],
+            [
+              121.0544428,
+              14.636114
+            ],
+            [
+              121.0523438,
+              14.6365864
+            ],
+            [
+              121.0505309,
+              14.6369945
+            ],
+            [
+              121.0504033,
+              14.6364733
+            ],
+            [
+              121.0500884,
+              14.6351869
+            ],
+            [
+              121.0495586,
+              14.6329429
+            ],
+            [
+              121.0495984,
+              14.6329295
+            ],
+            [
+              121.0496566,
+              14.6326702
+            ]
+          ]
+        ]
+      },
+      "id": "way/85238912"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/91187868",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:street": "East Avenue",
+        "amenity": "hospital",
+        "capacity:persons": "600",
+        "description": "VAWC",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "East Avenue Medical Center",
+        "operator": "Department of Health",
+        "operator:type": "public",
+        "ref:doh": "540",
+        "short_name": "EAMC",
+        "website": "https://eamc.gov.ph/",
+        "wikidata": "Q28449283",
+        "wikimedia_commons": "Category:East Avenue Medical Center",
+        "wikipedia": "en:East Avenue Medical Center"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0475419,
+              14.6432893
+            ],
+            [
+              121.0469789,
+              14.6408435
+            ],
+            [
+              121.0483286,
+              14.6405341
+            ],
+            [
+              121.0485921,
+              14.6416954
+            ],
+            [
+              121.0486829,
+              14.6421212
+            ],
+            [
+              121.0488699,
+              14.6429561
+            ],
+            [
+              121.0475697,
+              14.6432823
+            ],
+            [
+              121.0475419,
+              14.6432893
+            ]
+          ]
+        ]
+      },
+      "id": "way/91187868"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/91187869",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:province": "Metro Manila",
+        "addr:street": "East Avenue",
+        "addr:street:corner": "Matalino Street",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "healthcare:speciality": "general;vaccination",
+        "name": "Philippine Heart Center",
+        "wikidata": "Q2144614",
+        "wikimedia_commons": "Category:Philippine Heart Center",
+        "wikipedia": "en:Philippine Heart Center"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0475419,
+              14.6432893
+            ],
+            [
+              121.0475697,
+              14.6432823
+            ],
+            [
+              121.0488699,
+              14.6429561
+            ],
+            [
+              121.0488905,
+              14.6430277
+            ],
+            [
+              121.0488991,
+              14.6430698
+            ],
+            [
+              121.0492931,
+              14.6446254
+            ],
+            [
+              121.0492361,
+              14.6446332
+            ],
+            [
+              121.0492328,
+              14.6446079
+            ],
+            [
+              121.0489375,
+              14.6446726
+            ],
+            [
+              121.0485582,
+              14.6447409
+            ],
+            [
+              121.0479051,
+              14.6448771
+            ],
+            [
+              121.0477904,
+              14.64434
+            ],
+            [
+              121.0476543,
+              14.6437989
+            ],
+            [
+              121.0475627,
+              14.643377
+            ],
+            [
+              121.0475419,
+              14.6432893
+            ]
+          ]
+        ]
+      },
+      "id": "way/91187869"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/91599188",
+        "addr:street": "Commonwealth Avenue",
+        "amenity": "hospital",
+        "building": "hospital",
+        "healthcare": "hospital",
+        "name": "General Malvar Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0724897,
+              14.667739
+            ],
+            [
+              121.0724914,
+              14.6675923
+            ],
+            [
+              121.0725634,
+              14.6675931
+            ],
+            [
+              121.0725645,
+              14.6675025
+            ],
+            [
+              121.0726211,
+              14.6675161
+            ],
+            [
+              121.0726813,
+              14.667438
+            ],
+            [
+              121.0727944,
+              14.6675194
+            ],
+            [
+              121.0727458,
+              14.6675825
+            ],
+            [
+              121.0727439,
+              14.6677419
+            ],
+            [
+              121.0724897,
+              14.667739
+            ]
+          ]
+        ]
+      },
+      "id": "way/91599188"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/93806644",
+        "addr:barangay": "Project 6",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:street": "North Avenue",
+        "amenity": "hospital",
+        "check_date": "2023-09-16",
+        "contact:facebook": "https://www.facebook.com/vmmcofficialpage",
+        "description": "VAWC Facility",
+        "name": "Veterans Memorial Medical Center",
+        "operator": "Philippine Veterans Affairs Office",
+        "operator:type": "government",
+        "operator:wikidata": "Q7185270",
+        "ref:doh": "2911",
+        "website": "https://vmmc.gov.ph/",
+        "wikidata": "Q7923649",
+        "wikipedia": "en:Veterans Memorial Medical Center"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0377928,
+              14.6552182
+            ],
+            [
+              121.0378269,
+              14.6551724
+            ],
+            [
+              121.0379014,
+              14.6551081
+            ],
+            [
+              121.0379715,
+              14.6550534
+            ],
+            [
+              121.0380449,
+              14.6550074
+            ],
+            [
+              121.038115,
+              14.6549731
+            ],
+            [
+              121.0381835,
+              14.6549406
+            ],
+            [
+              121.0398395,
+              14.6545761
+            ],
+            [
+              121.0410816,
+              14.6543128
+            ],
+            [
+              121.0411703,
+              14.6543047
+            ],
+            [
+              121.041257,
+              14.6542958
+            ],
+            [
+              121.0413465,
+              14.6542972
+            ],
+            [
+              121.0414436,
+              14.6543268
+            ],
+            [
+              121.0415354,
+              14.6543683
+            ],
+            [
+              121.0416046,
+              14.6544009
+            ],
+            [
+              121.0416767,
+              14.6544447
+            ],
+            [
+              121.041741,
+              14.6544981
+            ],
+            [
+              121.0418278,
+              14.6545944
+            ],
+            [
+              121.0419166,
+              14.6547133
+            ],
+            [
+              121.042077,
+              14.6550697
+            ],
+            [
+              121.0423568,
+              14.655695
+            ],
+            [
+              121.0423526,
+              14.6557313
+            ],
+            [
+              121.0423304,
+              14.6557801
+            ],
+            [
+              121.0422916,
+              14.6558288
+            ],
+            [
+              121.0419044,
+              14.6559292
+            ],
+            [
+              121.0417261,
+              14.6559754
+            ],
+            [
+              121.0418984,
+              14.6572257
+            ],
+            [
+              121.0418965,
+              14.6573461
+            ],
+            [
+              121.0418858,
+              14.6574381
+            ],
+            [
+              121.0418706,
+              14.6575276
+            ],
+            [
+              121.0418283,
+              14.6576427
+            ],
+            [
+              121.0417257,
+              14.6577898
+            ],
+            [
+              121.0415873,
+              14.6578617
+            ],
+            [
+              121.041131,
+              14.657966
+            ],
+            [
+              121.0412319,
+              14.6584614
+            ],
+            [
+              121.0399782,
+              14.6587273
+            ],
+            [
+              121.0398226,
+              14.6580543
+            ],
+            [
+              121.0392358,
+              14.6580241
+            ],
+            [
+              121.0391681,
+              14.6578808
+            ],
+            [
+              121.0391091,
+              14.6578315
+            ],
+            [
+              121.0390124,
+              14.657787
+            ],
+            [
+              121.0389491,
+              14.65772
+            ],
+            [
+              121.0388774,
+              14.6576742
+            ],
+            [
+              121.038743,
+              14.6576316
+            ],
+            [
+              121.0386374,
+              14.6575902
+            ],
+            [
+              121.0384231,
+              14.6567323
+            ],
+            [
+              121.0378128,
+              14.6568284
+            ],
+            [
+              121.0377587,
+              14.6556887
+            ],
+            [
+              121.0377484,
+              14.6554155
+            ],
+            [
+              121.037758,
+              14.6553244
+            ],
+            [
+              121.0377928,
+              14.6552182
+            ]
+          ]
+        ]
+      },
+      "id": "way/93806644"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/96054542",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "New Era General Hospital",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0673654,
+              14.6638164
+            ],
+            [
+              121.0674477,
+              14.663871
+            ],
+            [
+              121.0674023,
+              14.6639388
+            ],
+            [
+              121.0673258,
+              14.6639408
+            ],
+            [
+              121.0674049,
+              14.6645016
+            ],
+            [
+              121.0663911,
+              14.6650603
+            ],
+            [
+              121.0661451,
+              14.6643867
+            ],
+            [
+              121.065925,
+              14.6637763
+            ],
+            [
+              121.0664779,
+              14.6636021
+            ],
+            [
+              121.0666698,
+              14.6637173
+            ],
+            [
+              121.0668161,
+              14.663811
+            ],
+            [
+              121.0671765,
+              14.6636909
+            ],
+            [
+              121.0672245,
+              14.6637227
+            ],
+            [
+              121.0673654,
+              14.6638164
+            ]
+          ]
+        ]
+      },
+      "id": "way/96054542"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/96336385",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Jose Fabella Memorial Hospital Annex",
+        "note": "verify hospital boundary"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0440489,
+              14.6462222
+            ],
+            [
+              121.0441264,
+              14.6463648
+            ],
+            [
+              121.0442103,
+              14.6465114
+            ],
+            [
+              121.0444967,
+              14.6465931
+            ],
+            [
+              121.0442295,
+              14.6470334
+            ],
+            [
+              121.0437071,
+              14.6477305
+            ],
+            [
+              121.0429472,
+              14.64726
+            ],
+            [
+              121.0425286,
+              14.6470021
+            ],
+            [
+              121.042833,
+              14.6465484
+            ],
+            [
+              121.0437275,
+              14.6463265
+            ],
+            [
+              121.0440489,
+              14.6462222
+            ]
+          ]
+        ]
+      },
+      "id": "way/96336385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/97073768",
+        "amenity": "hospital",
+        "capacity:persons": "700",
+        "name": "Philippine Orthopedic Hospital",
+        "opening_hours": "24/7",
+        "operator": "Department of Health",
+        "operator:type": "public",
+        "phone": "+63 2 711 4276",
+        "ref:doh": "715",
+        "website": "https://poc.doh.gov.ph"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0035356,
+              14.6286813
+            ],
+            [
+              121.0028926,
+              14.6283986
+            ],
+            [
+              121.0031736,
+              14.6278009
+            ],
+            [
+              121.0025888,
+              14.6275147
+            ],
+            [
+              121.0028786,
+              14.6269021
+            ],
+            [
+              121.0041231,
+              14.6274524
+            ],
+            [
+              121.0035356,
+              14.6286813
+            ]
+          ]
+        ]
+      },
+      "id": "way/97073768"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/102682002",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "11",
+        "addr:postcode": "1113",
+        "addr:street": "Banawe Street",
+        "amenity": "hospital",
+        "capacity:persons": "107",
+        "healthcare": "hospital",
+        "mapillary": "1032323741036757",
+        "name": "Fe Del Mundo Medical Center",
+        "old_name": "Children's Medical Center",
+        "operator:type": "private",
+        "previously": "node:255064314",
+        "ref:doh": "493",
+        "strap_line": "A Mount Grace Hospital",
+        "website": "https://www.fedelmundo.com.ph/"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0089232,
+              14.6202096
+            ],
+            [
+              121.0095669,
+              14.6202563
+            ],
+            [
+              121.0095193,
+              14.6208734
+            ],
+            [
+              121.0091959,
+              14.6208418
+            ],
+            [
+              121.0091805,
+              14.6209891
+            ],
+            [
+              121.0088669,
+              14.6209584
+            ],
+            [
+              121.0089232,
+              14.6202096
+            ]
+          ]
+        ]
+      },
+      "id": "way/102682002"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/113550717",
+        "amenity": "hospital",
+        "building": "yes",
+        "healthcare": "hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0457678,
+              14.6747273
+            ],
+            [
+              121.0459876,
+              14.6748466
+            ],
+            [
+              121.0460751,
+              14.6749737
+            ],
+            [
+              121.0459837,
+              14.6750349
+            ],
+            [
+              121.0459017,
+              14.6749257
+            ],
+            [
+              121.0457107,
+              14.6748318
+            ],
+            [
+              121.0457678,
+              14.6747273
+            ]
+          ]
+        ]
+      },
+      "id": "way/113550717"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/116914958",
+        "amenity": "hospital",
+        "building": "yes",
+        "healthcare": "hospital",
+        "name": "EAMC OPD"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0480049,
+              14.6428594
+            ],
+            [
+              121.0476178,
+              14.6429423
+            ],
+            [
+              121.0475383,
+              14.6425944
+            ],
+            [
+              121.0479253,
+              14.6425115
+            ],
+            [
+              121.0480049,
+              14.6428594
+            ]
+          ]
+        ]
+      },
+      "id": "way/116914958"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/116954572",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1103",
+        "addr:street": "Kamuning Road",
+        "amenity": "hospital",
+        "building": "yes",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "healthcare:speciality": "general;paediatrics;maternity",
+        "name": "Dr. Jesus C. Delgado Memorial Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0350418,
+              14.6279469
+            ],
+            [
+              121.0348831,
+              14.6279035
+            ],
+            [
+              121.0348678,
+              14.6279559
+            ],
+            [
+              121.0344388,
+              14.6278387
+            ],
+            [
+              121.0345055,
+              14.6276099
+            ],
+            [
+              121.034563,
+              14.6276256
+            ],
+            [
+              121.0347055,
+              14.6276645
+            ],
+            [
+              121.0347152,
+              14.6276313
+            ],
+            [
+              121.0347531,
+              14.6276416
+            ],
+            [
+              121.0347959,
+              14.6276533
+            ],
+            [
+              121.0347864,
+              14.6276861
+            ],
+            [
+              121.0349957,
+              14.6277433
+            ],
+            [
+              121.0349987,
+              14.6277331
+            ],
+            [
+              121.0350964,
+              14.6277597
+            ],
+            [
+              121.0350418,
+              14.6279469
+            ]
+          ]
+        ]
+      },
+      "id": "way/116954572"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/117750356",
+        "addr:street": "Mindanao Avenue",
+        "amenity": "hospital",
+        "capacity:persons": "80",
+        "check_date": "2025-04-15",
+        "healthcare": "hospital",
+        "name": "Metro North Medical Center and Hospital",
+        "operator:type": "private",
+        "previously": "node:1848281233",
+        "ref:doh": "30973"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0333939,
+              14.6688792
+            ],
+            [
+              121.0333546,
+              14.6688524
+            ],
+            [
+              121.0335707,
+              14.6685946
+            ],
+            [
+              121.0336265,
+              14.6686402
+            ],
+            [
+              121.0339431,
+              14.6688883
+            ],
+            [
+              121.0339288,
+              14.669059
+            ],
+            [
+              121.0337892,
+              14.6692025
+            ],
+            [
+              121.0333939,
+              14.6688792
+            ]
+          ]
+        ]
+      },
+      "id": "way/117750356"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/136816020",
+        "addr:street": "Segundo Avenue",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "CGEA Station Hospital",
+        "name:en": "Camp General Emilio Aguinaldo Station Hospital",
+        "opening_hours": "24/7",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0645375,
+              14.6120453
+            ],
+            [
+              121.064322,
+              14.612995
+            ],
+            [
+              121.0636949,
+              14.6128321
+            ],
+            [
+              121.0639463,
+              14.611912
+            ],
+            [
+              121.0645375,
+              14.6120453
+            ]
+          ]
+        ]
+      },
+      "id": "way/136816020"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/155400231",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "201",
+        "addr:postcode": "1113",
+        "addr:street": "E. Rodriguez Sr. Avenue",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "De Los Santos Medical Center",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0169095,
+              14.6205963
+            ],
+            [
+              121.0170838,
+              14.6201305
+            ],
+            [
+              121.0169766,
+              14.6200204
+            ],
+            [
+              121.0169202,
+              14.6199423
+            ],
+            [
+              121.0168867,
+              14.6198917
+            ],
+            [
+              121.016766,
+              14.6198268
+            ],
+            [
+              121.0167837,
+              14.6196519
+            ],
+            [
+              121.0168043,
+              14.6196538
+            ],
+            [
+              121.0168078,
+              14.6195742
+            ],
+            [
+              121.0170957,
+              14.6196674
+            ],
+            [
+              121.0175677,
+              14.619798
+            ],
+            [
+              121.017736,
+              14.6198461
+            ],
+            [
+              121.0177319,
+              14.6198596
+            ],
+            [
+              121.0178415,
+              14.6198904
+            ],
+            [
+              121.018214,
+              14.6200066
+            ],
+            [
+              121.0182586,
+              14.6200189
+            ],
+            [
+              121.0181755,
+              14.6202797
+            ],
+            [
+              121.0180229,
+              14.6207744
+            ],
+            [
+              121.0179174,
+              14.6207398
+            ],
+            [
+              121.0176616,
+              14.6206648
+            ],
+            [
+              121.017627,
+              14.6206547
+            ],
+            [
+              121.0174915,
+              14.6206106
+            ],
+            [
+              121.0175403,
+              14.6204309
+            ],
+            [
+              121.0173165,
+              14.6203683
+            ],
+            [
+              121.0172156,
+              14.6206811
+            ],
+            [
+              121.0171536,
+              14.6208416
+            ],
+            [
+              121.0170956,
+              14.6207834
+            ],
+            [
+              121.0169095,
+              14.6205963
+            ]
+          ]
+        ]
+      },
+      "id": "way/155400231"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/193633009",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1104",
+        "addr:street": "Quezon Avenue",
+        "amenity": "hospital",
+        "building": "hospital",
+        "building:levels": "7",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Providence Hospital",
+        "phone": "+63 2 558 6999"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0319524,
+              14.6410845
+            ],
+            [
+              121.0316933,
+              14.6414718
+            ],
+            [
+              121.0314048,
+              14.6412911
+            ],
+            [
+              121.0316282,
+              14.6409572
+            ],
+            [
+              121.0316639,
+              14.6409038
+            ],
+            [
+              121.0316865,
+              14.6409179
+            ],
+            [
+              121.0317266,
+              14.6409431
+            ],
+            [
+              121.0318904,
+              14.6410469
+            ],
+            [
+              121.0319387,
+              14.6410762
+            ],
+            [
+              121.0319524,
+              14.6410845
+            ]
+          ]
+        ]
+      },
+      "id": "way/193633009"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/207162795",
+        "addr:city": "Quezon City",
+        "addr:district": "NCR",
+        "addr:postcode": "1100",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "St. Agnes General Hospital",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.017051,
+              14.6472688
+            ],
+            [
+              121.0170241,
+              14.6470657
+            ],
+            [
+              121.0173229,
+              14.6470286
+            ],
+            [
+              121.0173498,
+              14.6472318
+            ],
+            [
+              121.017051,
+              14.6472688
+            ]
+          ]
+        ]
+      },
+      "id": "way/207162795"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/231404558",
+        "addr2:street": "Senator Miriam P. Defensor-Santiago Avenue",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:street": "Quezon Avenue",
+        "alt_name": "Lungsod ng Kabataan",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Philippine Children's Medical Center",
+        "operator": "Department of Health",
+        "operator:short": "DOH",
+        "operator:type": "government",
+        "operator:wikidata": "Q3545669",
+        "previously": "node:255070235",
+        "short_name": "PCMC",
+        "website": "http://www.pcmc.gov.ph/",
+        "wikidata": "Q56277032"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0400341,
+              14.6481041
+            ],
+            [
+              121.0403209,
+              14.647453
+            ],
+            [
+              121.0403356,
+              14.6474258
+            ],
+            [
+              121.0404432,
+              14.6471757
+            ],
+            [
+              121.0407248,
+              14.6466509
+            ],
+            [
+              121.0407852,
+              14.6466093
+            ],
+            [
+              121.0408522,
+              14.6466028
+            ],
+            [
+              121.0409085,
+              14.6466106
+            ],
+            [
+              121.0417142,
+              14.6471071
+            ],
+            [
+              121.0423426,
+              14.647498
+            ],
+            [
+              121.0424163,
+              14.6475386
+            ],
+            [
+              121.0427056,
+              14.6477164
+            ],
+            [
+              121.0428531,
+              14.6478095
+            ],
+            [
+              121.0425863,
+              14.6480509
+            ],
+            [
+              121.0420378,
+              14.6484791
+            ],
+            [
+              121.0418027,
+              14.6485702
+            ],
+            [
+              121.04174,
+              14.6485387
+            ],
+            [
+              121.0409796,
+              14.6480872
+            ],
+            [
+              121.0407168,
+              14.6485076
+            ],
+            [
+              121.0400341,
+              14.6481041
+            ]
+          ]
+        ]
+      },
+      "id": "way/231404558"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/263167706",
+        "addr:city": "Quezon City",
+        "addr:district": "Ncr",
+        "addr:postcode": "1100",
+        "amenity": "hospital",
+        "building": "yes",
+        "garmin:description": "hospital",
+        "healthcare": "hospital",
+        "name": "New York Medical And Surgical Clinic",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0513591,
+              14.6269389
+            ],
+            [
+              121.0513314,
+              14.6269274
+            ],
+            [
+              121.0513167,
+              14.6269604
+            ],
+            [
+              121.0509437,
+              14.6268049
+            ],
+            [
+              121.0509648,
+              14.6267575
+            ],
+            [
+              121.0508737,
+              14.6267196
+            ],
+            [
+              121.0509255,
+              14.6266032
+            ],
+            [
+              121.0511236,
+              14.6266858
+            ],
+            [
+              121.051101,
+              14.6267366
+            ],
+            [
+              121.0511835,
+              14.626771
+            ],
+            [
+              121.0512062,
+              14.6267202
+            ],
+            [
+              121.0513256,
+              14.6267699
+            ],
+            [
+              121.0513194,
+              14.6267837
+            ],
+            [
+              121.0513797,
+              14.6268089
+            ],
+            [
+              121.0513725,
+              14.6268249
+            ],
+            [
+              121.051404,
+              14.626838
+            ],
+            [
+              121.0513591,
+              14.6269389
+            ]
+          ]
+        ]
+      },
+      "id": "way/263167706"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264289095",
+        "addr:street": "F. Salalilla Street",
+        "amenity": "hospital",
+        "building": "hospital",
+        "healthcare": "hospital",
+        "name": "Villarosa Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0661482,
+              14.6220433
+            ],
+            [
+              121.0659464,
+              14.6219633
+            ],
+            [
+              121.0659961,
+              14.6218461
+            ],
+            [
+              121.0661978,
+              14.6219261
+            ],
+            [
+              121.0661482,
+              14.6220433
+            ]
+          ]
+        ]
+      },
+      "id": "way/264289095"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/283053426",
+        "addr:city": "Quezon City",
+        "addr:street": "Aurora Boulevard",
+        "amenity": "hospital",
+        "building": "hospital",
+        "building:levels": "15",
+        "capacity:persons": "276",
+        "healthcare": "hospital",
+        "height": "56.4",
+        "name": "World Citi Medical Center",
+        "operator:type": "private",
+        "ref:doh": "5107"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0634131,
+              14.6267848
+            ],
+            [
+              121.0634636,
+              14.627278
+            ],
+            [
+              121.0632059,
+              14.627302
+            ],
+            [
+              121.0631875,
+              14.6271166
+            ],
+            [
+              121.0632189,
+              14.6271137
+            ],
+            [
+              121.0631896,
+              14.6268046
+            ],
+            [
+              121.0634131,
+              14.6267848
+            ]
+          ]
+        ]
+      },
+      "id": "way/283053426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/299406484",
+        "addr:street": "Zabarte Road",
+        "amenity": "hospital",
+        "name": "Nodado General Hospital",
+        "ref": "DOH000000000006502"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0475785,
+              14.7383548
+            ],
+            [
+              121.0473422,
+              14.7383049
+            ],
+            [
+              121.0473476,
+              14.7382811
+            ],
+            [
+              121.0473691,
+              14.7381931
+            ],
+            [
+              121.0476047,
+              14.7382434
+            ],
+            [
+              121.0475785,
+              14.7383548
+            ]
+          ]
+        ]
+      },
+      "id": "way/299406484"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/486970925",
+        "access": "private",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Philippine National Police General Hospital",
+        "short_name": "PNP General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0514304,
+              14.6098289
+            ],
+            [
+              121.0517428,
+              14.6093161
+            ],
+            [
+              121.0514796,
+              14.6091886
+            ],
+            [
+              121.0515437,
+              14.6090658
+            ],
+            [
+              121.0527502,
+              14.6096263
+            ],
+            [
+              121.0524263,
+              14.6101947
+            ],
+            [
+              121.0519435,
+              14.6100864
+            ],
+            [
+              121.0514304,
+              14.6098289
+            ]
+          ]
+        ]
+      },
+      "id": "way/486970925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/497953970",
+        "amenity": "hospital",
+        "beds": "35",
+        "contact:phone": "+63289398050 ;+63289610328",
+        "healthcare": "hospital",
+        "name": "Bernardino General Hospital",
+        "ref": "DOH000000000000430"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0467705,
+              14.740264
+            ],
+            [
+              121.0464803,
+              14.7402719
+            ],
+            [
+              121.0464785,
+              14.7402138
+            ],
+            [
+              121.0465131,
+              14.7400331
+            ],
+            [
+              121.0468077,
+              14.7400886
+            ],
+            [
+              121.0467705,
+              14.740264
+            ]
+          ]
+        ]
+      },
+      "id": "way/497953970"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/541799981",
+        "addr:street": "Buenamar Street",
+        "amenity": "hospital",
+        "building": "hospital",
+        "healthcare": "hospital",
+        "name": "Hope General Hopital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0389147,
+              14.719376
+            ],
+            [
+              121.0389755,
+              14.7191746
+            ],
+            [
+              121.0391522,
+              14.7192245
+            ],
+            [
+              121.0390914,
+              14.7194258
+            ],
+            [
+              121.0389147,
+              14.719376
+            ]
+          ]
+        ]
+      },
+      "id": "way/541799981"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/541820647",
+        "amenity": "hospital",
+        "building": "yes",
+        "healthcare": "hospital",
+        "name": "Casaul General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0204312,
+              14.6792526
+            ],
+            [
+              121.0207491,
+              14.6792604
+            ],
+            [
+              121.0207676,
+              14.6792669
+            ],
+            [
+              121.0207221,
+              14.6794059
+            ],
+            [
+              121.0206739,
+              14.6795197
+            ],
+            [
+              121.020531,
+              14.6795162
+            ],
+            [
+              121.0205319,
+              14.6794836
+            ],
+            [
+              121.0204252,
+              14.679481
+            ],
+            [
+              121.0204312,
+              14.6792526
+            ]
+          ]
+        ]
+      },
+      "id": "way/541820647"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/560063538",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Quezon Institute Compound",
+        "wikidata": "Q28402069",
+        "wikipedia": "en:Quezon Institute"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0105365,
+              14.6183643
+            ],
+            [
+              121.0105124,
+              14.617321
+            ],
+            [
+              121.010507,
+              14.6165943
+            ],
+            [
+              121.0104667,
+              14.6146949
+            ],
+            [
+              121.0107646,
+              14.6146972
+            ],
+            [
+              121.0107484,
+              14.6143765
+            ],
+            [
+              121.0141978,
+              14.6151123
+            ],
+            [
+              121.0139671,
+              14.6160311
+            ],
+            [
+              121.0140771,
+              14.6160518
+            ],
+            [
+              121.0135644,
+              14.6183265
+            ],
+            [
+              121.0135044,
+              14.6186161
+            ],
+            [
+              121.0105365,
+              14.6183643
+            ]
+          ]
+        ]
+      },
+      "id": "way/560063538"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/591766108",
+        "addr:city": "Quezon City",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "mapillary": "704955914045947",
+        "name": "San Lorenzo Hospital",
+        "name:en": "San Lorenzo Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0690664,
+              14.7358362
+            ],
+            [
+              121.0690701,
+              14.7356159
+            ],
+            [
+              121.0691622,
+              14.7356176
+            ],
+            [
+              121.0692522,
+              14.7356283
+            ],
+            [
+              121.0691821,
+              14.7358368
+            ],
+            [
+              121.0690664,
+              14.7358362
+            ]
+          ]
+        ]
+      },
+      "id": "way/591766108"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/704249058",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "251",
+        "addr:street": "Commonwealth Avenue",
+        "amenity": "hospital",
+        "building": "hospital",
+        "healthcare": "hospital",
+        "name": "Diliman Doctors Hospital",
+        "phone": "+6328836900",
+        "ref": "DOH000000000037100"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0761447,
+              14.6686557
+            ],
+            [
+              121.0761442,
+              14.6683719
+            ],
+            [
+              121.0757602,
+              14.6683726
+            ],
+            [
+              121.0757597,
+              14.6681163
+            ],
+            [
+              121.0764295,
+              14.6681151
+            ],
+            [
+              121.0764305,
+              14.6686552
+            ],
+            [
+              121.0761447,
+              14.6686557
+            ]
+          ]
+        ]
+      },
+      "id": "way/704249058"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/781507514",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1116",
+        "addr:state": "NCR",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "mapillary": "754740731906371",
+        "name": "Bernardino General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0348493,
+              14.700494
+            ],
+            [
+              121.0345989,
+              14.6999894
+            ],
+            [
+              121.0348099,
+              14.699897
+            ],
+            [
+              121.0351011,
+              14.7003795
+            ],
+            [
+              121.0350054,
+              14.7004246
+            ],
+            [
+              121.034919,
+              14.7004656
+            ],
+            [
+              121.0348493,
+              14.700494
+            ]
+          ]
+        ]
+      },
+      "id": "way/781507514"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/784554612",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1126",
+        "addr:street": "Batasan Hills",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Rosario Maclang Bautista General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0886442,
+              14.6863435
+            ],
+            [
+              121.0885784,
+              14.6860857
+            ],
+            [
+              121.0895634,
+              14.6858505
+            ],
+            [
+              121.0896292,
+              14.6861083
+            ],
+            [
+              121.0886442,
+              14.6863435
+            ]
+          ]
+        ]
+      },
+      "id": "way/784554612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/836960349",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "278",
+        "addr:postcode": "1112",
+        "addr:street": "E. Rodriguez Sr. Avenue",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "St. Luke's Medical Center",
+        "name:id": "Pusat Medis Santo Lukas",
+        "name:ms": "Pusat Perubatan Santo Lukas",
+        "name:vec": "Sentro Mèdego San Luca",
+        "opening_hours": "24/7",
+        "operator:type": "private",
+        "phone": "+63 2 723 0101",
+        "website": "https://www.stlukes.com.ph/",
+        "wikidata": "Q28449135",
+        "wikimedia_commons": "Category:St. Luke's Medical Center – Quezon City",
+        "wikipedia": "en:St. Luke's Medical Center – Quezon City"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0231805,
+              14.621518
+            ],
+            [
+              121.0240978,
+              14.6218105
+            ],
+            [
+              121.0246589,
+              14.6219913
+            ],
+            [
+              121.02415,
+              14.622799
+            ],
+            [
+              121.0241064,
+              14.6228592
+            ],
+            [
+              121.0235962,
+              14.6237369
+            ],
+            [
+              121.0234567,
+              14.6239769
+            ],
+            [
+              121.0232999,
+              14.6242466
+            ],
+            [
+              121.0227222,
+              14.6240711
+            ],
+            [
+              121.0224379,
+              14.6238367
+            ],
+            [
+              121.0224328,
+              14.6235758
+            ],
+            [
+              121.022349,
+              14.6232828
+            ],
+            [
+              121.0224016,
+              14.6228706
+            ],
+            [
+              121.0225743,
+              14.6223007
+            ],
+            [
+              121.0230625,
+              14.6220806
+            ],
+            [
+              121.0230539,
+              14.6218325
+            ],
+            [
+              121.0231805,
+              14.621518
+            ]
+          ]
+        ]
+      },
+      "id": "way/836960349"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/847013665",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1117",
+        "addr:street": "F. Salvador Avenue",
+        "amenity": "hospital",
+        "beds": "8",
+        "contact:email": "cruz_dalidahospital@yahoo.com",
+        "contact:facebook": "CruzDalidaHospital",
+        "contact:phone": "+63284174080 ;+63283521849",
+        "description": "This small hospital is located at the second entrance while going to salvador avenue. It is already being upgraded with new facilities. It is also not that high tech as some Hospitals but this place is just a fast emergency hospital center",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "healthcare:speciality": "surgery;physiatry;general",
+        "mapillary": "136719802213092",
+        "name": "Cruz-Dalida Hospital",
+        "operator:type": "private",
+        "ref": "DOH000000000000462"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.043914,
+              14.7234145
+            ],
+            [
+              121.0438977,
+              14.7232261
+            ],
+            [
+              121.0440437,
+              14.7231307
+            ],
+            [
+              121.044148,
+              14.7232943
+            ],
+            [
+              121.0440799,
+              14.7233344
+            ],
+            [
+              121.0440101,
+              14.7234557
+            ],
+            [
+              121.043914,
+              14.7234145
+            ]
+          ]
+        ]
+      },
+      "id": "way/847013665"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/923686671",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "141",
+        "addr:postcode": "1100",
+        "addr:street": "Mindanao Avenue",
+        "amenity": "hospital",
+        "check_date": "2025-03-31",
+        "healthcare": "hospital",
+        "mapillary": "471414624070557",
+        "name": "Dr. Montano G. Ramos General Hospital"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0322276,
+              14.6706901
+            ],
+            [
+              121.0318977,
+              14.6706524
+            ],
+            [
+              121.0319466,
+              14.6703715
+            ],
+            [
+              121.0322698,
+              14.6704332
+            ],
+            [
+              121.0322276,
+              14.6706901
+            ]
+          ]
+        ]
+      },
+      "id": "way/923686671"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/933223291",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Capitol Medical Center",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0218867,
+              14.6342227
+            ],
+            [
+              121.0221398,
+              14.6338517
+            ],
+            [
+              121.0221175,
+              14.6338377
+            ],
+            [
+              121.0221244,
+              14.6338277
+            ],
+            [
+              121.022182,
+              14.6337343
+            ],
+            [
+              121.0223227,
+              14.6338129
+            ],
+            [
+              121.0225248,
+              14.6335088
+            ],
+            [
+              121.0231534,
+              14.633907
+            ],
+            [
+              121.0226482,
+              14.6346863
+            ],
+            [
+              121.0223651,
+              14.6345114
+            ],
+            [
+              121.0226039,
+              14.6341369
+            ],
+            [
+              121.0223767,
+              14.6340045
+            ],
+            [
+              121.0221271,
+              14.634364
+            ],
+            [
+              121.0218867,
+              14.6342227
+            ]
+          ]
+        ]
+      },
+      "id": "way/933223291"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1251014451",
+        "addr:barangay": "Fairview",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1118",
+        "addr:province": "Metro Manila",
+        "addr:street": "Regalado Avenue",
+        "addr:suburb": "Novaliches",
+        "amenity": "hospital",
+        "name": "Far Eastern University - Nicanor Reyes Medical Foundation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0662946,
+              14.6993233
+            ],
+            [
+              121.0663139,
+              14.6991225
+            ],
+            [
+              121.0665904,
+              14.6985827
+            ],
+            [
+              121.0666927,
+              14.6983897
+            ],
+            [
+              121.0668739,
+              14.6982242
+            ],
+            [
+              121.0670319,
+              14.6981438
+            ],
+            [
+              121.0671626,
+              14.6981056
+            ],
+            [
+              121.0672406,
+              14.6981007
+            ],
+            [
+              121.0675049,
+              14.6981047
+            ],
+            [
+              121.0674917,
+              14.6994085
+            ],
+            [
+              121.0672109,
+              14.6994266
+            ],
+            [
+              121.0668721,
+              14.6994436
+            ],
+            [
+              121.0664202,
+              14.6994663
+            ],
+            [
+              121.066406,
+              14.6994174
+            ],
+            [
+              121.0663777,
+              14.6993811
+            ],
+            [
+              121.0663448,
+              14.6993551
+            ],
+            [
+              121.0662946,
+              14.6993233
+            ]
+          ]
+        ]
+      },
+      "id": "way/1251014451"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1302980224",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "6",
+        "addr:street": "Nicanor Ramirez Street",
+        "amenity": "hospital",
+        "capacity:persons": "100",
+        "name": "United Doctors Medical Center",
+        "operator:type": "private",
+        "previously": "n255065320",
+        "ref:doh": "797",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0016799,
+              14.6174507
+            ],
+            [
+              121.0017275,
+              14.6166351
+            ],
+            [
+              121.0019863,
+              14.6168597
+            ],
+            [
+              121.0019511,
+              14.6174688
+            ],
+            [
+              121.0016799,
+              14.6174507
+            ]
+          ]
+        ]
+      },
+      "id": "way/1302980224"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255059925",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:province": "Metro Manila",
+        "amenity": "hospital",
+        "name": "Our Lady Of Mercy Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0397952,
+          14.721521
+        ]
+      },
+      "id": "node/255059925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255060717",
+        "addr:city": "Kalookan",
+        "addr:postcode": "1400",
+        "addr:state": "NCR",
+        "amenity": "hospital",
+        "fixme": "verify location",
+        "garmin:description": "hospital",
+        "healthcare": "hospital",
+        "name": "A. R. Bautista Children And General Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.043441,
+          14.7303
+        ]
+      },
+      "id": "node/255060717"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255061867",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1118",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "name": "Casual General Hospital",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.070637,
+          14.7370013
+        ]
+      },
+      "id": "node/255061867"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255063024",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:province": "Metro Manila",
+        "amenity": "hospital",
+        "garmin:description": "hospital",
+        "name": "J. P. Sioson General Hospital And Colleges",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0250945,
+          14.6599034
+        ]
+      },
+      "id": "node/255063024"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255066513",
+        "addr:city": "Kalookan",
+        "addr:postcode": "1400",
+        "addr:state": "NCR",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "garmin:description": "hospital",
+        "healthcare": "hospital",
+        "name": "Fairview Polymedic Hospital",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.04251,
+          14.729371
+        ]
+      },
+      "id": "node/255066513"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255070464",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1100",
+        "addr:province": "Metro Manila",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "garmin:description": "hospital",
+        "healthcare": "hospital",
+        "name": "Dr. Montano G. Ramos General Hospital",
+        "phone": "+63 289276628",
+        "source": "jklinc;streetlevel imagery",
+        "source:url": "http://www.freewebs.com/phroadguide/",
+        "website": "https://web.facebook.com/dmgrgh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0235618,
+          14.6595215
+        ]
+      },
+      "id": "node/255070464"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/597000047",
+        "addr:street": "Quirino Highway",
+        "alt_name": "Ann Francis Maternity Hospital",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "mapillary": "0jWk0rG0Tv82fF1RG5ksfi",
+        "name": "Ann Francis Mother & Child Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0312571,
+          14.6943711
+        ]
+      },
+      "id": "node/597000047"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6351453988",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Philippine Medical Tests System",
+        "name:en": "Philippine Medical Tests System"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0246028,
+          14.6358797
+        ]
+      },
+      "id": "node/6351453988"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7278748585",
+        "addr:city": "Quezon City",
+        "addr:housenumber": "411",
+        "addr:postcode": "1116",
+        "addr:street": "Quirino Highway",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "mapillary": "1190737268022408",
+        "name": "Vian Family Hospital II",
+        "name:en": "Vian Family Hospital II",
+        "operator:type": "private",
+        "phone": "+63 2 7261 3275; +63 2 3454 3433"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.021062,
+          14.682847
+        ]
+      },
+      "id": "node/7278748585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8720820470",
+        "addr:street": "Ramirez Street",
+        "amenity": "hospital",
+        "name": "Queensberry"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0396761,
+          14.7238749
+        ]
+      },
+      "id": "node/8720820470"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11167011319",
+        "amenity": "hospital",
+        "healthcare": "hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0945893,
+          14.6948708
+        ]
+      },
+      "id": "node/11167011319"
+    }
+  ]
+}

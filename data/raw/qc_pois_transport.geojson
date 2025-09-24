@@ -1,0 +1,4535 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-09-13T13:20:39Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/8216826",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "TriNoma P2P Bus Terminal",
+        "public_transport": "station",
+        "smoking": "no",
+        "type": "multipolygon",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0350518,
+              14.6535858
+            ],
+            [
+              121.0354745,
+              14.653495
+            ],
+            [
+              121.0355539,
+              14.6538409
+            ],
+            [
+              121.0351311,
+              14.6539316
+            ],
+            [
+              121.0350972,
+              14.6537839
+            ],
+            [
+              121.0350518,
+              14.6535858
+            ]
+          ]
+        ]
+      },
+      "id": "relation/8216826"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/12200115",
+        "air_conditioning": "no",
+        "building": "yes",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "5",
+        "light_rail": "yes",
+        "name": "Quezon Avenue",
+        "name:es": "Avenida Quezon",
+        "name:etymology": "Manuel Luis Quezon",
+        "name:etymology:wikidata": "Q1503",
+        "name:etymology:wikipedia": "es:Manuel L. Quezon",
+        "network": "MRT Line 3",
+        "operator": "Metro Rail Transit Corporation",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "1999-12-15",
+        "station": "light_rail",
+        "type": "multipolygon",
+        "wikidata": "Q7271600"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0390811,
+              14.6419457
+            ],
+            [
+              121.0386111,
+              14.6426606
+            ],
+            [
+              121.0386442,
+              14.6426809
+            ],
+            [
+              121.0385212,
+              14.6428679
+            ],
+            [
+              121.0385757,
+              14.6429014
+            ],
+            [
+              121.0386409,
+              14.6429416
+            ],
+            [
+              121.0385937,
+              14.6430134
+            ],
+            [
+              121.0386172,
+              14.6430279
+            ],
+            [
+              121.0385358,
+              14.6431516
+            ],
+            [
+              121.038449,
+              14.6430982
+            ],
+            [
+              121.0383774,
+              14.6430541
+            ],
+            [
+              121.0383367,
+              14.6430291
+            ],
+            [
+              121.0383203,
+              14.643019
+            ],
+            [
+              121.0383051,
+              14.6430096
+            ],
+            [
+              121.0382899,
+              14.6430003
+            ],
+            [
+              121.0382747,
+              14.6429909
+            ],
+            [
+              121.0382596,
+              14.6429816
+            ],
+            [
+              121.0382258,
+              14.6429608
+            ],
+            [
+              121.0381875,
+              14.6429373
+            ],
+            [
+              121.0381379,
+              14.6429067
+            ],
+            [
+              121.0381186,
+              14.6428949
+            ],
+            [
+              121.038201,
+              14.6427696
+            ],
+            [
+              121.0382497,
+              14.6426955
+            ],
+            [
+              121.0382613,
+              14.6426779
+            ],
+            [
+              121.0382765,
+              14.6426872
+            ],
+            [
+              121.0383289,
+              14.6427194
+            ],
+            [
+              121.0383634,
+              14.6427407
+            ],
+            [
+              121.0383752,
+              14.6427479
+            ],
+            [
+              121.0384857,
+              14.6425798
+            ],
+            [
+              121.0384954,
+              14.6425857
+            ],
+            [
+              121.0389636,
+              14.6418735
+            ],
+            [
+              121.0391442,
+              14.641666
+            ],
+            [
+              121.0389766,
+              14.6418815
+            ],
+            [
+              121.039004,
+              14.6418984
+            ],
+            [
+              121.0390314,
+              14.6419152
+            ],
+            [
+              121.0392079,
+              14.6417008
+            ],
+            [
+              121.0390811,
+              14.6419457
+            ]
+          ]
+        ]
+      },
+      "id": "relation/12200115"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/16755875",
+        "building": "construction",
+        "building:levels": "2",
+        "building:min_level": "1",
+        "check_date": "2023-11-19",
+        "construction:public_transport": "station",
+        "fixme": "Check if rail type is correct, or should be subway/light rail/etc. Area may be a bit off.",
+        "layer": "2",
+        "name": "Mindanao Avenue",
+        "operator": "SMC-Mass Rail Transit 7 Incorporated",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "local knowledge;aerial imagery;streetlevel imagery",
+        "subway": "yes",
+        "train": "yes",
+        "type": "multipolygon",
+        "wikidata": "Q6863607",
+        "wikipedia": "en:Mindanao Avenue station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0610386,
+              14.7336597
+            ],
+            [
+              121.0610388,
+              14.7324187
+            ],
+            [
+              121.0612006,
+              14.7323746
+            ],
+            [
+              121.0613359,
+              14.7324133
+            ],
+            [
+              121.0613389,
+              14.7332201
+            ],
+            [
+              121.0616177,
+              14.7332265
+            ],
+            [
+              121.0616188,
+              14.7333343
+            ],
+            [
+              121.0613394,
+              14.7333319
+            ],
+            [
+              121.0613406,
+              14.7336609
+            ],
+            [
+              121.0611904,
+              14.7337068
+            ],
+            [
+              121.0610386,
+              14.7336597
+            ]
+          ]
+        ]
+      },
+      "id": "relation/16755875"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/19265414",
+        "amenity": "bus_station",
+        "building": "yes",
+        "building:levels": "2",
+        "building:min_level": "1",
+        "bus": "yes",
+        "check_date": "2025-01-31",
+        "name": "SM North EDSA Busway Concurse",
+        "public_transport": "station",
+        "type": "multipolygon"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.029333,
+              14.6558972
+            ],
+            [
+              121.0293168,
+              14.6558296
+            ],
+            [
+              121.0293118,
+              14.6558086
+            ],
+            [
+              121.0281216,
+              14.6560752
+            ],
+            [
+              121.028108,
+              14.6560184
+            ],
+            [
+              121.0292982,
+              14.6557518
+            ],
+            [
+              121.0292936,
+              14.6557326
+            ],
+            [
+              121.029273,
+              14.6556466
+            ],
+            [
+              121.0292541,
+              14.6555675
+            ],
+            [
+              121.0292442,
+              14.6555262
+            ],
+            [
+              121.0293611,
+              14.6555
+            ],
+            [
+              121.0293651,
+              14.6555168
+            ],
+            [
+              121.02937,
+              14.655537
+            ],
+            [
+              121.0293904,
+              14.6556223
+            ],
+            [
+              121.0294106,
+              14.6557067
+            ],
+            [
+              121.0294151,
+              14.6557256
+            ],
+            [
+              121.0296999,
+              14.6556618
+            ],
+            [
+              121.0297135,
+              14.6557186
+            ],
+            [
+              121.0294758,
+              14.6557718
+            ],
+            [
+              121.0294287,
+              14.6557824
+            ],
+            [
+              121.0294337,
+              14.6558035
+            ],
+            [
+              121.0294496,
+              14.6558697
+            ],
+            [
+              121.0294767,
+              14.6559831
+            ],
+            [
+              121.0294825,
+              14.6560061
+            ],
+            [
+              121.0294279,
+              14.6560184
+            ],
+            [
+              121.0293654,
+              14.6560324
+            ],
+            [
+              121.029333,
+              14.6558972
+            ]
+          ]
+        ]
+      },
+      "id": "relation/19265414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/26202828",
+        "building": "construction",
+        "building:levels": "2",
+        "building:min_level": "1",
+        "construction:building": "train_station",
+        "construction:public_transport": "station",
+        "layer": "1",
+        "name": "Don Antonio",
+        "railway": "station",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.08256,
+              14.6777067
+            ],
+            [
+              121.0820095,
+              14.6766706
+            ],
+            [
+              121.0820327,
+              14.676659
+            ],
+            [
+              121.0820551,
+              14.6766481
+            ],
+            [
+              121.0822152,
+              14.6765692
+            ],
+            [
+              121.0824559,
+              14.6764487
+            ],
+            [
+              121.0826895,
+              14.6763325
+            ],
+            [
+              121.0832399,
+              14.6773686
+            ],
+            [
+              121.0827603,
+              14.6776071
+            ],
+            [
+              121.0826061,
+              14.6776838
+            ],
+            [
+              121.0825751,
+              14.6776992
+            ],
+            [
+              121.08256,
+              14.6777067
+            ]
+          ]
+        ]
+      },
+      "id": "way/26202828"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/30262758",
+        "air_conditioning": "no",
+        "building": "transportation",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "4",
+        "light_rail": "yes",
+        "name": "GMA Kamuning",
+        "network": "MRT Line 3",
+        "operator": "Metro Rail Transit",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "light_rail",
+        "wikidata": "Q6359855",
+        "wikipedia": "en:Kamuning station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0432534,
+              14.6349826
+            ],
+            [
+              121.0433372,
+              14.63503
+            ],
+            [
+              121.0433895,
+              14.6350638
+            ],
+            [
+              121.0435543,
+              14.6348051
+            ],
+            [
+              121.0435658,
+              14.634812
+            ],
+            [
+              121.043584,
+              14.6348229
+            ],
+            [
+              121.0436002,
+              14.6348325
+            ],
+            [
+              121.0436165,
+              14.6348422
+            ],
+            [
+              121.0436327,
+              14.6348519
+            ],
+            [
+              121.0436489,
+              14.6348615
+            ],
+            [
+              121.0436645,
+              14.6348708
+            ],
+            [
+              121.0436967,
+              14.63489
+            ],
+            [
+              121.0435343,
+              14.635145
+            ],
+            [
+              121.0435568,
+              14.6351585
+            ],
+            [
+              121.0436565,
+              14.6352179
+            ],
+            [
+              121.0435316,
+              14.6354139
+            ],
+            [
+              121.0433945,
+              14.6353322
+            ],
+            [
+              121.0430405,
+              14.6358879
+            ],
+            [
+              121.0430205,
+              14.635876
+            ],
+            [
+              121.0430065,
+              14.6358677
+            ],
+            [
+              121.0429949,
+              14.6358607
+            ],
+            [
+              121.0429797,
+              14.6358517
+            ],
+            [
+              121.0429645,
+              14.6358426
+            ],
+            [
+              121.0429494,
+              14.6358336
+            ],
+            [
+              121.0429343,
+              14.6358246
+            ],
+            [
+              121.0429225,
+              14.6358176
+            ],
+            [
+              121.0429036,
+              14.6358063
+            ],
+            [
+              121.0428906,
+              14.6357986
+            ],
+            [
+              121.0432424,
+              14.6352462
+            ],
+            [
+              121.0431287,
+              14.6351784
+            ],
+            [
+              121.0432534,
+              14.6349826
+            ]
+          ]
+        ]
+      },
+      "id": "way/30262758"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/82900131",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Baliwag Transit Cubao",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0492012,
+              14.6241642
+            ],
+            [
+              121.0497737,
+              14.6244106
+            ],
+            [
+              121.0495428,
+              14.6249033
+            ],
+            [
+              121.0489774,
+              14.6246565
+            ],
+            [
+              121.0490423,
+              14.6245138
+            ],
+            [
+              121.0492012,
+              14.6241642
+            ]
+          ]
+        ]
+      },
+      "id": "way/82900131"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/82900168",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Saint Jude Transit",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.053993,
+              14.6117353
+            ],
+            [
+              121.054309,
+              14.6118727
+            ],
+            [
+              121.0542465,
+              14.6120113
+            ],
+            [
+              121.0539305,
+              14.611874
+            ],
+            [
+              121.053993,
+              14.6117353
+            ]
+          ]
+        ]
+      },
+      "id": "way/82900168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/95496202",
+        "air_conditioning": "no",
+        "building": "yes",
+        "building:levels": "2",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "4",
+        "light_rail": "yes",
+        "name": "Santolan-Annapolis",
+        "network": "MRT Line 3",
+        "operator": "Metro Rail Transit Corporation",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "1999-12-15",
+        "station": "light_rail",
+        "wikidata": "Q7420578",
+        "wikipedia": "en:Santolan–Annapolis station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0564659,
+              14.6072445
+            ],
+            [
+              121.0565846,
+              14.6072962
+            ],
+            [
+              121.0566343,
+              14.6073179
+            ],
+            [
+              121.0566528,
+              14.6073259
+            ],
+            [
+              121.0566675,
+              14.6073323
+            ],
+            [
+              121.0566822,
+              14.6073387
+            ],
+            [
+              121.0566969,
+              14.6073451
+            ],
+            [
+              121.0567116,
+              14.6073515
+            ],
+            [
+              121.0567272,
+              14.6073583
+            ],
+            [
+              121.056811,
+              14.6073948
+            ],
+            [
+              121.0569436,
+              14.6074487
+            ],
+            [
+              121.0568417,
+              14.6076728
+            ],
+            [
+              121.0567064,
+              14.6076188
+            ],
+            [
+              121.0566683,
+              14.6076022
+            ],
+            [
+              121.0562657,
+              14.6084678
+            ],
+            [
+              121.0562397,
+              14.6084564
+            ],
+            [
+              121.0562264,
+              14.6084507
+            ],
+            [
+              121.0562127,
+              14.6084447
+            ],
+            [
+              121.0561966,
+              14.6084377
+            ],
+            [
+              121.0561805,
+              14.6084307
+            ],
+            [
+              121.0561643,
+              14.6084236
+            ],
+            [
+              121.0561482,
+              14.6084166
+            ],
+            [
+              121.0561336,
+              14.6084102
+            ],
+            [
+              121.0561224,
+              14.6084054
+            ],
+            [
+              121.0561044,
+              14.6083976
+            ],
+            [
+              121.0565056,
+              14.6075351
+            ],
+            [
+              121.0564775,
+              14.6075229
+            ],
+            [
+              121.0563016,
+              14.6074463
+            ],
+            [
+              121.0563458,
+              14.6073512
+            ],
+            [
+              121.0563714,
+              14.6072963
+            ],
+            [
+              121.0564299,
+              14.6073218
+            ],
+            [
+              121.0564659,
+              14.6072445
+            ]
+          ]
+        ]
+      },
+      "id": "way/95496202"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/96705744",
+        "amenity": "bus_station",
+        "name": "Batasan Transportation Terminal",
+        "note": "category is just an approximation. tricycle terminal is more appropriate"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.087284,
+              14.6863722
+            ],
+            [
+              121.0876828,
+              14.686251
+            ],
+            [
+              121.0880681,
+              14.6862574
+            ],
+            [
+              121.0881453,
+              14.6865388
+            ],
+            [
+              121.0875741,
+              14.6866853
+            ],
+            [
+              121.0873718,
+              14.6866425
+            ],
+            [
+              121.087284,
+              14.6863722
+            ]
+          ]
+        ]
+      },
+      "id": "way/96705744"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/113358959",
+        "air_conditioning": "no",
+        "building": "yes",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "3",
+        "name": "Betty Go-Belmonte",
+        "network": "LRT Line 2",
+        "operator": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "2004-04-05",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q3545741",
+        "wikipedia": "en:Betty Go-Belmonte station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0422504,
+              14.6184303
+            ],
+            [
+              121.0423457,
+              14.6182794
+            ],
+            [
+              121.0427728,
+              14.6185324
+            ],
+            [
+              121.0431617,
+              14.6187643
+            ],
+            [
+              121.0431217,
+              14.618834
+            ],
+            [
+              121.0430777,
+              14.618915
+            ],
+            [
+              121.0422504,
+              14.6184303
+            ]
+          ]
+        ]
+      },
+      "id": "way/113358959"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/121783517",
+        "building": "yes",
+        "bus": "jeep",
+        "name": "Balintawak Cloverleaf Jeepney Station",
+        "public_transport": "station",
+        "station": "bus"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0045332,
+              14.656554
+            ],
+            [
+              121.0045471,
+              14.6559596
+            ],
+            [
+              121.0049975,
+              14.6559695
+            ],
+            [
+              121.0049836,
+              14.6565638
+            ],
+            [
+              121.0045332,
+              14.656554
+            ]
+          ]
+        ]
+      },
+      "id": "way/121783517"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/140209727",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0541056,
+              14.6122667
+            ],
+            [
+              121.0538045,
+              14.6121335
+            ],
+            [
+              121.0538653,
+              14.6120008
+            ],
+            [
+              121.0541664,
+              14.6121339
+            ],
+            [
+              121.0541056,
+              14.6122667
+            ]
+          ]
+        ]
+      },
+      "id": "way/140209727"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/146590386",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Five Star Cubao",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0494009,
+              14.6236876
+            ],
+            [
+              121.0494692,
+              14.6235423
+            ],
+            [
+              121.0495037,
+              14.6234679
+            ],
+            [
+              121.0495714,
+              14.6235418
+            ],
+            [
+              121.0496906,
+              14.6236589
+            ],
+            [
+              121.0497867,
+              14.6237477
+            ],
+            [
+              121.0498665,
+              14.623834
+            ],
+            [
+              121.050006,
+              14.6239624
+            ],
+            [
+              121.0499238,
+              14.6241044
+            ],
+            [
+              121.049727,
+              14.6238555
+            ],
+            [
+              121.0496283,
+              14.6238
+            ],
+            [
+              121.0496349,
+              14.6237917
+            ],
+            [
+              121.0494009,
+              14.6236876
+            ]
+          ]
+        ]
+      },
+      "id": "way/146590386"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/151955152",
+        "area": "yes",
+        "bus": "yes",
+        "name": "Robinson Tricycle and Jeepney Transport Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0576189,
+              14.736258
+            ],
+            [
+              121.0577079,
+              14.7361116
+            ],
+            [
+              121.0580738,
+              14.736124
+            ],
+            [
+              121.0580696,
+              14.736278
+            ],
+            [
+              121.0576189,
+              14.736258
+            ]
+          ]
+        ]
+      },
+      "id": "way/151955152"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/156577568",
+        "addr:street": "Quirino Highway",
+        "amenity": "bus_station",
+        "building": "transportation",
+        "name": "Novaliches Public Terminal",
+        "operator": "Metropolitan Manila Development Authority",
+        "public_transport": "station",
+        "smoking": "no",
+        "wheelchair": "limited"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0546875,
+              14.734797
+            ],
+            [
+              121.0546216,
+              14.7347779
+            ],
+            [
+              121.0544338,
+              14.7347235
+            ],
+            [
+              121.0544606,
+              14.7346371
+            ],
+            [
+              121.0545283,
+              14.7344184
+            ],
+            [
+              121.0547158,
+              14.7344727
+            ],
+            [
+              121.054782,
+              14.7344919
+            ],
+            [
+              121.0546875,
+              14.734797
+            ]
+          ]
+        ]
+      },
+      "id": "way/156577568"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/184582280",
+        "air_conditioning": "no",
+        "building": "transportation",
+        "building:levels": "3",
+        "building:min_level": "1",
+        "height": "33",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "3",
+        "min_height": "10",
+        "name": "Araneta Center - Cubao",
+        "network": "LRT Line 2",
+        "operator": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "roof:height": "3",
+        "roof:shape": "round",
+        "source:outline": "Bing",
+        "start_date": "2003-04-05",
+        "station": "subway",
+        "subway": "yes",
+        "train": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q4784087",
+        "wikipedia": "en:Araneta Center–Cubao station (LRT)",
+        "wikipedia:en": "Araneta Center–Cubao station (LRT)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0521896,
+              14.6224042
+            ],
+            [
+              121.0522177,
+              14.6223482
+            ],
+            [
+              121.0522189,
+              14.6223458
+            ],
+            [
+              121.052485,
+              14.6224707
+            ],
+            [
+              121.0525629,
+              14.6225072
+            ],
+            [
+              121.0526668,
+              14.622556
+            ],
+            [
+              121.0531311,
+              14.6227738
+            ],
+            [
+              121.0531117,
+              14.6228125
+            ],
+            [
+              121.0541423,
+              14.623296
+            ],
+            [
+              121.0541306,
+              14.6233193
+            ],
+            [
+              121.0541111,
+              14.6233584
+            ],
+            [
+              121.0541018,
+              14.6233769
+            ],
+            [
+              121.0530575,
+              14.622887
+            ],
+            [
+              121.0530526,
+              14.6228969
+            ],
+            [
+              121.0530425,
+              14.622917
+            ],
+            [
+              121.0530352,
+              14.6229315
+            ],
+            [
+              121.0530231,
+              14.6229556
+            ],
+            [
+              121.0530217,
+              14.6229584
+            ],
+            [
+              121.0530058,
+              14.6229902
+            ],
+            [
+              121.0521073,
+              14.6225686
+            ],
+            [
+              121.0521281,
+              14.622527
+            ],
+            [
+              121.0521304,
+              14.6225224
+            ],
+            [
+              121.0521405,
+              14.6225024
+            ],
+            [
+              121.0521476,
+              14.6224881
+            ],
+            [
+              121.0521576,
+              14.6224682
+            ],
+            [
+              121.0521648,
+              14.6224538
+            ],
+            [
+              121.0521815,
+              14.6224204
+            ],
+            [
+              121.0521896,
+              14.6224042
+            ]
+          ]
+        ]
+      },
+      "id": "way/184582280"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/188169761",
+        "air_conditioning": "no",
+        "building": "train_station",
+        "building:levels": "3",
+        "height": "33",
+        "internet_access": "yes",
+        "internet_access:fee": "no",
+        "layer": "2",
+        "name": "Gilmore",
+        "network": "LRT Line 2",
+        "operator": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "roof:height": "3",
+        "roof:shape": "round",
+        "start_date": "2004-04-05",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikipedia": "en:Gilmore station (Line 2)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0345968,
+              14.6137078
+            ],
+            [
+              121.0345138,
+              14.6138414
+            ],
+            [
+              121.0342501,
+              14.613688
+            ],
+            [
+              121.0336948,
+              14.6133646
+            ],
+            [
+              121.0337778,
+              14.6132311
+            ],
+            [
+              121.0343374,
+              14.6135567
+            ],
+            [
+              121.0345968,
+              14.6137078
+            ]
+          ]
+        ]
+      },
+      "id": "way/188169761"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/188169786",
+        "air_conditioning": "no",
+        "building": "yes",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "2",
+        "name": "Anonas",
+        "network": "LRT Line 2",
+        "operator": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "2003-04-05",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q4770011",
+        "wikipedia": "en:Anonas station (Line 2)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.064257,
+              14.6278417
+            ],
+            [
+              121.0646573,
+              14.6279075
+            ],
+            [
+              121.0646759,
+              14.6278019
+            ],
+            [
+              121.0647302,
+              14.6278109
+            ],
+            [
+              121.0647129,
+              14.6279092
+            ],
+            [
+              121.0652193,
+              14.6279925
+            ],
+            [
+              121.065188,
+              14.6281705
+            ],
+            [
+              121.064227,
+              14.6280124
+            ],
+            [
+              121.064257,
+              14.6278417
+            ]
+          ]
+        ]
+      },
+      "id": "way/188169786"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/222628892",
+        "air_conditioning": "no",
+        "building": "transportation",
+        "internet_access": "wlan",
+        "light_rail": "yes",
+        "name": "North Avenue",
+        "network": "MRT Line 3",
+        "note": "Possible expansion of station for UGCS integration",
+        "operator": "Metro Rail Transit Corporation",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "1999-12-15",
+        "station": "light_rail",
+        "wikidata": "Q22349799",
+        "wikipedia": "en:North Avenue station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0320515,
+              14.6527172
+            ],
+            [
+              121.0320268,
+              14.652702
+            ],
+            [
+              121.0319799,
+              14.6526731
+            ],
+            [
+              121.0319647,
+              14.6526638
+            ],
+            [
+              121.0319495,
+              14.6526544
+            ],
+            [
+              121.0319343,
+              14.652645
+            ],
+            [
+              121.0319191,
+              14.6526357
+            ],
+            [
+              121.0319091,
+              14.6526296
+            ],
+            [
+              121.0318898,
+              14.6526177
+            ],
+            [
+              121.0321211,
+              14.6522658
+            ],
+            [
+              121.0320982,
+              14.6522517
+            ],
+            [
+              121.032033,
+              14.6522116
+            ],
+            [
+              121.0320176,
+              14.6522021
+            ],
+            [
+              121.0321565,
+              14.6519907
+            ],
+            [
+              121.0322407,
+              14.6520416
+            ],
+            [
+              121.0322712,
+              14.6520613
+            ],
+            [
+              121.0325613,
+              14.6516199
+            ],
+            [
+              121.0325741,
+              14.6516278
+            ],
+            [
+              121.0325878,
+              14.6516362
+            ],
+            [
+              121.032593,
+              14.6516394
+            ],
+            [
+              121.032608,
+              14.6516486
+            ],
+            [
+              121.032623,
+              14.6516579
+            ],
+            [
+              121.032638,
+              14.6516671
+            ],
+            [
+              121.0326529,
+              14.6516762
+            ],
+            [
+              121.0326714,
+              14.6516876
+            ],
+            [
+              121.0326835,
+              14.6516951
+            ],
+            [
+              121.0327026,
+              14.6517068
+            ],
+            [
+              121.0324158,
+              14.6521432
+            ],
+            [
+              121.0324729,
+              14.6521775
+            ],
+            [
+              121.0325616,
+              14.6522307
+            ],
+            [
+              121.0326082,
+              14.6522604
+            ],
+            [
+              121.032667,
+              14.6522977
+            ],
+            [
+              121.0325183,
+              14.652524
+            ],
+            [
+              121.0324821,
+              14.6525013
+            ],
+            [
+              121.0324125,
+              14.6524578
+            ],
+            [
+              121.0323275,
+              14.6524047
+            ],
+            [
+              121.0322763,
+              14.6523751
+            ],
+            [
+              121.0320515,
+              14.6527172
+            ]
+          ]
+        ]
+      },
+      "id": "way/222628892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/316754125",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "E-jeep AGS Station",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0747708,
+              14.6346611
+            ],
+            [
+              121.0747721,
+              14.634628
+            ],
+            [
+              121.0748092,
+              14.6346272
+            ],
+            [
+              121.0748076,
+              14.6346598
+            ],
+            [
+              121.0747708,
+              14.6346611
+            ]
+          ]
+        ]
+      },
+      "id": "way/316754125"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/324169539",
+        "amenity": "bus_station",
+        "building": "transportation",
+        "building:levels": "1",
+        "name": "SM City North EDSA Bus Interchange",
+        "opening_hours": "24/7",
+        "operator": "SM Prime Holdings",
+        "public_transport": "station",
+        "smoking": "no"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0294825,
+              14.6560061
+            ],
+            [
+              121.029489,
+              14.6560331
+            ],
+            [
+              121.0295319,
+              14.6562118
+            ],
+            [
+              121.0287561,
+              14.6563863
+            ],
+            [
+              121.0287446,
+              14.656338
+            ],
+            [
+              121.0287334,
+              14.6562918
+            ],
+            [
+              121.0287067,
+              14.6561804
+            ],
+            [
+              121.0287876,
+              14.6561622
+            ],
+            [
+              121.0288205,
+              14.6561549
+            ],
+            [
+              121.0288502,
+              14.6561482
+            ],
+            [
+              121.0288792,
+              14.6561417
+            ],
+            [
+              121.028911,
+              14.6561345
+            ],
+            [
+              121.028941,
+              14.6561278
+            ],
+            [
+              121.0289714,
+              14.656121
+            ],
+            [
+              121.029001,
+              14.6561143
+            ],
+            [
+              121.029031,
+              14.6561076
+            ],
+            [
+              121.0290614,
+              14.6561007
+            ],
+            [
+              121.0290917,
+              14.6560939
+            ],
+            [
+              121.0291231,
+              14.6560869
+            ],
+            [
+              121.0291516,
+              14.6560805
+            ],
+            [
+              121.0291835,
+              14.6560733
+            ],
+            [
+              121.0292135,
+              14.6560666
+            ],
+            [
+              121.0292494,
+              14.6560585
+            ],
+            [
+              121.0292797,
+              14.6560517
+            ],
+            [
+              121.0293099,
+              14.6560449
+            ],
+            [
+              121.0293654,
+              14.6560324
+            ],
+            [
+              121.0294279,
+              14.6560184
+            ],
+            [
+              121.0294825,
+              14.6560061
+            ]
+          ]
+        ]
+      },
+      "id": "way/324169539"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/402882917",
+        "air_conditioning": "no",
+        "building": "yes",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "1",
+        "light_rail": "yes",
+        "name": "Balintawak",
+        "name:zh-Hant": "描林沓瓦",
+        "network": "Manila LRT",
+        "operator": "Light Rail Manila Corporation",
+        "owner": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "2010-03-22",
+        "station": "light_rail",
+        "wheelchair": "yes",
+        "wikidata": "Q4850961",
+        "wikipedia": "en:Balintawak station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0034021,
+              14.6575534
+            ],
+            [
+              121.003403,
+              14.6574723
+            ],
+            [
+              121.0034041,
+              14.6573645
+            ],
+            [
+              121.0034051,
+              14.6572713
+            ],
+            [
+              121.0038309,
+              14.6572754
+            ],
+            [
+              121.0038315,
+              14.6572118
+            ],
+            [
+              121.0039367,
+              14.6572129
+            ],
+            [
+              121.003936,
+              14.6572765
+            ],
+            [
+              121.0043897,
+              14.6572809
+            ],
+            [
+              121.0043889,
+              14.6573531
+            ],
+            [
+              121.0043887,
+              14.6573718
+            ],
+            [
+              121.0043875,
+              14.6574903
+            ],
+            [
+              121.0043873,
+              14.6575092
+            ],
+            [
+              121.0043867,
+              14.657563
+            ],
+            [
+              121.0038869,
+              14.6575581
+            ],
+            [
+              121.0038865,
+              14.6575969
+            ],
+            [
+              121.0039797,
+              14.6575978
+            ],
+            [
+              121.0039793,
+              14.6576369
+            ],
+            [
+              121.0038191,
+              14.6576353
+            ],
+            [
+              121.00382,
+              14.6575574
+            ],
+            [
+              121.0034968,
+              14.6575543
+            ],
+            [
+              121.0034021,
+              14.6575534
+            ]
+          ]
+        ]
+      },
+      "id": "way/402882917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/402882918",
+        "addr:city": "Quezon City",
+        "addr:district": "Project 7",
+        "addr:postcode": "1100",
+        "addr:region": "Metro Manila",
+        "addr:street": "EDSA",
+        "air_conditioning": "no",
+        "building": "transportation",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "3",
+        "light_rail": "yes",
+        "name": "Fernando Poe Jr.",
+        "network": "Manila LRT",
+        "old_name": "Roosevelt",
+        "operator": "Light Rail Manila Corporation",
+        "owner": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "2010-10-22",
+        "station": "light_rail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0206861,
+              14.6577283
+            ],
+            [
+              121.0206814,
+              14.6576952
+            ],
+            [
+              121.0206768,
+              14.6576627
+            ],
+            [
+              121.0206606,
+              14.6575485
+            ],
+            [
+              121.0206565,
+              14.6575196
+            ],
+            [
+              121.0206504,
+              14.6574768
+            ],
+            [
+              121.0210969,
+              14.6574176
+            ],
+            [
+              121.0210543,
+              14.6573705
+            ],
+            [
+              121.0209246,
+              14.6573854
+            ],
+            [
+              121.020921,
+              14.6573725
+            ],
+            [
+              121.0209174,
+              14.6573595
+            ],
+            [
+              121.0213537,
+              14.6573005
+            ],
+            [
+              121.0213563,
+              14.6573155
+            ],
+            [
+              121.0213589,
+              14.6573309
+            ],
+            [
+              121.0211897,
+              14.6573564
+            ],
+            [
+              121.0211625,
+              14.6574089
+            ],
+            [
+              121.0215886,
+              14.6573524
+            ],
+            [
+              121.0215934,
+              14.6573862
+            ],
+            [
+              121.0215977,
+              14.6574164
+            ],
+            [
+              121.0216153,
+              14.657541
+            ],
+            [
+              121.0216195,
+              14.6575707
+            ],
+            [
+              121.0216242,
+              14.6576038
+            ],
+            [
+              121.021203,
+              14.6576597
+            ],
+            [
+              121.0212097,
+              14.6577184
+            ],
+            [
+              121.021261,
+              14.6577462
+            ],
+            [
+              121.0213937,
+              14.6577259
+            ],
+            [
+              121.0213983,
+              14.6577432
+            ],
+            [
+              121.021401,
+              14.6577534
+            ],
+            [
+              121.0209346,
+              14.6578174
+            ],
+            [
+              121.0209328,
+              14.657807
+            ],
+            [
+              121.0209304,
+              14.6577929
+            ],
+            [
+              121.0211136,
+              14.6577684
+            ],
+            [
+              121.0211484,
+              14.65773
+            ],
+            [
+              121.0211373,
+              14.6576684
+            ],
+            [
+              121.0206861,
+              14.6577283
+            ]
+          ]
+        ]
+      },
+      "id": "way/402882918"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/402888750",
+        "air_conditioning": "yes",
+        "building": "transportation",
+        "building:levels:underground": "2",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "layer": "-1",
+        "level": "-1",
+        "location": "underground",
+        "name": "Katipunan",
+        "network": "LRT Line 2",
+        "operator": "Light Rail Transit Authority",
+        "public_transport": "station",
+        "railway": "station",
+        "start_date": "2003-04-05",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "limited",
+        "wikidata": "Q3547775",
+        "wikipedia": "en:Katipunan station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0734713,
+              14.6315374
+            ],
+            [
+              121.0726024,
+              14.6310975
+            ],
+            [
+              121.072584,
+              14.6311305
+            ],
+            [
+              121.0725429,
+              14.6312075
+            ],
+            [
+              121.0724276,
+              14.6311498
+            ],
+            [
+              121.0722735,
+              14.6310712
+            ],
+            [
+              121.0723318,
+              14.6309634
+            ],
+            [
+              121.0722131,
+              14.6309033
+            ],
+            [
+              121.0723594,
+              14.630633
+            ],
+            [
+              121.0727354,
+              14.6308234
+            ],
+            [
+              121.0727566,
+              14.6307822
+            ],
+            [
+              121.07277,
+              14.6307553
+            ],
+            [
+              121.0728358,
+              14.6306293
+            ],
+            [
+              121.073117,
+              14.6307672
+            ],
+            [
+              121.0732423,
+              14.6308295
+            ],
+            [
+              121.0731755,
+              14.6309551
+            ],
+            [
+              121.0731399,
+              14.6310202
+            ],
+            [
+              121.0736197,
+              14.6312631
+            ],
+            [
+              121.0734713,
+              14.6315374
+            ]
+          ]
+        ]
+      },
+      "id": "way/402888750"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529409684",
+        "building": "construction",
+        "building:levels": "1",
+        "building:levels:underground": "2",
+        "construction:building": "train_station",
+        "construction:public_transport": "station",
+        "name": "University Avenue",
+        "network": "MRT",
+        "operator": "SMC-MRT7 Inc.",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0557157,
+              14.6556856
+            ],
+            [
+              121.0540107,
+              14.6545507
+            ],
+            [
+              121.0541271,
+              14.654387
+            ],
+            [
+              121.0558321,
+              14.6555219
+            ],
+            [
+              121.0557157,
+              14.6556856
+            ]
+          ]
+        ]
+      },
+      "id": "way/529409684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/547151163",
+        "building": "construction",
+        "building:levels": "1",
+        "building:levels:underground": "2",
+        "construction:building": "train_station",
+        "construction:public_transport": "station",
+        "name": "Quezon Memorial Circle",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0469573,
+              14.6524353
+            ],
+            [
+              121.04702,
+              14.651919
+            ],
+            [
+              121.0482991,
+              14.6520643
+            ],
+            [
+              121.0482814,
+              14.6522102
+            ],
+            [
+              121.048621,
+              14.6522488
+            ],
+            [
+              121.0485991,
+              14.6524298
+            ],
+            [
+              121.0482602,
+              14.6523913
+            ],
+            [
+              121.0482372,
+              14.6525807
+            ],
+            [
+              121.0469573,
+              14.6524353
+            ]
+          ]
+        ]
+      },
+      "id": "way/547151163"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/564479403",
+        "building": "transportation",
+        "building:levels": "4",
+        "building:levels:underground": "2",
+        "light_rail": "yes",
+        "name": "North Triangle Common Station",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0308738,
+              14.6550754
+            ],
+            [
+              121.031059,
+              14.6547936
+            ],
+            [
+              121.0312623,
+              14.6549306
+            ],
+            [
+              121.0313148,
+              14.6551422
+            ],
+            [
+              121.0309956,
+              14.6552146
+            ],
+            [
+              121.0309779,
+              14.6551398
+            ],
+            [
+              121.0308738,
+              14.6550754
+            ]
+          ]
+        ]
+      },
+      "id": "way/564479403"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/589280579",
+        "amenity": "bus_station",
+        "name": "SM Fairview - Public Transport Terminal B",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0556656,
+              14.7330495
+            ],
+            [
+              121.0555646,
+              14.7321719
+            ],
+            [
+              121.0558693,
+              14.7321778
+            ],
+            [
+              121.0558726,
+              14.73304
+            ],
+            [
+              121.0556656,
+              14.7330495
+            ]
+          ]
+        ]
+      },
+      "id": "way/589280579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/670398505",
+        "building": "train_station",
+        "building:levels": "2",
+        "building:min_level": "1",
+        "layer": "1",
+        "name": "Tandang Sora",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0670477,
+              14.6629383
+            ],
+            [
+              121.0679875,
+              14.6635539
+            ],
+            [
+              121.0681349,
+              14.6633432
+            ],
+            [
+              121.068167,
+              14.6632973
+            ],
+            [
+              121.0682289,
+              14.6633378
+            ],
+            [
+              121.0677795,
+              14.6639802
+            ],
+            [
+              121.0667777,
+              14.6633242
+            ],
+            [
+              121.0670477,
+              14.6629383
+            ]
+          ]
+        ]
+      },
+      "id": "way/670398505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/773124869",
+        "building": "roof",
+        "layer": "1",
+        "name": "Centris UV Express FX Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.038668,
+              14.6444648
+            ],
+            [
+              121.0392498,
+              14.6436322
+            ],
+            [
+              121.0392766,
+              14.6436478
+            ],
+            [
+              121.0386913,
+              14.6444761
+            ],
+            [
+              121.038668,
+              14.6444648
+            ]
+          ]
+        ]
+      },
+      "id": "way/773124869"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/792917713",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1109",
+        "addr:street": "Times Square Avenue",
+        "amenity": "bus_station",
+        "building": "roof",
+        "bus": "yes",
+        "layer": "1",
+        "name": "Araneta City Bus Station",
+        "old_name": "Araneta Center Bus Terminal",
+        "previously": "node:255067301",
+        "public_transport": "station",
+        "smoking": "no",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0551044,
+              14.6219823
+            ],
+            [
+              121.0551075,
+              14.6219755
+            ],
+            [
+              121.0550534,
+              14.6219521
+            ],
+            [
+              121.0553348,
+              14.6213283
+            ],
+            [
+              121.0554068,
+              14.6211725
+            ],
+            [
+              121.0556123,
+              14.6207388
+            ],
+            [
+              121.0556876,
+              14.6207713
+            ],
+            [
+              121.0557119,
+              14.6207818
+            ],
+            [
+              121.0555106,
+              14.6212186
+            ],
+            [
+              121.0553929,
+              14.6213529
+            ],
+            [
+              121.0553382,
+              14.6214726
+            ],
+            [
+              121.0554579,
+              14.6215239
+            ],
+            [
+              121.0552246,
+              14.6220338
+            ],
+            [
+              121.0551044,
+              14.6219823
+            ]
+          ]
+        ]
+      },
+      "id": "way/792917713"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/794273528",
+        "building": "roof",
+        "building:levels": "1",
+        "jeepney": "yes",
+        "layer": "1",
+        "name": "SM City Fairview Jeepney Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0610208,
+              14.734998
+            ],
+            [
+              121.0609926,
+              14.7349979
+            ],
+            [
+              121.0609501,
+              14.7349977
+            ],
+            [
+              121.0608121,
+              14.7349969
+            ],
+            [
+              121.0607637,
+              14.7349967
+            ],
+            [
+              121.0607644,
+              14.7348656
+            ],
+            [
+              121.060766,
+              14.7345872
+            ],
+            [
+              121.0608387,
+              14.7345876
+            ],
+            [
+              121.0609524,
+              14.7345882
+            ],
+            [
+              121.0609949,
+              14.7345884
+            ],
+            [
+              121.0610231,
+              14.7345886
+            ],
+            [
+              121.0610213,
+              14.734911
+            ],
+            [
+              121.0610208,
+              14.734998
+            ]
+          ]
+        ]
+      },
+      "id": "way/794273528"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/795502690",
+        "amenity": "bus_station",
+        "building": "roof",
+        "bus": "yes",
+        "layer": "1",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0829172,
+              14.6784762
+            ],
+            [
+              121.0829096,
+              14.6784609
+            ],
+            [
+              121.0828039,
+              14.6782472
+            ],
+            [
+              121.0828333,
+              14.6782336
+            ],
+            [
+              121.0828774,
+              14.6782132
+            ],
+            [
+              121.0829906,
+              14.6784422
+            ],
+            [
+              121.0829172,
+              14.6784762
+            ]
+          ]
+        ]
+      },
+      "id": "way/795502690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/799600846",
+        "building": "construction",
+        "building:levels": "2",
+        "construction:building": "train_station",
+        "construction:public_transport": "station",
+        "name": "Manggahan",
+        "railway": "station",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0872002,
+              14.6981128
+            ],
+            [
+              121.087219,
+              14.6969147
+            ],
+            [
+              121.0874284,
+              14.6969178
+            ],
+            [
+              121.0874095,
+              14.6981159
+            ],
+            [
+              121.0872002,
+              14.6981128
+            ]
+          ]
+        ]
+      },
+      "id": "way/799600846"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/802411495",
+        "building": "Bagumbayan Riverboat Station",
+        "ferry": "yes",
+        "name": "Bagumbayan-Santolan Ferry",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0853663,
+              14.6080369
+            ],
+            [
+              121.0853616,
+              14.60804
+            ],
+            [
+              121.0853293,
+              14.6079942
+            ],
+            [
+              121.0854465,
+              14.6079167
+            ],
+            [
+              121.0854788,
+              14.6079624
+            ],
+            [
+              121.085434,
+              14.6079921
+            ],
+            [
+              121.0854681,
+              14.6080403
+            ],
+            [
+              121.0854004,
+              14.6080851
+            ],
+            [
+              121.0853663,
+              14.6080369
+            ]
+          ]
+        ]
+      },
+      "id": "way/802411495"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/900276075",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1109",
+        "amenity": "bus_station",
+        "building": "transportation",
+        "building:levels": "1",
+        "name": "Araneta City Jeepney Terminal",
+        "public_transport": "station",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0546132,
+              14.6179013
+            ],
+            [
+              121.05428,
+              14.6176438
+            ],
+            [
+              121.0543009,
+              14.6176185
+            ],
+            [
+              121.0546341,
+              14.617876
+            ],
+            [
+              121.0546132,
+              14.6179013
+            ]
+          ]
+        ]
+      },
+      "id": "way/900276075"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/901908936",
+        "building": "train_station",
+        "building:levels": "2",
+        "building:min_level": "1",
+        "layer": "1",
+        "name": "Batasan",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0868493,
+              14.6855072
+            ],
+            [
+              121.0868096,
+              14.6855228
+            ],
+            [
+              121.0866844,
+              14.6855721
+            ],
+            [
+              121.0863969,
+              14.6856854
+            ],
+            [
+              121.0862512,
+              14.6857428
+            ],
+            [
+              121.0861892,
+              14.6857672
+            ],
+            [
+              121.0857252,
+              14.684665
+            ],
+            [
+              121.0857807,
+              14.6846431
+            ],
+            [
+              121.0859141,
+              14.6845906
+            ],
+            [
+              121.0862276,
+              14.6844671
+            ],
+            [
+              121.0863445,
+              14.684421
+            ],
+            [
+              121.0863853,
+              14.6844049
+            ],
+            [
+              121.0868493,
+              14.6855072
+            ]
+          ]
+        ]
+      },
+      "id": "way/901908936"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/910344270",
+        "building": "construction",
+        "building:levels": "3",
+        "building:min_level": "1",
+        "construction": "transportation",
+        "construction:building": "transportation",
+        "construction:railway": "subway",
+        "construction:station": "subway",
+        "layer": "1",
+        "name": "North Avenue",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0309956,
+              14.6552146
+            ],
+            [
+              121.0313148,
+              14.6551422
+            ],
+            [
+              121.0320785,
+              14.6549689
+            ],
+            [
+              121.0330573,
+              14.6547467
+            ],
+            [
+              121.0331039,
+              14.6549387
+            ],
+            [
+              121.0331315,
+              14.6550525
+            ],
+            [
+              121.0331423,
+              14.6550972
+            ],
+            [
+              121.0325137,
+              14.6552399
+            ],
+            [
+              121.0324268,
+              14.6552596
+            ],
+            [
+              121.0310806,
+              14.6555651
+            ],
+            [
+              121.0310487,
+              14.6554299
+            ],
+            [
+              121.0310269,
+              14.6553427
+            ],
+            [
+              121.0310046,
+              14.6552518
+            ],
+            [
+              121.0309956,
+              14.6552146
+            ]
+          ]
+        ]
+      },
+      "id": "way/910344270"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/910654579",
+        "building": "construction",
+        "building:levels": "3",
+        "building:min_level": "1",
+        "construction:building": "transportation",
+        "construction:public_transport": "station",
+        "layer": "1",
+        "name": "Regalado Avenue",
+        "railway": "station",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0689239,
+              14.7066336
+            ],
+            [
+              121.0673025,
+              14.7066375
+            ],
+            [
+              121.0673018,
+              14.7063521
+            ],
+            [
+              121.0689232,
+              14.7063483
+            ],
+            [
+              121.0689239,
+              14.7066336
+            ]
+          ]
+        ]
+      },
+      "id": "way/910654579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/910654580",
+        "building": "construction",
+        "building:levels": "3",
+        "building:min_level": "1",
+        "construction:building": "transportation",
+        "construction:public_transport": "station",
+        "layer": "1",
+        "name": "Doña Carmen",
+        "railway": "station",
+        "subway": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0788953,
+              14.7052586
+            ],
+            [
+              121.077746,
+              14.7052554
+            ],
+            [
+              121.0777447,
+              14.7049701
+            ],
+            [
+              121.078894,
+              14.7049733
+            ],
+            [
+              121.0788953,
+              14.7052586
+            ]
+          ]
+        ]
+      },
+      "id": "way/910654580"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1096489820",
+        "amenity": "bus_station",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0868953,
+              14.6936081
+            ],
+            [
+              121.0867895,
+              14.693736
+            ],
+            [
+              121.0867309,
+              14.6938292
+            ],
+            [
+              121.0864167,
+              14.6938463
+            ],
+            [
+              121.0862584,
+              14.6938917
+            ],
+            [
+              121.0861753,
+              14.6939501
+            ],
+            [
+              121.0861818,
+              14.6936283
+            ],
+            [
+              121.0868953,
+              14.6936081
+            ]
+          ]
+        ]
+      },
+      "id": "way/1096489820"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1097910919",
+        "building:levels": "2",
+        "layer": "2",
+        "name": "EDSA Balintawak",
+        "proposed:building": "train_station",
+        "proposed:light_rail": "yes",
+        "proposed:railway": "station",
+        "proposed:station": "light_rail",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0006291,
+              14.6588674
+            ],
+            [
+              121.0006301,
+              14.6589921
+            ],
+            [
+              121.0006361,
+              14.6598187
+            ],
+            [
+              121.0005514,
+              14.6598194
+            ],
+            [
+              121.000507,
+              14.6598196
+            ],
+            [
+              121.000392,
+              14.6598204
+            ],
+            [
+              121.0003848,
+              14.6588691
+            ],
+            [
+              121.0005006,
+              14.6588683
+            ],
+            [
+              121.0005401,
+              14.658868
+            ],
+            [
+              121.0006291,
+              14.6588674
+            ]
+          ]
+        ]
+      },
+      "id": "way/1097910919"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1097910925",
+        "building:levels": "2",
+        "layer": "2",
+        "name": "Baesa Station",
+        "proposed:building": "train_station",
+        "proposed:light_rail": "yes",
+        "proposed:railway": "station",
+        "proposed:station": "light_rail",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0068725,
+              14.6661056
+            ],
+            [
+              121.0076073,
+              14.6667576
+            ],
+            [
+              121.0075296,
+              14.6668396
+            ],
+            [
+              121.0074996,
+              14.6668712
+            ],
+            [
+              121.0074308,
+              14.6669438
+            ],
+            [
+              121.0066961,
+              14.6662917
+            ],
+            [
+              121.0067554,
+              14.6662291
+            ],
+            [
+              121.0067903,
+              14.6661923
+            ],
+            [
+              121.0068725,
+              14.6661056
+            ]
+          ]
+        ]
+      },
+      "id": "way/1097910925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1097910934",
+        "building:levels": "2",
+        "layer": "2",
+        "name": "Talipapa",
+        "proposed:building": "train_station",
+        "proposed:light_rail": "yes",
+        "proposed:railway": "station",
+        "proposed:station": "light_rail",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0216852,
+              14.6835053
+            ],
+            [
+              121.0217743,
+              14.6836099
+            ],
+            [
+              121.0220004,
+              14.6838755
+            ],
+            [
+              121.0219567,
+              14.6839103
+            ],
+            [
+              121.0219209,
+              14.6839388
+            ],
+            [
+              121.021861,
+              14.6839866
+            ],
+            [
+              121.0215458,
+              14.6836163
+            ],
+            [
+              121.0216042,
+              14.6835698
+            ],
+            [
+              121.02164,
+              14.6835413
+            ],
+            [
+              121.0216852,
+              14.6835053
+            ]
+          ]
+        ]
+      },
+      "id": "way/1097910934"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1097910939",
+        "building:levels": "2",
+        "layer": "2",
+        "name": "Mindanao Avenue",
+        "proposed:building": "train_station",
+        "proposed:light_rail": "yes",
+        "proposed:railway": "station",
+        "proposed:station": "light_rail",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0281719,
+              14.69081
+            ],
+            [
+              121.0287924,
+              14.6915184
+            ],
+            [
+              121.0287529,
+              14.6915507
+            ],
+            [
+              121.0287242,
+              14.6915743
+            ],
+            [
+              121.0286603,
+              14.6916266
+            ],
+            [
+              121.0280398,
+              14.6909182
+            ],
+            [
+              121.0281017,
+              14.6908675
+            ],
+            [
+              121.0281371,
+              14.6908384
+            ],
+            [
+              121.0281719,
+              14.69081
+            ]
+          ]
+        ]
+      },
+      "id": "way/1097910939"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1110918384",
+        "addr:city": "Quezon City",
+        "addr:street": "20th Avenue",
+        "area": "yes",
+        "mapillary": "940400216589017",
+        "name": "Eaglestar Transit",
+        "public_transport": "station",
+        "source:name": "extrapolation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0623115,
+              14.6216331
+            ],
+            [
+              121.0623763,
+              14.6214951
+            ],
+            [
+              121.0626477,
+              14.6216097
+            ],
+            [
+              121.0625787,
+              14.6217556
+            ],
+            [
+              121.0623115,
+              14.6216331
+            ]
+          ]
+        ]
+      },
+      "id": "way/1110918384"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1149427127",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Genesis Transport Service Incorporated",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0484437,
+              14.6257384
+            ],
+            [
+              121.0485319,
+              14.6255405
+            ],
+            [
+              121.0485466,
+              14.6255074
+            ],
+            [
+              121.0486164,
+              14.6253507
+            ],
+            [
+              121.0489628,
+              14.625497
+            ],
+            [
+              121.0487899,
+              14.6258845
+            ],
+            [
+              121.0484437,
+              14.6257384
+            ]
+          ]
+        ]
+      },
+      "id": "way/1149427127"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1149427130",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Solid North Transit Inc.",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0483483,
+              14.6235459
+            ],
+            [
+              121.0484469,
+              14.6234843
+            ],
+            [
+              121.0485423,
+              14.6236084
+            ],
+            [
+              121.0488624,
+              14.6237182
+            ],
+            [
+              121.0488041,
+              14.623831
+            ],
+            [
+              121.0484649,
+              14.6236802
+            ],
+            [
+              121.0483483,
+              14.6235459
+            ]
+          ]
+        ]
+      },
+      "id": "way/1149427130"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1227085662",
+        "building": "retail",
+        "layer": "1",
+        "name": "SM Fairview - Public Transport Terminal A",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0609529,
+              14.7344325
+            ],
+            [
+              121.0608904,
+              14.7344324
+            ],
+            [
+              121.0608911,
+              14.7340326
+            ],
+            [
+              121.0609536,
+              14.7340327
+            ],
+            [
+              121.0609529,
+              14.7344325
+            ]
+          ]
+        ]
+      },
+      "id": "way/1227085662"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1290224378",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "description": "Dyipni_Stop",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0398383,
+              14.7194588
+            ],
+            [
+              121.0397879,
+              14.7194513
+            ],
+            [
+              121.0397972,
+              14.7193807
+            ],
+            [
+              121.0398468,
+              14.7193882
+            ],
+            [
+              121.0398383,
+              14.7194588
+            ]
+          ]
+        ]
+      },
+      "id": "way/1290224378"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1314284669",
+        "addr:city": "Quezon City",
+        "addr:postcode": "1109",
+        "addr:street": "Gen. Romulo",
+        "air_conditioning": "yes",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "level": "0",
+        "name": "Araneta City Busport",
+        "network": "LTFRB PUB;P2P",
+        "operator": "Araneta City Inc.",
+        "previously": "node:4844168622",
+        "public_transport": "station",
+        "route_ref": "P2P-2;QC7",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0575566,
+              14.6198718
+            ],
+            [
+              121.0576475,
+              14.6199625
+            ],
+            [
+              121.0576039,
+              14.6200074
+            ],
+            [
+              121.0575456,
+              14.6200738
+            ],
+            [
+              121.057486,
+              14.6201424
+            ],
+            [
+              121.0574386,
+              14.6202077
+            ],
+            [
+              121.057388,
+              14.6202773
+            ],
+            [
+              121.0572726,
+              14.620207
+            ],
+            [
+              121.0573835,
+              14.6200617
+            ],
+            [
+              121.0575109,
+              14.6199126
+            ],
+            [
+              121.0575566,
+              14.6198718
+            ]
+          ]
+        ]
+      },
+      "id": "way/1314284669"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1376146823",
+        "name": "Quirino Station",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0661111,
+              14.735547
+            ],
+            [
+              121.0661189,
+              14.7353653
+            ],
+            [
+              121.0672635,
+              14.7353802
+            ],
+            [
+              121.0672619,
+              14.7355649
+            ],
+            [
+              121.0661111,
+              14.735547
+            ]
+          ]
+        ]
+      },
+      "id": "way/1376146823"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1376146824",
+        "name": "Sacred Heart",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0834901,
+              14.7499103
+            ],
+            [
+              121.0835825,
+              14.7498343
+            ],
+            [
+              121.0842601,
+              14.7507978
+            ],
+            [
+              121.0841747,
+              14.7508617
+            ],
+            [
+              121.0834901,
+              14.7499103
+            ]
+          ]
+        ]
+      },
+      "id": "way/1376146824"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255050039",
+        "addr:city": "Kalookan",
+        "addr:postcode": "1400",
+        "addr:province": "Metro Manila",
+        "amenity": "bus_station",
+        "fixme": "name",
+        "source": "jklinc"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0418183,
+          14.7237525
+        ]
+      },
+      "id": "node/255050039"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255066619",
+        "addr:city": "Caloocan",
+        "addr:postcode": "1400",
+        "addr:state": "NCR",
+        "amenity": "bus_station",
+        "garmin:description": "bus station",
+        "name": "Santrans Terminal",
+        "source": "jklinc",
+        "source:url": "http://www.freewebs.com/phroadguide/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0650862,
+          14.7353017
+        ]
+      },
+      "id": "node/255066619"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/589927760",
+        "addr:city": "Quezon City",
+        "addr:street": "Annapolis",
+        "amenity": "jeepney_station",
+        "jeepney": "yes",
+        "name": "A. Roces Transport Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0512904,
+          14.6228148
+        ]
+      },
+      "id": "node/589927760"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/700738852",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "check_date": "2023-02-18",
+        "name": "Farmers Plaza UV Express Station",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0512384,
+          14.6205053
+        ]
+      },
+      "id": "node/700738852"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/965963133",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Farmers Market UV Express Station",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0517369,
+          14.6197191
+        ]
+      },
+      "id": "node/965963133"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1260852424",
+        "addr:street": "Visayas Avenue",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "description": "Jeepney Station: Tandang Sora - City hall route",
+        "name": "Tandang Sora - Quezon City Hall Jeepney Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0433671,
+          14.6745841
+        ]
+      },
+      "id": "node/1260852424"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1309676576",
+        "addr:city": "Quezon City",
+        "name": "FX Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0373741,
+          14.7211865
+        ]
+      },
+      "id": "node/1309676576"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1449251758",
+        "addr:street": "EDSA",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Isarog Lines",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0513203,
+          14.618337
+        ]
+      },
+      "id": "node/1449251758"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1489297922",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "description": "Bocaue-Balagtas-Bulacan",
+        "name": "Petron",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0541632,
+          14.6139016
+        ]
+      },
+      "id": "node/1489297922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1646787549",
+        "air_conditioning": "no",
+        "description": "Primarily used by UV Express Service",
+        "fixme": "Add more routes",
+        "internet_access": "no",
+        "name": "SM Fairview - Public Transport Terminal A",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0609146,
+          14.7342397
+        ]
+      },
+      "id": "node/1646787549"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1649835258",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Barney Autolines",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0487132,
+          14.6234629
+        ]
+      },
+      "id": "node/1649835258"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2059301663",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Jeepney Terminal: Litex-Montalban",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0868829,
+          14.7013906
+        ]
+      },
+      "id": "node/2059301663"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2269060013",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.053801,
+          14.6126726
+        ]
+      },
+      "id": "node/2269060013"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2655355088",
+        "description": "Tricycle Station",
+        "name": "Tricycle Station",
+        "name:en": "Tricycle Station",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0736535,
+          14.641824
+        ]
+      },
+      "id": "node/2655355088"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3190133402",
+        "amenity": "bus_station",
+        "name": "Ever Jeepney Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0841803,
+          14.6778956
+        ]
+      },
+      "id": "node/3190133402"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3309043238",
+        "amenity": "shelter",
+        "covered": "yes",
+        "layer": "-1",
+        "level": "0",
+        "name": "North EDSA - Katipunan/LRTA",
+        "operator": "Global Electric Transportation Services Cooperative",
+        "public_transport": "station",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0317703,
+          14.655698
+        ]
+      },
+      "id": "node/3309043238"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4203732991",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Cubao - Divisoria Jeepney Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0493197,
+          14.6213958
+        ]
+      },
+      "id": "node/4203732991"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4265803207",
+        "amenity": "bus_station",
+        "name": "Sta. Lucia-Quirino Hwy Jeepney Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0507513,
+          14.7044202
+        ]
+      },
+      "id": "node/4265803207"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4265807597",
+        "addr:street": "Lopez",
+        "amenity": "bus_station",
+        "name": "Homeland-Baluyot Tricycle Station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0530916,
+          14.7042184
+        ]
+      },
+      "id": "node/4265807597"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4265809403",
+        "amenity": "bus_station",
+        "name": "Quirino Highway - Sta. Lucia Jeepney Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0393311,
+          14.7085558
+        ]
+      },
+      "id": "node/4265809403"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4271992989",
+        "addr:street": "Tandang Sora Avenue Extension",
+        "amenity": "taxi",
+        "name": "Santa Quiteria Tricycle Operators & Drivers Association",
+        "public_transport": "station",
+        "short_name": "SQ TODA",
+        "taxi_vehicle": "auto_rickshaw"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.017907,
+          14.6802516
+        ]
+      },
+      "id": "node/4271992989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4428508791",
+        "amenity": "bus_station",
+        "name": "Tumana-Balara Jeepney Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.075069,
+          14.6534749
+        ]
+      },
+      "id": "node/4428508791"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4454906972",
+        "fixme": "needs verification. Info based on interview of terminal staff at North EDSA.",
+        "name": "Blue Residences COMET terminal",
+        "old_name": "Katipunan Terminal",
+        "operator": "Global Electric Transportation Services Cooperative",
+        "public_transport": "station",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0744293,
+          14.6325171
+        ]
+      },
+      "id": "node/4454906972"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4574896896",
+        "amenity": "bus_station",
+        "name": "Bart house",
+        "name:en": "Bart house"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0569651,
+          14.7066304
+        ]
+      },
+      "id": "node/4574896896"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4595581794",
+        "amenity": "bus_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0864317,
+          14.695788
+        ]
+      },
+      "id": "node/4595581794"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5140538792",
+        "amenity": "bus_station",
+        "name": "UV Express Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0567314,
+          14.7351318
+        ]
+      },
+      "id": "node/5140538792"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5377269277",
+        "name": "Katipunan",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes",
+        "wikidata": "Q3547775",
+        "wikipedia": "en:Katipunan station",
+        "wikipedia:en": "Katipunan station (Line 2)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0727741,
+          14.6310644
+        ]
+      },
+      "id": "node/5377269277"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5693215829",
+        "amenity": "bus_station",
+        "name": "Riverside Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.08703,
+          14.692856
+        ]
+      },
+      "id": "node/5693215829"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6006974256",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Bagumbayan Jeepney Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0820578,
+          14.6063389
+        ]
+      },
+      "id": "node/6006974256"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6277644185",
+        "addr:city": "Quezon City",
+        "addr:street": "Katuparan",
+        "amenity": "bus_station",
+        "fixme": "name",
+        "name": "Tricycle Terminal",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0942062,
+          14.6966808
+        ]
+      },
+      "id": "node/6277644185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7505572035",
+        "amenity": "ferry_terminal",
+        "ferry": "yes",
+        "name": "Bagumbayan-Santolan Ferry",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0854113,
+          14.6081256
+        ]
+      },
+      "id": "node/7505572035"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7780851471",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Viron Transit",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9954234,
+          14.6216926
+        ]
+      },
+      "id": "node/7780851471"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8720440617",
+        "name": "Santa Monica Shop & Ride",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0415898,
+          14.7232558
+        ]
+      },
+      "id": "node/8720440617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10100751717",
+        "amenity": "bus_station",
+        "name": "Coda Lines Terminal"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0487404,
+          14.6233319
+        ]
+      },
+      "id": "node/10100751717"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10304443618",
+        "amenity": "bus_station",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.038688,
+          14.6444137
+        ]
+      },
+      "id": "node/10304443618"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10679761374",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "check_date": "2023-02-20",
+        "name": "First North Luzon transit, Cubao terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0498021,
+          14.6240156
+        ]
+      },
+      "id": "node/10679761374"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10857182830",
+        "amenity": "bus_station",
+        "name": "JAC Liner"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0458375,
+          14.6316842
+        ]
+      },
+      "id": "node/10857182830"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10915939500",
+        "access": "yes",
+        "amenity": "bus_station",
+        "bus": "yes",
+        "internet_access": "no",
+        "name": "PHILCOA Jeepney",
+        "operator:type": "public",
+        "parking": "surface",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0419939,
+          14.7230371
+        ]
+      },
+      "id": "node/10915939500"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11072267226",
+        "addr:street": "Quirino Highway",
+        "amenity": "bus_station",
+        "mapillary": "1249545375581713",
+        "operator": "Sauyo Transport Corporation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0392751,
+          14.7214896
+        ]
+      },
+      "id": "node/11072267226"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11329697351",
+        "light_rail": "yes",
+        "name": "Cubao",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "light_rail",
+        "wikidata": "Q4784084",
+        "wikipedia": "en:Cubao station (Line 3)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0510726,
+          14.6194837
+        ]
+      },
+      "id": "node/11329697351"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12653929570",
+        "mapillary": "1235005264336662",
+        "name": "Barcads UVE Terminal",
+        "public_transport": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0362026,
+          14.7219922
+        ]
+      },
+      "id": "node/12653929570"
+    }
+  ]
+}

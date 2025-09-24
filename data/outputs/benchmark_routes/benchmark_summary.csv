@@ -1,0 +1,21 @@
+start,end,length_m,steps,runtime_s,geojson_file
+Quezon Memorial Circle,SM Fairview,13838.292532487649,127,0.00,Quezon_Memorial_Circle_to_SM_Fairview.geojson
+Quezon Memorial Circle,Vertis North,3306.7476603188056,24,0.00,Quezon_Memorial_Circle_to_Vertis_North.geojson
+Quezon Memorial Circle,Tandang Sora MRT Station,14993.871930053861,118,0.00,Quezon_Memorial_Circle_to_Tandang_Sora_MRT_Station.geojson
+Quezon Memorial Circle,SM North EDSA,1883.325445149051,11,0.00,Quezon_Memorial_Circle_to_SM_North_EDSA.geojson
+SM Fairview,Quezon Memorial Circle,13488.077351508442,119,0.02,SM_Fairview_to_Quezon_Memorial_Circle.geojson
+SM Fairview,Vertis North,15172.275233109225,138,0.01,SM_Fairview_to_Vertis_North.geojson
+SM Fairview,Tandang Sora MRT Station,12239.563831549884,91,0.00,SM_Fairview_to_Tandang_Sora_MRT_Station.geojson
+SM Fairview,SM North EDSA,12266.203800551686,111,0.00,SM_Fairview_to_SM_North_EDSA.geojson
+Vertis North,Quezon Memorial Circle,2602.0215658974075,38,0.00,Vertis_North_to_Quezon_Memorial_Circle.geojson
+Vertis North,SM Fairview,12661.403798765754,128,0.01,Vertis_North_to_SM_Fairview.geojson
+Vertis North,Tandang Sora MRT Station,13816.983196331963,119,0.00,Vertis_North_to_Tandang_Sora_MRT_Station.geojson
+Vertis North,SM North EDSA,706.4367114271556,12,0.00,Vertis_North_to_SM_North_EDSA.geojson
+Tandang Sora MRT Station,Quezon Memorial Circle,2715.2955314147034,13,0.00,Tandang_Sora_MRT_Station_to_Quezon_Memorial_Circle.geojson
+Tandang Sora MRT Station,SM Fairview,15327.285878575036,151,0.02,Tandang_Sora_MRT_Station_to_SM_Fairview.geojson
+Tandang Sora MRT Station,Vertis North,6022.043191733509,36,0.00,Tandang_Sora_MRT_Station_to_Vertis_North.geojson
+Tandang Sora MRT Station,SM North EDSA,4598.620976563754,23,0.02,Tandang_Sora_MRT_Station_to_SM_North_EDSA.geojson
+SM North EDSA,Quezon Memorial Circle,6611.387777896484,55,0.00,SM_North_EDSA_to_Quezon_Memorial_Circle.geojson
+SM North EDSA,SM Fairview,14228.54103272739,140,0.00,SM_North_EDSA_to_SM_Fairview.geojson
+SM North EDSA,Vertis North,8295.585659497272,74,0.01,SM_North_EDSA_to_Vertis_North.geojson
+SM North EDSA,Tandang Sora MRT Station,15384.120430293602,131,0.00,SM_North_EDSA_to_Tandang_Sora_MRT_Station.geojson
