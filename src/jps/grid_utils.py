@@ -26,9 +26,12 @@ def load_clean_grid(tif_path="data/processed/qc_grid_clean.tif",
     print(f"Grid shape: {grid.shape}, CRS: {crs}")
 
     # --- PNG preview ---
+    plt.figure(figsize=(8, 10))
     plt.imshow(grid, cmap="gray", interpolation="none")
     plt.title("QC Grid (1=road, 0=obstacle)")
-    plt.savefig(preview_png, dpi=300, bbox_inches="tight")
+    plt.axis("off")  # hides axis numbers and ticks
+    plt.tight_layout()
+    plt.savefig(preview_png, dpi=300, bbox_inches="tight", pad_inches=0.1)
     plt.close()
     print(f"[OK] Saved grid preview PNG → {preview_png}")
 

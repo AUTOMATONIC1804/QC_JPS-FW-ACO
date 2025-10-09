@@ -109,21 +109,24 @@ def run_demo(use_qc=True, manual=False, start_coords=None, goal_coords=None):
     # Run JPS
     path = jump_point_search(grid, start, goal, heuristic=octile)
 
-    # Always visualize start/goal
+    # --- Visualization ---
+    plt.figure(figsize=(8, 10))
     plt.imshow(grid.matrix, cmap="gray", interpolation="none")
-    plt.scatter(start[1], start[0], color="green", marker="o", label="Start")
-    plt.scatter(goal[1], goal[0], color="red", marker="x", label="Goal")
+    plt.scatter(start[1], start[0], color="lime", s=100, label="Start", edgecolors="black", zorder=3)
+    plt.scatter(goal[1], goal[0], color="red", s=100, label="Goal", marker="x", zorder=3)
 
     if path:
         print(f"✅ Path found with {len(path)} steps")
         path_rows, path_cols = zip(*path)
-        plt.plot(path_cols, path_rows, color="yellow", linewidth=2, label="JPS Path")
+        plt.plot(path_cols, path_rows, color="yellow", linewidth=2, label="JPS Path", zorder=2)
     else:
         print("❌ No path found!")
         plt.title("JPS Demo (No Path Found)")
 
-    plt.legend()
-    plt.savefig("data/outputs/jps_demo.png", dpi=300, bbox_inches="tight")
+    plt.legend(facecolor="white", framealpha=0.8, loc="upper right", fontsize=10)
+    plt.axis("off")
+    plt.tight_layout()
+    plt.savefig("data/outputs/jps_demo.png", dpi=300, bbox_inches="tight", pad_inches=0.1)
     plt.close()
     print("[OK] Saved PNG visualization → data/outputs/jps_demo.png")
 
@@ -157,7 +160,6 @@ def run_demo(use_qc=True, manual=False, start_coords=None, goal_coords=None):
         geojson = {"type": "FeatureCollection", "features": features}
         with open("data/outputs/jps_demo.geojson", "w") as f:
             json.dump(geojson, f)
-
         print("[OK] Saved GeoJSON (with start/goal) → data/outputs/jps_demo.geojson")
 
 
