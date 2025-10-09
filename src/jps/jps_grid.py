@@ -1,26 +1,45 @@
 """
 src/jps/jps_grid.py
-Handles grid-based map for JPS.
+Grid wrapper for JPS.
 """
 
 import numpy as np
 
+
 class Grid:
     def __init__(self, matrix):
         """
-        matrix: 2D numpy array (1=passable, 0=obstacle)
+        matrix: 2D numpy array where 1=road (passable), 0=obstacle.
         """
         self.matrix = matrix
-        self.rows, self.cols = matrix.shape
+        self.height, self.width = matrix.shape
 
-    def in_bounds(self, r, c):
-        return 0 <= r < self.rows and 0 <= c < self.cols
+    def in_bounds(self, row, col):
+        return 0 <= row < self.height and 0 <= col < self.width
 
-    def passable(self, r, c):
-        return self.in_bounds(r, c) and self.matrix[r, c] == 1
+    def passable(self, row, col):
+        return self.in_bounds(row, col) and self.matrix[row, col] == 1
 
-    def neighbors(self, r, c):
-        """Return all possible 8-direction moves."""
-        dirs = [(-1, 0), (1, 0), (0, -1), (0, 1),
-                (-1, -1), (-1, 1), (1, -1), (1, 1)]
-        return [(r+dr, c+dc) for dr, dc in dirs if self.passable(r+dr, c+dc)]
+    def neighbors(self, row, col):
+        """
+        Return valid 8-way neighbors of (row, col).
+        Prevents corner cutting through obstacles.
+        """
+        results = []
+        directions = [
+            (-1, 0), (1, 0), (0, -1), (0, 1),   # N, S, W, E
+            (-1, -1), (-1, 1), (1, -1), (1, 1)  # NW, NE, SW, SE
+        ]
+
+        for dr, dc in directions:
+            r, c = row + dr, col + dc
+            if not self.passable(r, c):
+                continue
+
+            # For diagonal moves, check corner cutting
+            if abs(dr) + abs(dc) == 2:
+                if not (self.passable(row + dr, col) and self.passable(row, col + dc)):
+                    continue
+            results.append((r, c))
+
+        return results
