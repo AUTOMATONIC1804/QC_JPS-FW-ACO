@@ -1,91 +1,79 @@
 """
 src/algorithms/dijkstra_runner.py
-Run Dijkstra on the QC road graph (.graphml) using lon/lat input.
-Exports PNG + GeoJSON with path, start, and goal.
+Robust Dijkstra implementation using OSMnx + NetworkX on the QC major roads graph.
+Now with clutter-free visualization (no thick overlapping lines).
 """
 
 import os
-import time
 import json
-import numpy as np
-import osmnx as ox
+import time
 import networkx as nx
-import geopandas as gpd
+import osmnx as ox
 import matplotlib.pyplot as plt
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Point, mapping
+from math import radians, sin, cos, sqrt, atan2
 
 
 def haversine(lat1, lon1, lat2, lon2):
+    """Compute great-circle distance (in meters) between two lat/lon points."""
     R = 6371000.0
-    phi1, phi2 = np.radians(lat1), np.radians(lat2)
-    dphi = phi2 - phi1
-    dlambda = np.radians(lon2 - lon1)
-    a = np.sin(dphi/2.0)**2 + np.cos(phi1)*np.cos(phi2)*np.sin(dlambda/2.0)**2
-    return 2 * R * np.arcsin(np.sqrt(a))
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+    return 2 * R * atan2(sqrt(a), sqrt(1 - a))
 
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(121.0596, 14.7324),
+    start_coords=(121.0596, 14.7324),  # lon, lat
     goal_coords=(121.080857, 14.59297),
     output_dir="data/outputs"
 ):
-    os.makedirs(output_dir, exist_ok=True)
-    t0 = time.time()
     print(f"🚆 Running Dijkstra on {graph_path}")
 
+    # --- Load graph ---
     G = ox.load_graphml(graph_path)
     print(f"[OK] Graph loaded with {len(G.nodes)} nodes and {len(G.edges)} edges")
 
-    # ✅ Extract largest connected component
-    if not nx.is_connected(G.to_undirected()):
-        largest_cc = max(nx.connected_components(G.to_undirected()), key=len)
-        G = G.subgraph(largest_cc).copy()
-        print(f"[OK] Using largest connected component: {len(G.nodes)} nodes")
+    # --- Convert to undirected ---
+    if isinstance(G, nx.DiGraph):
+        G = G.to_undirected(reciprocal=False)
+        print("[OK] Graph converted to undirected")
 
-    # --- Find nearest nodes via haversine ---
+    # --- Ensure 'length' attribute is float ---
+    for u, v, data in G.edges(data=True):
+        if "length" in data and isinstance(data["length"], str):
+            try:
+                data["length"] = float(data["length"])
+            except ValueError:
+                data["length"] = 0.0
+    print("[OK] Edge lengths verified as floats")
+
+    # --- Largest component only ---
+    largest_cc = max(nx.connected_components(G), key=len)
+    G = G.subgraph(largest_cc).copy()
+    print(f"[OK] Kept largest component ({len(G.nodes)} nodes)")
+
+    # --- Snap start and goal ---
     nodes_gdf = ox.graph_to_gdfs(G, nodes=True, edges=False)
-    lat_arr, lon_arr = nodes_gdf["y"].to_numpy(), nodes_gdf["x"].to_numpy()
+    lat_arr = nodes_gdf["y"].to_numpy()
+    lon_arr = nodes_gdf["x"].to_numpy()
 
-    sx, sy = start_coords
-    gx, gy = goal_coords
-    dist_start = haversine(sy, sx, lat_arr, lon_arr)
-    dist_goal = haversine(gy, gx, lat_arr, lon_arr)
+    def nearest_node(lon, lat):
+        dists = ((lat_arr - lat)**2 + (lon_arr - lon)**2)
+        idx = dists.argmin()
+        node_id = nodes_gdf.index[idx]
+        dist_m = haversine(lat, lon, lat_arr[idx], lon_arr[idx])
+        return node_id, dist_m
 
-    start_node = nodes_gdf.index[np.argmin(dist_start)]
-    goal_node = nodes_gdf.index[np.argmin(dist_goal)]
+    start_node, dist_start = nearest_node(*start_coords)
+    goal_node, dist_goal = nearest_node(*goal_coords)
+    print(f"🎯 Start node: {start_node} ({dist_start:.2f} m away)")
+    print(f"🏁 Goal  node: {goal_node} ({dist_goal:.2f} m away)")
 
-    if start_node == goal_node:
-        print("⚠️ Start and goal snapped to same node, picking next nearest goal.")
-        sorted_idx = np.argsort(dist_goal)
-        for idx in sorted_idx[1:]:
-            if nodes_gdf.index[idx] != start_node:
-                goal_node = nodes_gdf.index[idx]
-                break
-
-    print(f"🎯 Start node: {start_node}, Goal node: {goal_node}")
-
-    # ✅ Ensure both nodes are still in the graph
-    if start_node not in G.nodes or goal_node not in G.nodes:
-        print("⚠️ One or both nodes not in largest component, re-snapping...")
-        # Recompute using the remaining G nodes
-        nodes_gdf = ox.graph_to_gdfs(G, nodes=True, edges=False)
-        lat_arr, lon_arr = nodes_gdf["y"].to_numpy(), nodes_gdf["x"].to_numpy()
-        dist_start = haversine(sy, sx, lat_arr, lon_arr)
-        dist_goal = haversine(gy, gx, lat_arr, lon_arr)
-        start_node = nodes_gdf.index[np.argmin(dist_start)]
-        goal_node = nodes_gdf.index[np.argmin(dist_goal)]
-        print(f"✅ Resnapped to connected nodes: {start_node}, {goal_node}")
-
-    # --- Run Dijkstra ---
-    try:
-        t1 = time.time()
-        path = nx.shortest_path(G, source=start_node, target=goal_node, weight="length")
-        path_length_m = nx.shortest_path_length(G, source=start_node, target=goal_node, weight="length")
-        runtime_ms = (time.time() - t1) * 1000
-        print(f"[OK] Dijkstra completed — Runtime: {runtime_ms:.2f} ms, Path length: {path_length_m:.2f} m")
-    except nx.NetworkXNoPath:
-        print("❌ Still no path found even in largest component.")
+    # --- Connectivity check ---
+    if not nx.has_path(G, start_node, goal_node):
+        print("❌ No path found between these nodes — not connected in the graph.")
         return {
             "algorithm": "Dijkstra",
             "runtime_ms": None,
@@ -93,28 +81,65 @@ def run_dijkstra_benchmark(
             "steps": None,
         }
 
-    # --- Visualization ---
-    G_proj = ox.project_graph(G)
-    fig, ax = ox.plot_graph_route(G_proj, path, route_linewidth=2, node_size=0, bgcolor="white", show=False, close=False)
-    ax.scatter(G_proj.nodes[start_node]["x"], G_proj.nodes[start_node]["y"], color="green", s=60, label="Start")
-    ax.scatter(G_proj.nodes[goal_node]["x"], G_proj.nodes[goal_node]["y"], color="red", s=60, marker="x", label="Goal")
-    ax.legend()
-    plt.savefig(f"{output_dir}/dijkstra_path.png", dpi=300, bbox_inches="tight")
+    # --- Run Dijkstra ---
+    t0 = time.time()
+    path = nx.shortest_path(G, source=start_node, target=goal_node, weight="length")
+    length_m = nx.shortest_path_length(G, source=start_node, target=goal_node, weight="length")
+    runtime_ms = (time.time() - t0) * 1000
+    print(f"[OK] Dijkstra completed — Runtime: {runtime_ms:.2f} ms, Path length: {length_m:.2f} m")
+
+    adjusted_length = max(0, length_m - (dist_start + dist_goal))
+    print(f"📏 Adjusted path length (minus snap offsets): {adjusted_length:.2f} m")
+
+    # ==================================================
+    # CLEAN VISUALIZATION (replaces ox.plot_graph_route)
+    # ==================================================
+    print("[OK] Rendering clean map...")
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ox.plot_graph(
+        G, ax=ax, node_size=0, edge_color="lightgray",
+        edge_linewidth=0.6, bgcolor="white", show=False, close=False
+    )
+
+    # Plot route path (solid blue line)
+    x_coords = [G.nodes[n]["x"] for n in path]
+    y_coords = [G.nodes[n]["y"] for n in path]
+    ax.plot(x_coords, y_coords, color="blue", linewidth=2.5, label="Dijkstra Path", zorder=3)
+
+    # Start / Goal markers
+    x_start, y_start = G.nodes[start_node]["x"], G.nodes[start_node]["y"]
+    x_goal, y_goal = G.nodes[goal_node]["x"], G.nodes[goal_node]["y"]
+    ax.scatter(x_start, y_start, s=80, color="lime", edgecolors="black", label="Start", zorder=5)
+    ax.scatter(x_goal, y_goal, s=100, color="red", marker="x", label="Goal", zorder=5)
+
+    ax.legend(facecolor="white", framealpha=0.9, loc="lower right")
+    plt.tight_layout()
+
+    os.makedirs(output_dir, exist_ok=True)
+    out_png = os.path.join(output_dir, "dijkstra_path.png")
+    plt.savefig(out_png, dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"[OK] Saved Dijkstra visualization → {output_dir}/dijkstra_path.png")
+    print(f"[OK] Saved Dijkstra visualization → {out_png}")
 
-    # --- GeoJSON Export ---
+    # --- GeoJSON export ---
     coords = [(G.nodes[n]["x"], G.nodes[n]["y"]) for n in path]
-    route_gdf = gpd.GeoDataFrame(geometry=[LineString(coords)], crs="EPSG:4326")
-    route_gdf.to_file(f"{output_dir}/dijkstra_path.geojson", driver="GeoJSON")
-    print(f"[OK] Saved GeoJSON → {output_dir}/dijkstra_path.geojson")
+    geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {"type": "Feature", "geometry": mapping(LineString(coords)), "properties": {"algorithm": "Dijkstra"}},
+            {"type": "Feature", "geometry": mapping(Point(x_start, y_start)), "properties": {"role": "start"}},
+            {"type": "Feature", "geometry": mapping(Point(x_goal, y_goal)), "properties": {"role": "goal"}},
+        ],
+    }
+    out_geojson = os.path.join(output_dir, "dijkstra_path.geojson")
+    with open(out_geojson, "w") as f:
+        json.dump(geojson, f)
+    print(f"[OK] Saved GeoJSON → {out_geojson}")
 
+    # --- Return metrics ---
     return {
         "algorithm": "Dijkstra",
         "runtime_ms": float(runtime_ms),
-        "path_length_m": float(path_length_m),
-        "steps": len(path)
+        "path_length_m": float(adjusted_length),
+        "steps": len(path),
     }
-
-
-

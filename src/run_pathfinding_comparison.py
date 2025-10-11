@@ -1,21 +1,25 @@
 """
 src/run_pathfinding_comparison.py
-Compare JPS (grid-based) vs Dijkstra and A* (graph-based).
+Compare JPS and Dijkstra only (A* temporarily removed).
 """
 
 import json
 from src.algorithms.jps_runner import run_jps_benchmark
 from src.algorithms.dijkstra_runner import run_dijkstra_benchmark
-from src.algorithms.astar_runner import run_astar_benchmark
 
 
 def main():
     print("=== 🚆 PATHFINDING COMPARISON START ===")
 
     results = []
-    results.append(run_jps_benchmark())
-    results.append(run_dijkstra_benchmark())
-    results.append(run_astar_benchmark())
+
+    # --- Run JPS ---
+    jps_metrics = run_jps_benchmark()
+    results.append(jps_metrics)
+
+    # --- Run Dijkstra ---
+    dijkstra_metrics = run_dijkstra_benchmark()
+    results.append(dijkstra_metrics)
 
     print("\n=== ✅ COMPARISON COMPLETE ===")
     for r in results:
@@ -31,4 +35,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
