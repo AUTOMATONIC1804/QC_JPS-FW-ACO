@@ -1,8 +1,8 @@
 [
   {
     "algorithm": "JPS",
-    "runtime_ms": 0.0,
-    "path_length_m": null,
-    "steps": null
+    "runtime_ms": 177.0984999999996,
+    "path_length_m": 20331.534623807704,
+    "steps": 452
   }
 ]
