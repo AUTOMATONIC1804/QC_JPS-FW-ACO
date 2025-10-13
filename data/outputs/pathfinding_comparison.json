@@ -1,13 +1,13 @@
 [
   {
     "algorithm": "JPS",
-    "runtime_ms": 122.47179999999958,
+    "runtime_ms": 189.45240000000751,
     "path_length_m": 20331.534623807704,
     "steps": 452
   },
   {
     "algorithm": "Dijkstra",
-    "runtime_ms": 30.202150344848633,
+    "runtime_ms": 26.60846710205078,
     "path_length_m": 17444.796972215187,
     "steps": 125
   }
