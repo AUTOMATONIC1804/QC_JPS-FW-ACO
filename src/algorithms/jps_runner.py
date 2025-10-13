@@ -86,17 +86,39 @@ def run_jps_benchmark(
     print(f"[OK] JPS completed — Runtime: {runtime_ms:.2f} ms, Path length: {path_length_m:.2f} m")
 
     # --- Visualization ---
-    plt.figure(figsize=(8, 10))
-    plt.imshow(grid.matrix, cmap="gray", interpolation="none")
+
+    plt.figure(figsize=(10, 12), facecolor="white")
+    ax = plt.gca()
+    ax.set_facecolor("white")
+
+    # show grid: black roads on white background
+    ax.imshow(grid.matrix, cmap="gray", interpolation="none", origin="upper")
+
+    # JPS path (yellow)
     rows, cols = zip(*path)
-    plt.scatter(start[1], start[0], color="lime", label="Start")
-    plt.scatter(goal[1], goal[0], color="red", label="Goal", marker="x")
-    plt.plot(cols, rows, color="yellow", linewidth=2, label="JPS Path")
-    plt.legend(facecolor="white", framealpha=0.8)
-    plt.axis("off")
-    plt.tight_layout()
-    plt.savefig(f"{output_dir}/jps_path.png", dpi=300, bbox_inches="tight")
+    ax.plot(cols, rows, color="#FFD600", linewidth=2.8, label="JPS Path", zorder=3)
+
+    # Start / Goal markers
+    ax.scatter(start[1], start[0], s=120, facecolor="#4CAF50", edgecolors="black",
+        linewidth=1.2, zorder=4, label="Start")
+    ax.scatter(goal[1], goal[0], s=140, facecolor="red", marker="X",
+        zorder=4, label="Goal")
+
+    # Legend: white background, black border, top-right
+    leg = ax.legend(loc="upper right", frameon=True)
+    leg.get_frame().set_facecolor("white")
+    leg.get_frame().set_edgecolor("black")
+    leg.get_frame().set_alpha(1.0)
+    for text in leg.get_texts():
+        text.set_color("black")
+
+    ax.axis("off")
+    plt.tight_layout(pad=0)
+    plt.savefig(f"{output_dir}/jps_path.png", dpi=300, bbox_inches="tight", pad_inches=0, facecolor="white")
     plt.close()
+
+
+
 
     # --- GeoJSON Export ---
     coords = [cell_to_coords(r, c, transform) for r, c in path]

@@ -1,97 +1,185 @@
 """
 src/algorithms/astar_runner.py
-Run A* (A-Star) algorithm on the QC road network (GraphML-based).
+A* algorithm on QC grid (based on JPS runner).
+References:
+- GeeksforGeeks: https://www.geeksforgeeks.org/dsa/a-search-algorithm/
+- DataCamp: https://www.datacamp.com/tutorial/a-star-algorithm
 """
 
-import os
-import time
+import heapq
 import json
 import numpy as np
-import osmnx as ox
-import networkx as nx
-import geopandas as gpd
 import matplotlib.pyplot as plt
-from shapely.geometry import LineString
+from math import sqrt
+from collections import deque
+from pyproj import Transformer
+from shapely.geometry import Point, LineString, mapping
+
+from src.jps.jps_grid import Grid
+from src.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
+from src.algorithms.metrics_utils import measure_runtime, compute_path_length
 
 
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371000.0
-    phi1, phi2 = np.radians(lat1), np.radians(lat2)
-    dphi = phi2 - phi1
-    dlambda = np.radians(lon2 - lon1)
-    a = np.sin(dphi/2.0)**2 + np.cos(phi1)*np.cos(phi2)*np.sin(dlambda/2.0)**2
-    return 2 * R * np.arcsin(np.sqrt(a))
+# -------------------------
+# Supporting Functions
+# -------------------------
+def snap_to_nearest_road(grid, start_cell, max_radius=50):
+    """If start_cell is obstacle, find nearest road (value=1) via BFS."""
+    r0, c0 = start_cell
+    if grid.matrix[r0, c0] == 1:
+        return start_cell
+
+    rows, cols = grid.matrix.shape
+    visited = set()
+    q = deque([(r0, c0, 0)])
+    while q:
+        r, c, d = q.popleft()
+        if d > max_radius:
+            break
+        if (r, c) in visited:
+            continue
+        visited.add((r, c))
+        if 0 <= r < rows and 0 <= c < cols and grid.matrix[r, c] == 1:
+            return (r, c)
+        for dr, dc in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]:
+            rr, cc = r+dr, c+dc
+            if 0 <= rr < rows and 0 <= cc < cols:
+                q.append((rr, cc, d+1))
+    raise ValueError(f"No nearby road within {max_radius} cells")
 
 
-def heuristic(n1, n2, G):
-    lat1, lon1 = G.nodes[n1]["y"], G.nodes[n1]["x"]
-    lat2, lon2 = G.nodes[n2]["y"], G.nodes[n2]["x"]
-    return haversine(lat1, lon1, lat2, lon2)
+def octile_distance(a, b):
+    """Octile distance heuristic (diagonal-allowed)."""
+    dx = abs(a[0] - b[0])
+    dy = abs(a[1] - b[1])
+    F = sqrt(2) - 1
+    return F * min(dx, dy) + max(dx, dy)
 
 
+def astar_search(grid, start, goal):
+    """Perform A* search on grid with 8-directional movement."""
+    rows, cols = grid.matrix.shape
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: octile_distance(start, goal)}
+
+    directions = [
+        (-1, 0), (1, 0), (0, -1), (0, 1),
+        (-1, -1), (-1, 1), (1, -1), (1, 1)
+    ]
+
+    while open_set:
+        _, current = heapq.heappop(open_set)
+        if current == goal:
+            # reconstruct path
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            path.reverse()
+            return path
+
+        for dr, dc in directions:
+            neighbor = (current[0] + dr, current[1] + dc)
+            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                if grid.matrix[neighbor[0], neighbor[1]] == 0:
+                    continue  # obstacle
+                tentative_g = g_score[current] + (sqrt(2) if dr != 0 and dc != 0 else 1)
+                if tentative_g < g_score.get(neighbor, float("inf")):
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f_score[neighbor] = tentative_g + octile_distance(neighbor, goal)
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+
+    return None  # No path
+
+
+# -------------------------
+# Main Benchmark Function
+# -------------------------
 def run_astar_benchmark(
-    graph_path="data/processed/qc_roads_major.graphml",
+    tif_path="data/processed/qc_grid_clean.tif",
     start_coords=(121.0596, 14.7324),
     goal_coords=(121.080857, 14.59297),
     output_dir="data/outputs"
 ):
-    os.makedirs(output_dir, exist_ok=True)
-    print(f"🚀 Running A* on {graph_path}")
-    t0 = time.time()
+    """Run A* on QC grid and return metrics."""
+    print("🚀 Running A* on QC grid...")
 
-    G = ox.load_graphml(graph_path)
-    if not nx.is_connected(G.to_undirected()):
-        G = G.subgraph(max(nx.connected_components(G.to_undirected()), key=len)).copy()
+    # Load grid
+    grid_arr, transform, crs = load_clean_grid(
+        tif_path=tif_path,
+        preview_png=f"{output_dir}/grid_preview.png",
+        preview_geojson=f"{output_dir}/grid_preview.geojson",
+    )
+    grid = Grid(grid_arr)
 
-    nodes_gdf = ox.graph_to_gdfs(G, nodes=True, edges=False)
-    lat_arr, lon_arr = nodes_gdf["y"].to_numpy(), nodes_gdf["x"].to_numpy()
+    # Convert lon/lat → EPSG:3857 grid cells
+    transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
+    sx, sy = transformer.transform(*start_coords)
+    gx, gy = transformer.transform(*goal_coords)
+    start = coords_to_cell(sx, sy, transform)
+    goal = coords_to_cell(gx, gy, transform)
 
-    sx, sy = start_coords
-    gx, gy = goal_coords
-    dist_start = haversine(sy, sx, lat_arr, lon_arr)
-    dist_goal = haversine(gy, gx, lat_arr, lon_arr)
+    start = snap_to_nearest_road(grid, start)
+    goal = snap_to_nearest_road(grid, goal)
+    print(f"🎯 Start: {start}, Goal: {goal}")
 
-    start_node = nodes_gdf.index[np.argmin(dist_start)]
-    goal_node = nodes_gdf.index[np.argmin(dist_goal)]
+    # Run A* with runtime measurement
+    path, runtime_ms = measure_runtime(astar_search, grid, start, goal)
+    if not path:
+        print("❌ No path found by A*.")
+        return {"algorithm": "A*", "runtime_ms": None, "path_length_m": None, "steps": None}
 
-    if start_node == goal_node:
-        print("⚠️ Start and goal same — using next nearest goal.")
-        sorted_idx = np.argsort(dist_goal)
-        for idx in sorted_idx[1:]:
-            if nodes_gdf.index[idx] != start_node:
-                goal_node = nodes_gdf.index[idx]
-                break
-
-    print(f"🎯 Start node: {start_node}, Goal node: {goal_node}")
-
-    # Run A*
-    t1 = time.time()
-    path = nx.astar_path(G, start_node, goal_node, heuristic=lambda u, v: heuristic(u, v, G), weight="length")
-    path_length_m = nx.path_weight(G, path, weight="length")
-    runtime_ms = (time.time() - t1) * 1000
+    path_length_m = compute_path_length(path, transform)
     print(f"[OK] A* completed — Runtime: {runtime_ms:.2f} ms, Path length: {path_length_m:.2f} m")
 
-    # Visualization
-    G_proj = ox.project_graph(G)
-    fig, ax = ox.plot_graph_route(G_proj, path, route_linewidth=2, node_size=0, bgcolor="white", show=False, close=False)
-    ax.scatter(G_proj.nodes[start_node]["x"], G_proj.nodes[start_node]["y"], color="blue", s=60, label="Start")
-    ax.scatter(G_proj.nodes[goal_node]["x"], G_proj.nodes[goal_node]["y"], color="orange", s=60, marker="x", label="Goal")
-    ax.legend()
-    plt.savefig(f"{output_dir}/astar_path.png", dpi=300, bbox_inches="tight")
-    plt.close(fig)
-    print(f"[OK] Saved A* visualization → {output_dir}/astar_path.png")
+    # --- Visualization (white bg, black roads, blue path) ---
+    plt.figure(figsize=(10, 12), facecolor="white")
+    ax = plt.gca()
+    ax.set_facecolor("white")
 
-    # GeoJSON export
-    coords = [(G.nodes[n]["x"], G.nodes[n]["y"]) for n in path]
-    route_gdf = gpd.GeoDataFrame(geometry=[LineString(coords)], crs="EPSG:4326")
-    route_gdf.to_file(f"{output_dir}/astar_path.geojson", driver="GeoJSON")
-    print(f"[OK] Saved GeoJSON → {output_dir}/astar_path.geojson")
+    ax.imshow(grid.matrix, cmap="gray", interpolation="none", origin="upper")
+
+    rows, cols = zip(*path)
+    ax.plot(cols, rows, color="#007BFF", linewidth=2.8, label="A* Path", zorder=3)
+
+    ax.scatter(start[1], start[0], s=120, facecolor="#4CAF50", edgecolors="black",
+               linewidth=1.2, zorder=4, label="Start")
+    ax.scatter(goal[1], goal[0], s=140, facecolor="red", marker="X",
+               zorder=4, label="Goal")
+
+    leg = ax.legend(loc="upper right", frameon=True)
+    leg.get_frame().set_facecolor("white")
+    leg.get_frame().set_edgecolor("black")
+    leg.get_frame().set_alpha(1.0)
+    for text in leg.get_texts():
+        text.set_color("black")
+
+    ax.axis("off")
+    plt.tight_layout(pad=0)
+    plt.savefig(f"{output_dir}/astar_path.png", dpi=300, bbox_inches="tight", pad_inches=0, facecolor="white")
+    plt.close()
+
+    # --- GeoJSON Export ---
+    coords = [cell_to_coords(r, c, transform) for r, c in path]
+    geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {"type": "Feature", "geometry": mapping(LineString(coords)), "properties": {"algorithm": "A*"}},
+            {"type": "Feature", "geometry": mapping(Point(cell_to_coords(*start, transform))), "properties": {"role": "start"}},
+            {"type": "Feature", "geometry": mapping(Point(cell_to_coords(*goal, transform))), "properties": {"role": "goal"}},
+        ],
+    }
+    with open(f"{output_dir}/astar_path.geojson", "w") as f:
+        json.dump(geojson, f)
 
     return {
         "algorithm": "A*",
         "runtime_ms": float(runtime_ms),
         "path_length_m": float(path_length_m),
-        "steps": len(path)
+        "steps": len(path),
     }
-
-

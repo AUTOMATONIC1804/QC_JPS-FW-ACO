@@ -1,7 +1,6 @@
 """
 src/algorithms/dijkstra_runner.py
-Robust Dijkstra implementation using OSMnx + NetworkX on the QC major roads graph.
-Now with clutter-free visualization (no thick overlapping lines).
+Clean, consistent visualization (black background, white roads, top-right legend).
 """
 
 import os
@@ -15,7 +14,7 @@ from math import radians, sin, cos, sqrt, atan2
 
 
 def haversine(lat1, lon1, lat2, lon2):
-    """Compute great-circle distance (in meters) between two lat/lon points."""
+    """Compute great-circle distance (in meters)."""
     R = 6371000.0
     dlat = radians(lat2 - lat1)
     dlon = radians(lon2 - lon1)
@@ -25,39 +24,36 @@ def haversine(lat1, lon1, lat2, lon2):
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(121.0596, 14.7324),  # lon, lat
+    start_coords=(121.0596, 14.7324),
     goal_coords=(121.080857, 14.59297),
     output_dir="data/outputs"
 ):
     print(f"🚆 Running Dijkstra on {graph_path}")
 
-    # --- Load graph ---
     G = ox.load_graphml(graph_path)
     print(f"[OK] Graph loaded with {len(G.nodes)} nodes and {len(G.edges)} edges")
 
-    # --- Convert to undirected ---
+    # Convert to undirected
     if isinstance(G, nx.DiGraph):
         G = G.to_undirected(reciprocal=False)
         print("[OK] Graph converted to undirected")
 
-    # --- Ensure 'length' attribute is float ---
-    for u, v, data in G.edges(data=True):
+    # Ensure 'length' is float
+    for _, _, data in G.edges(data=True):
         if "length" in data and isinstance(data["length"], str):
             try:
                 data["length"] = float(data["length"])
             except ValueError:
                 data["length"] = 0.0
-    print("[OK] Edge lengths verified as floats")
 
-    # --- Largest component only ---
+    # Largest component only
     largest_cc = max(nx.connected_components(G), key=len)
     G = G.subgraph(largest_cc).copy()
     print(f"[OK] Kept largest component ({len(G.nodes)} nodes)")
 
-    # --- Snap start and goal ---
+    # Snap to nearest nodes
     nodes_gdf = ox.graph_to_gdfs(G, nodes=True, edges=False)
-    lat_arr = nodes_gdf["y"].to_numpy()
-    lon_arr = nodes_gdf["x"].to_numpy()
+    lat_arr, lon_arr = nodes_gdf["y"].to_numpy(), nodes_gdf["x"].to_numpy()
 
     def nearest_node(lon, lat):
         dists = ((lat_arr - lat)**2 + (lon_arr - lon)**2)
@@ -71,57 +67,61 @@ def run_dijkstra_benchmark(
     print(f"🎯 Start node: {start_node} ({dist_start:.2f} m away)")
     print(f"🏁 Goal  node: {goal_node} ({dist_goal:.2f} m away)")
 
-    # --- Connectivity check ---
     if not nx.has_path(G, start_node, goal_node):
-        print("❌ No path found between these nodes — not connected in the graph.")
-        return {
-            "algorithm": "Dijkstra",
-            "runtime_ms": None,
-            "path_length_m": None,
-            "steps": None,
-        }
+        print("❌ No path found between nodes.")
+        return {"algorithm": "Dijkstra", "runtime_ms": None, "path_length_m": None, "steps": None}
 
-    # --- Run Dijkstra ---
+    # Run Dijkstra
     t0 = time.time()
     path = nx.shortest_path(G, source=start_node, target=goal_node, weight="length")
     length_m = nx.shortest_path_length(G, source=start_node, target=goal_node, weight="length")
     runtime_ms = (time.time() - t0) * 1000
-    print(f"[OK] Dijkstra completed — Runtime: {runtime_ms:.2f} ms, Path length: {length_m:.2f} m")
-
     adjusted_length = max(0, length_m - (dist_start + dist_goal))
-    print(f"📏 Adjusted path length (minus snap offsets): {adjusted_length:.2f} m")
+    print(f"[OK] Dijkstra completed — Runtime: {runtime_ms:.2f} ms, Path length: {adjusted_length:.2f} m")
 
-    # ==================================================
-    # CLEAN VISUALIZATION (replaces ox.plot_graph_route)
-    # ==================================================
-    print("[OK] Rendering clean map...")
+    # --- Visualization (black background + white roads, unified style) ---
+    print("[OK] Rendering clean black map...")
+
     fig, ax = plt.subplots(figsize=(10, 10))
+    fig.patch.set_facecolor("black")
+    ax.set_facecolor("black")
+
+    # Plot base map (white roads)
     ox.plot_graph(
-        G, ax=ax, node_size=0, edge_color="lightgray",
-        edge_linewidth=0.6, bgcolor="white", show=False, close=False
+        G, ax=ax, node_size=0, edge_color="white",
+        edge_linewidth=0.6, bgcolor="black", show=False, close=False
     )
 
-    # Plot route path (solid blue line)
+    # Dijkstra path (blue)
     x_coords = [G.nodes[n]["x"] for n in path]
     y_coords = [G.nodes[n]["y"] for n in path]
-    ax.plot(x_coords, y_coords, color="blue", linewidth=2.5, label="Dijkstra Path", zorder=3)
+    ax.plot(x_coords, y_coords, color="#2196F3", linewidth=2.8, label="Dijkstra Path", zorder=3)
 
     # Start / Goal markers
     x_start, y_start = G.nodes[start_node]["x"], G.nodes[start_node]["y"]
     x_goal, y_goal = G.nodes[goal_node]["x"], G.nodes[goal_node]["y"]
-    ax.scatter(x_start, y_start, s=80, color="lime", edgecolors="black", label="Start", zorder=5)
-    ax.scatter(x_goal, y_goal, s=100, color="red", marker="x", label="Goal", zorder=5)
 
-    ax.legend(facecolor="white", framealpha=0.9, loc="lower right")
-    plt.tight_layout()
+    ax.scatter(x_start, y_start, s=120, facecolor="#00FF00", edgecolors="black", linewidth=1.2, zorder=5, label="Start")
+    ax.scatter(x_goal, y_goal, s=140, color="red", marker="X", zorder=5, label="Goal")
 
+    # Legend (top-right, white text, black background)
+    leg = ax.legend(
+        loc="upper right", frameon=True, facecolor="black",
+        edgecolor="white", labelcolor="white", framealpha=0.8
+    )
+    for text in leg.get_texts():
+        text.set_color("white")
+
+    ax.axis("off")
+    plt.tight_layout(pad=0)
     os.makedirs(output_dir, exist_ok=True)
     out_png = os.path.join(output_dir, "dijkstra_path.png")
-    plt.savefig(out_png, dpi=300, bbox_inches="tight")
+    plt.savefig(out_png, dpi=300, bbox_inches="tight", pad_inches=0, facecolor="black")
     plt.close(fig)
+
     print(f"[OK] Saved Dijkstra visualization → {out_png}")
 
-    # --- GeoJSON export ---
+
     coords = [(G.nodes[n]["x"], G.nodes[n]["y"]) for n in path]
     geojson = {
         "type": "FeatureCollection",
@@ -131,12 +131,9 @@ def run_dijkstra_benchmark(
             {"type": "Feature", "geometry": mapping(Point(x_goal, y_goal)), "properties": {"role": "goal"}},
         ],
     }
-    out_geojson = os.path.join(output_dir, "dijkstra_path.geojson")
-    with open(out_geojson, "w") as f:
+    with open(os.path.join(output_dir, "dijkstra_path.geojson"), "w") as f:
         json.dump(geojson, f)
-    print(f"[OK] Saved GeoJSON → {out_geojson}")
 
-    # --- Return metrics ---
     return {
         "algorithm": "Dijkstra",
         "runtime_ms": float(runtime_ms),
