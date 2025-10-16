@@ -1,5 +1,5 @@
 """
-src/jps/jps_node.py
+src/algorithms/jps/jps_node.py
 Node class used in Jump Point Search.
 """
 

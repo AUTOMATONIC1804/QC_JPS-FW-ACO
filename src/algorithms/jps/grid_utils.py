@@ -1,5 +1,5 @@
 """
-src/jps/grid_utils.py
+src/algorithms/jps/grid_utils.py
 Utility functions for loading and visualizing grids.
 """
 

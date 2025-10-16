@@ -1,5 +1,5 @@
 """
-src/jps/jps_grid.py
+src/algorithms/jps/jps_grid.py
 Grid wrapper for JPS.
 """
 

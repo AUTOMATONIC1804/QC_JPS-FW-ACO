@@ -5,7 +5,7 @@ Utility functions for measuring runtime and path length in meters.
 
 import time
 from shapely.geometry import LineString
-from src.jps.grid_utils import cell_to_coords
+from src.algorithms.jps.grid_utils import cell_to_coords
 
 
 def measure_runtime(func, *args, **kwargs):

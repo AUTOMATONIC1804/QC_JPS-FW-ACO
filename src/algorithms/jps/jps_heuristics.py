@@ -1,5 +1,5 @@
 """
-src/jps/jps_heuristics.py
+src/algorithms/jps/jps_heuristics.py
 Heuristic functions for JPS.
 """
 

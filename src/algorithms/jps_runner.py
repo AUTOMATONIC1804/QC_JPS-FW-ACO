@@ -10,10 +10,10 @@ from collections import deque
 from pyproj import Transformer
 from shapely.geometry import Point, LineString, mapping
 
-from src.jps.jps_grid import Grid
-from src.jps.jps_main import jump_point_search
-from src.jps.jps_heuristics import octile
-from src.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
+from src.algorithms.jps.jps_grid import Grid
+from src.algorithms.jps.jps_main import jump_point_search
+from src.algorithms.jps.jps_heuristics import octile
+from src.algorithms.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
 from src.algorithms.metrics_utils import measure_runtime, compute_path_length
 
 

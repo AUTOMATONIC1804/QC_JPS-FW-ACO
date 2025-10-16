@@ -1,112 +1,30 @@
 """
 src/algorithms/astar_runner.py
-A* algorithm on QC grid (based on JPS runner).
+A* algorithm on QC grid (based on JPS structure).
 References:
 - GeeksforGeeks: https://www.geeksforgeeks.org/dsa/a-search-algorithm/
 - DataCamp: https://www.datacamp.com/tutorial/a-star-algorithm
 """
 
-import heapq
 import json
-import numpy as np
 import matplotlib.pyplot as plt
-from math import sqrt
-from collections import deque
 from pyproj import Transformer
 from shapely.geometry import Point, LineString, mapping
 
-from src.jps.jps_grid import Grid
-from src.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
+from src.algorithms.jps.jps_grid import Grid
+from src.algorithms.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
 from src.algorithms.metrics_utils import measure_runtime, compute_path_length
+from src.algorithms.astar.astar_main import astar_search
+from src.algorithms.astar.astar_utils import snap_to_nearest_road
 
 
-# -------------------------
-# Supporting Functions
-# -------------------------
-def snap_to_nearest_road(grid, start_cell, max_radius=50):
-    """If start_cell is obstacle, find nearest road (value=1) via BFS."""
-    r0, c0 = start_cell
-    if grid.matrix[r0, c0] == 1:
-        return start_cell
-
-    rows, cols = grid.matrix.shape
-    visited = set()
-    q = deque([(r0, c0, 0)])
-    while q:
-        r, c, d = q.popleft()
-        if d > max_radius:
-            break
-        if (r, c) in visited:
-            continue
-        visited.add((r, c))
-        if 0 <= r < rows and 0 <= c < cols and grid.matrix[r, c] == 1:
-            return (r, c)
-        for dr, dc in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]:
-            rr, cc = r+dr, c+dc
-            if 0 <= rr < rows and 0 <= cc < cols:
-                q.append((rr, cc, d+1))
-    raise ValueError(f"No nearby road within {max_radius} cells")
-
-
-def octile_distance(a, b):
-    """Octile distance heuristic (diagonal-allowed)."""
-    dx = abs(a[0] - b[0])
-    dy = abs(a[1] - b[1])
-    F = sqrt(2) - 1
-    return F * min(dx, dy) + max(dx, dy)
-
-
-def astar_search(grid, start, goal):
-    """Perform A* search on grid with 8-directional movement."""
-    rows, cols = grid.matrix.shape
-    open_set = []
-    heapq.heappush(open_set, (0, start))
-    came_from = {}
-    g_score = {start: 0}
-    f_score = {start: octile_distance(start, goal)}
-
-    directions = [
-        (-1, 0), (1, 0), (0, -1), (0, 1),
-        (-1, -1), (-1, 1), (1, -1), (1, 1)
-    ]
-
-    while open_set:
-        _, current = heapq.heappop(open_set)
-        if current == goal:
-            # reconstruct path
-            path = []
-            while current in came_from:
-                path.append(current)
-                current = came_from[current]
-            path.append(start)
-            path.reverse()
-            return path
-
-        for dr, dc in directions:
-            neighbor = (current[0] + dr, current[1] + dc)
-            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
-                if grid.matrix[neighbor[0], neighbor[1]] == 0:
-                    continue  # obstacle
-                tentative_g = g_score[current] + (sqrt(2) if dr != 0 and dc != 0 else 1)
-                if tentative_g < g_score.get(neighbor, float("inf")):
-                    came_from[neighbor] = current
-                    g_score[neighbor] = tentative_g
-                    f_score[neighbor] = tentative_g + octile_distance(neighbor, goal)
-                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
-
-    return None  # No path
-
-
-# -------------------------
-# Main Benchmark Function
-# -------------------------
 def run_astar_benchmark(
     tif_path="data/processed/qc_grid_clean.tif",
     start_coords=(121.0596, 14.7324),
     goal_coords=(121.080857, 14.59297),
     output_dir="data/outputs"
 ):
-    """Run A* on QC grid and return metrics."""
+    """Run A* on QC grid and return performance metrics."""
     print("🚀 Running A* on QC grid...")
 
     # Load grid
@@ -128,7 +46,7 @@ def run_astar_benchmark(
     goal = snap_to_nearest_road(grid, goal)
     print(f"🎯 Start: {start}, Goal: {goal}")
 
-    # Run A* with runtime measurement
+    # Run A* with timing
     path, runtime_ms = measure_runtime(astar_search, grid, start, goal)
     if not path:
         print("❌ No path found by A*.")
@@ -141,12 +59,10 @@ def run_astar_benchmark(
     plt.figure(figsize=(10, 12), facecolor="white")
     ax = plt.gca()
     ax.set_facecolor("white")
-
     ax.imshow(grid.matrix, cmap="gray", interpolation="none", origin="upper")
 
     rows, cols = zip(*path)
     ax.plot(cols, rows, color="#007BFF", linewidth=2.8, label="A* Path", zorder=3)
-
     ax.scatter(start[1], start[0], s=120, facecolor="#4CAF50", edgecolors="black",
                linewidth=1.2, zorder=4, label="Start")
     ax.scatter(goal[1], goal[0], s=140, facecolor="red", marker="X",

@@ -1,11 +1,11 @@
 """
-src/jps/jps_main.py
+src/algorithms/jps/jps_main.py
 Jump Point Search algorithm (8-way).
 Based on Harabor & Grastien (2012, 2014).
 """
 
 import heapq
-from src.jps.jps_node import Node
+from src.algorithms.jps.jps_node import Node
 
 
 # 8 directions
