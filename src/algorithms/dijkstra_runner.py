@@ -16,8 +16,8 @@ from src.algorithms.dijkstra.dijkstra_main import prepare_graph, snap_nodes
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(121.00210794876448, 14.618161542775779),
-    goal_coords=(121.03115460465105, 14.655409073297683),
+    start_coords=(121.05153128195097, 14.652763030203197),
+    goal_coords=(121.080857, 14.59297),
     output_dir="data/outputs"
 ):
     print(f"🚆 Running Dijkstra on {graph_path}")
