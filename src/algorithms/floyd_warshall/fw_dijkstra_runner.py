@@ -1,17 +1,19 @@
 """
-fw_dijkstra_runner.py (accurate spacing + 2km buffer)
-------------------------------------------------------
+fw_dijkstra_runner.py (real network nodes + 2 km buffer)
+--------------------------------------------------------
+
 Floyd–Warshall (FW) for Dijkstra route corridor.
 
 - Buffer: 2000 m around route
-- Path points: every 500 m along route
-- Buffer roads: every 500 m along roads inside buffer (excluding path duplicates)
-- All distances computed in EPSG:3857 for accuracy
+- Path points: from Dijkstra GeoJSON (already spaced)
+- Road nodes: real graph nodes inside buffer (~500 m filtered)
+- Distances: Haversine (meters)
+- CRS: EPSG:3857 for metric ops, EPSG:4326 for storage
 """
 
 import argparse, time, warnings
 from pathlib import Path
-from typing import Tuple, List, Dict, Any
+from typing import List, Dict, Any
 import numpy as np
 import geopandas as gpd
 import osmnx as ox
@@ -20,6 +22,7 @@ from shapely.geometry import LineString, MultiLineString
 from shapely.ops import unary_union
 from math import radians, sin, cos, asin, sqrt
 
+# Coordinate systems
 WGS84 = "EPSG:4326"
 METRIC = "EPSG:3857"
 
@@ -31,8 +34,8 @@ METRIC = "EPSG:3857"
 def _haversine_m(p1, p2):
     lon1, lat1 = p1; lon2, lat2 = p2
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-    a = sin((lat2-lat1)/2)**2 + cos(lat1)*cos(lat2)*sin((lon2-lon1)/2)**2
-    return 2*6371008.8*asin(min(1.0, np.sqrt(a)))
+    a = sin((lat2 - lat1) / 2) ** 2 + cos(lat1) * cos(lat2) * sin((lon2 - lon1) / 2) ** 2
+    return 2 * 6371008.8 * asin(min(1.0, np.sqrt(a)))
 
 
 def haversine_matrix(coords):
@@ -49,7 +52,8 @@ def haversine_matrix(coords):
 
 
 def floyd_warshall_numpy(D):
-    dist = D.copy(); n = dist.shape[0]
+    dist = D.copy()
+    n = dist.shape[0]
     for k in range(n):
         dist = np.minimum(dist, dist[:, [k]] + dist[[k], :])
     return dist
@@ -79,64 +83,82 @@ def buffer_route(line_4326: LineString, buffer_m: float) -> gpd.GeoDataFrame:
     """Create metric buffer (2 km default)."""
     line_m = gpd.GeoSeries([line_4326], crs=WGS84).to_crs(METRIC)
     buf = line_m.buffer(buffer_m)
-    return gpd.GeoDataFrame(geometry=buf, crs=METRIC).to_crs(WGS84)
+    return gpd.GeoDataFrame(geometry=buf, crs=METRIC)
 
 
-def graph_edges_to_gdf(graphml_path: str) -> gpd.GeoDataFrame:
-    """Convert GraphML to GeoDataFrame (EPSG:4326)."""
-    G = ox.load_graphml(graphml_path)
-    edges = ox.graph_to_gdfs(G, nodes=False, edges=True)
-    return edges.to_crs(WGS84)
+def load_graph_within_buffer(graphml_path: str, buffer_gdf: gpd.GeoDataFrame):
+    """
+    Load GraphML network and clip to the buffer polygon.
 
+    Works across OSMnx versions (1.x–2.x) by dynamically locating the
+    correct truncate function.
+    """
+    print(f"📂 Loading GraphML: {graphml_path}")
+    G_full = ox.load_graphml(graphml_path)
+    G_full = ox.project_graph(G_full, to_crs=METRIC)
 
-def clip_edges_with_buffer(edges: gpd.GeoDataFrame, buffer_gdf: gpd.GeoDataFrame):
-    """Clip road edges within the route buffer."""
-    clipped = gpd.overlay(edges, buffer_gdf, how="intersection")
-    return clipped.reset_index(drop=True)
+    polygon = buffer_gdf.geometry.iloc[0]
+
+    # --- Try multiple possible truncate functions depending on OSMnx version ---
+    truncate_fn = None
+    for mod_name, func_name in [
+        ("osmnx.truncate", "truncate_graph_polygon"),
+        ("osmnx.utils_graph", "truncate_graph_polygon"),
+        ("osmnx.graph", "truncate_graph_polygon"),
+    ]:
+        try:
+            mod = __import__(mod_name, fromlist=[func_name])
+            truncate_fn = getattr(mod, func_name, None)
+            if callable(truncate_fn):
+                break
+        except Exception:
+            continue
+
+    if truncate_fn is None:
+        raise ImportError(
+            "❌ Could not locate truncate_graph_polygon in any OSMnx module. "
+            "Please update or reinstall OSMnx."
+        )
+
+    # --- Perform clipping safely ---
+    try:
+        G_clip = truncate_fn(G_full, polygon, retain_all=True)
+    except TypeError:
+        # Some old versions don’t accept 'retain_all'
+        G_clip = truncate_fn(G_full, polygon)
+
+    # --- Extract nodes and edges ---
+    nodes_clip, edges_clip = ox.graph_to_gdfs(G_clip)
+    print(f"✅ Clipped: {len(nodes_clip)} nodes, {len(edges_clip)} edges inside buffer")
+    return nodes_clip.to_crs(WGS84), edges_clip.to_crs(WGS84)
+
 
 
 # -------------------------------------------------------------------------
-# Point sampling (accurate 500 m)
+# Node filtering (real graph nodes ~500 m apart)
 # -------------------------------------------------------------------------
 
-def sample_points_exact_3857(geom, spacing_m: float) -> List:
-    """Return points spaced at exact 500 m intervals (in EPSG:3857)."""
-    if geom is None:
-        return []
-    lines = [geom] if geom.geom_type == "LineString" else list(geom.geoms) if geom.geom_type == "MultiLineString" else []
-    pts = []
-    for ls in lines:
-        length = ls.length
-        dists = np.arange(0, length + spacing_m, spacing_m)
-        for d in dists:
-            pts.append(ls.interpolate(min(d, length)))
-    return pts
+def filter_nodes_by_spacing(nodes_gdf: gpd.GeoDataFrame, spacing_m: float) -> gpd.GeoDataFrame:
+    """Keep roughly one node per 'spacing_m' grid cell (in EPSG:3857)."""
+    if nodes_gdf.empty:
+        return nodes_gdf
 
-
-def sample_points_along_route(line_4326: LineString, spacing_m: float) -> gpd.GeoDataFrame:
-    """Sample points every 500 m along the Dijkstra path."""
-    line_m = gpd.GeoSeries([line_4326], crs=WGS84).to_crs(METRIC).iloc[0]
-    pts = sample_points_exact_3857(line_m, spacing_m)
-    gdf = gpd.GeoDataFrame(geometry=pts, crs=METRIC).to_crs(WGS84)
-    return gdf
-
-
-def sample_points_along_edges(edges_4326: gpd.GeoDataFrame, spacing_m: float) -> gpd.GeoDataFrame:
-    """Sample points along all roads in buffer (EPSG:3857 accurate spacing)."""
-    edges_m = edges_4326.to_crs(METRIC)
-    pts = []
-    for geom in edges_m.geometry:
-        pts.extend(sample_points_exact_3857(geom, spacing_m))
-    gdf = gpd.GeoDataFrame(geometry=pts, crs=METRIC).to_crs(WGS84)
-    return gdf
+    nodes_m = nodes_gdf.to_crs(METRIC)
+    nodes_m["gx"] = (nodes_m.geometry.x // spacing_m).astype(int)
+    nodes_m["gy"] = (nodes_m.geometry.y // spacing_m).astype(int)
+    thinned = nodes_m.drop_duplicates(subset=["gx", "gy"]).drop(columns=["gx", "gy"])
+    print(f"✅ Filtered {len(nodes_gdf)} → {len(thinned)} nodes (~{spacing_m} m grid)")
+    return thinned.to_crs(WGS84)
 
 
 # -------------------------------------------------------------------------
 # Main FW Dijkstra
 # -------------------------------------------------------------------------
 
-def run_fw_dijkstra(route_geojson, graphml_path,
-                    buffer_m=2000, spacing_m=500,
+def run_fw_dijkstra(route_geojson,
+                    graphml_path,
+                    buffer_m=2000,
+                    spacing_m=500,
                     output_dir="data/outputs/floyd_warshall") -> Dict[str, Any]:
 
     timings = {}
@@ -152,45 +174,50 @@ def run_fw_dijkstra(route_geojson, graphml_path,
     buffer_gdf = buffer_route(route_line, buffer_m)
     timings["buffer_ms"] = (time.perf_counter() - t) * 1000
 
-    # 3. Graph
+    # 3. Graph + clip to buffer
     t = time.perf_counter()
-    edges = graph_edges_to_gdf(graphml_path)
-    timings["load_graph_ms"] = (time.perf_counter() - t) * 1000
+    nodes, edges = load_graph_within_buffer(graphml_path, buffer_gdf)
+    timings["graph_clip_ms"] = (time.perf_counter() - t) * 1000
 
-    # 4. Clip to buffer
+    # 4. Filter nodes (~500 m)
     t = time.perf_counter()
-    roads = clip_edges_with_buffer(edges, buffer_gdf)
-    timings["clip_edges_ms"] = (time.perf_counter() - t) * 1000
+    nodes_filtered = filter_nodes_by_spacing(nodes, spacing_m)
+    timings["filter_nodes_ms"] = (time.perf_counter() - t) * 1000
 
-    # 5. Sample path + buffer roads
+    # 5. Combine with Dijkstra path points
     t = time.perf_counter()
-    path_pts = sample_points_along_route(route_line, spacing_m)
-    road_pts = sample_points_along_edges(roads, spacing_m)
-    # Merge + deduplicate
-    pts = gpd.GeoDataFrame(pd.concat([path_pts, road_pts], ignore_index=True), crs=WGS84)
-    pts["lon"] = pts.geometry.x.round(6)
-    pts["lat"] = pts.geometry.y.round(6)
-    pts = pts.drop_duplicates(subset=["lon", "lat"]).drop(columns=["lon", "lat"])
-    timings["sample_points_ms"] = (time.perf_counter() - t) * 1000
+    # take only Point features if path file has them, otherwise sample
+    path_gdf = gpd.read_file(route_geojson)
+    if "Point" not in path_gdf.geom_type.unique():
+        # if route file only contains a LineString, convert its vertices to points
+        coords = list(route_line.coords)
+        path_gdf = gpd.GeoDataFrame(geometry=[gpd.points_from_xy([x for x, y in coords],
+                                                                 [y for x, y in coords])])
+    path_points = path_gdf[path_gdf.geom_type == "Point"].to_crs(WGS84)
+    merged_pts = pd.concat([path_points, nodes_filtered], ignore_index=True)
+    merged_pts = gpd.GeoDataFrame(geometry=merged_pts.geometry, crs=WGS84)
+    merged_pts["lon"] = merged_pts.geometry.x.round(6)
+    merged_pts["lat"] = merged_pts.geometry.y.round(6)
+    merged_pts = merged_pts.drop_duplicates(subset=["lon", "lat"]).drop(columns=["lon", "lat"])
+    timings["merge_points_ms"] = (time.perf_counter() - t) * 1000
 
-    # 6. Build matrices
+    # 6. Distance + FW
     t = time.perf_counter()
-    coords = [(p.x, p.y) for p in pts.geometry]
+    coords = [(p.x, p.y) for p in merged_pts.geometry]
     D = haversine_matrix(coords)
     timings["build_matrix_ms"] = (time.perf_counter() - t) * 1000
-
     t = time.perf_counter()
     FW = floyd_warshall_numpy(D)
     timings["floyd_warshall_ms"] = (time.perf_counter() - t) * 1000
 
-    # 7. Save
+    # 7. Save outputs
     t = time.perf_counter()
     out = Path(output_dir); out.mkdir(parents=True, exist_ok=True)
-    buffer_gdf.to_file(out / "fw_dijkstra_buffer.geojson", driver="GeoJSON")
-    roads.to_file(out / "fw_dijkstra_roads.geojson", driver="GeoJSON")
-    path_pts.to_file(out / "fw_dijkstra_path_points.geojson", driver="GeoJSON")
-    road_pts.to_file(out / "fw_dijkstra_buffer_points.geojson", driver="GeoJSON")
-    pts.to_file(out / "fw_dijkstra_points_merged.geojson", driver="GeoJSON")
+    buffer_gdf.to_crs(WGS84).to_file(out / "fw_dijkstra_buffer.geojson", driver="GeoJSON")
+    edges.to_file(out / "fw_dijkstra_roads.geojson", driver="GeoJSON")
+    nodes_filtered.to_file(out / "fw_dijkstra_nodes.geojson", driver="GeoJSON")
+    path_points.to_file(out / "fw_dijkstra_path_points.geojson", driver="GeoJSON")
+    merged_pts.to_file(out / "fw_dijkstra_points_merged.geojson", driver="GeoJSON")
     np.save(out / "fw_dijkstra_D.npy", D)
     np.save(out / "fw_dijkstra_FW.npy", FW)
     timings["save_outputs_ms"] = (time.perf_counter() - t) * 1000
@@ -198,7 +225,7 @@ def run_fw_dijkstra(route_geojson, graphml_path,
 
     return {
         "params": {"buffer_m": buffer_m, "spacing_m": spacing_m},
-        "counts": {"n_points": int(len(pts)), "matrix_shape": list(D.shape)},
+        "counts": {"n_points": int(len(merged_pts)), "matrix_shape": list(D.shape)},
         "timings_ms": {k: round(v, 2) for k, v in timings.items()},
         "outputs": str(out)
     }
@@ -211,7 +238,7 @@ def run_fw_dijkstra(route_geojson, graphml_path,
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--route_geojson", default="data/outputs/dijkstra_path.geojson")
-    ap.add_argument("--graphml_path", default="data/processed/qc_roads_major.graphml")
+    ap.add_argument("--graphml_path", default=r"D:\Quezon_City\data\processed\qc_roads_major.graphml")
     ap.add_argument("--buffer_m", type=float, default=2000)
     ap.add_argument("--spacing_m", type=float, default=500)
     ap.add_argument("--output_dir", default="data/outputs/floyd_warshall")
@@ -225,7 +252,7 @@ if __name__ == "__main__":
         output_dir=args.output_dir
     )
 
-    print("=== 🚆 Dijkstra → FW (2 km buffer, 500 m spacing) ===")
+    print("\n=== 🚆 Dijkstra → FW (real nodes, 2 km buffer, 500 m spacing) ===")
     print("Counts:", info["counts"])
     print("Timings (ms):", info["timings_ms"])
     print("Outputs →", info["outputs"])

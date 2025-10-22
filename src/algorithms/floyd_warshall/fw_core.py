@@ -249,34 +249,38 @@ def get_roads_within_buffer(line_3857: LineString,
 
 def sample_points_along_roads(edges_3857: gpd.GeoDataFrame, spacing_m: float) -> gpd.GeoDataFrame:
     """
-    Sample points along each LineString/MultiLineString at a fixed spacing.
-    Deduplicate by snapping to a 1 m grid to avoid overlapping points from adjacent segments.
+    Sample points at exact 'spacing_m' intervals along each road geometry (EPSG:3857).
+    This ensures true 500 m (or custom) spacing, not vertex-based density.
+
+    Deduplicates by snapping to a 1 m grid.
     """
     rows = []
     for idx, geom in edges_3857.geometry.items():
         if geom is None:
             continue
-        if geom.geom_type == "MultiLineString":
-            lines = list(geom.geoms)
-        elif geom.geom_type == "LineString":
-            lines = [geom]
-        else:
-            continue
 
+        # Handle MultiLineString and LineString uniformly
+        lines = [geom] if geom.geom_type == "LineString" else list(geom.geoms) if geom.geom_type == "MultiLineString" else []
         for ls in lines:
             length = ls.length
-            n = max(1, int(length // spacing_m))
-            for i in range(n + 1):
-                d = min(i * spacing_m, length)
-                pt = ls.interpolate(d)
-                rows.append({"edge_id": idx, "geometry": pt})
+            if length < spacing_m:
+                # include only start and end
+                pts = [ls.interpolate(0), ls.interpolate(length)]
+            else:
+                dists = np.arange(0, length + spacing_m, spacing_m)
+                pts = [ls.interpolate(d) for d in dists]
 
-    pts = gpd.GeoDataFrame(rows, geometry="geometry", crs=METRIC)
-    # Dedup (approx): snap to 1 m
+            for p in pts:
+                rows.append({"edge_id": idx, "geometry": p})
+
+    pts = gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:3857")
+
     if len(pts) == 0:
         return pts
-    pts["X"] = pts.geometry.x.round(0)
-    pts["Y"] = pts.geometry.y.round(0)
+
+    # Snap to 1 m grid (avoid duplicates)
+    pts["X"] = (pts.geometry.x / 1).round(0)
+    pts["Y"] = (pts.geometry.y / 1).round(0)
     pts = pts.drop_duplicates(subset=["X", "Y"]).drop(columns=["X", "Y"]).reset_index(drop=True)
     return pts
 
