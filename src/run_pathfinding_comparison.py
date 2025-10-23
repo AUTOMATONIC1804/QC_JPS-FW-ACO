@@ -32,11 +32,14 @@ def main():
     # --- Summary ---
     print("\n=== ✅ COMPARISON COMPLETE ===")
     for r in results:
-        if r["path_length_m"] is None:
-            print(f"{r['algorithm']}: ❌ No path found.")
+        if r is None:
+            print("❌ One algorithm failed to return results.")
+            continue
+        if r.get("path_length_m") is None:
+            print(f"{r.get('algorithm', 'Unknown')}: ❌ No path found.")
         else:
             print(f"{r['algorithm']}: {r['runtime_ms']:.2f} ms | "
-                  f"{r['path_length_m']:.2f} m | {r['steps']} steps")
+                f"{r['path_length_m']:.2f} m | {r['steps']} steps")
 
     # --- Save results ---
     with open("data/outputs/pathfinding_comparison.json", "w") as f:

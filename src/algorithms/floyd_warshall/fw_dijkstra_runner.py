@@ -239,8 +239,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--route_geojson", default="data/outputs/dijkstra_path.geojson")
     ap.add_argument("--graphml_path", default=r"D:\Quezon_City\data\processed\qc_roads_major.graphml")
-    ap.add_argument("--buffer_m", type=float, default=2000)
-    ap.add_argument("--spacing_m", type=float, default=500)
+    ap.add_argument("--buffer_m", type=float, default=1000) # For Buffer 
+    ap.add_argument("--spacing_m", type=float, default=200) # For Spacing
     ap.add_argument("--output_dir", default="data/outputs/floyd_warshall")
     args = ap.parse_args()
 
