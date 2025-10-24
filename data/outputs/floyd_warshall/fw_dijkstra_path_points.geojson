@@ -1,9 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "fw_dijkstra_path_points",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "algorithm": null, "role": "start" }, "geometry": { "type": "Point", "coordinates": [ 121.0590524, 14.7352905 ] } },
-{ "type": "Feature", "properties": { "algorithm": null, "role": "goal" }, "geometry": { "type": "Point", "coordinates": [ 121.0676619, 14.6631782 ] } }
-]
-}

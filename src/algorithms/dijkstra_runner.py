@@ -1,6 +1,6 @@
 """
 src/algorithms/dijkstra_runner.py
-Clean and modular Dijkstra pathfinding — keeps visualization here.
+Clean and modular Dijkstra pathfinding — now with curved OSM edge geometries.
 """
 
 import os
@@ -10,8 +10,35 @@ import networkx as nx
 import osmnx as ox
 import matplotlib.pyplot as plt
 from shapely.geometry import LineString, Point, mapping
+from shapely.ops import linemerge
 
 from src.algorithms.dijkstra.dijkstra_main import prepare_graph, snap_nodes
+
+
+def build_curved_route(G, path_nodes):
+    """
+    Merge true OSM edge geometries along the path to form a smooth route.
+    Falls back to straight lines if no geometry field exists.
+    """
+    edge_lines = []
+    for u, v in zip(path_nodes[:-1], path_nodes[1:]):
+        edge_data = G.get_edge_data(u, v, 0)
+        geom = edge_data.get("geometry", None)
+        if geom is None:
+            geom = LineString([
+                (G.nodes[u]["x"], G.nodes[u]["y"]),
+                (G.nodes[v]["x"], G.nodes[v]["y"])
+            ])
+        edge_lines.append(geom)
+    try:
+        merged = linemerge(edge_lines)
+    except Exception:
+        # fallback if invalid merge
+        coords = []
+        for g in edge_lines:
+            coords.extend(list(g.coords))
+        merged = LineString(coords)
+    return merged
 
 
 def run_dijkstra_benchmark(
@@ -42,6 +69,10 @@ def run_dijkstra_benchmark(
     adjusted_length = max(0, length_m - (dist_start + dist_goal))
     print(f"[OK] Dijkstra completed — Runtime: {runtime_ms:.2f} ms, Path length: {adjusted_length:.2f} m")
 
+    # --- Build curved route from OSM edges ---
+    print("[OK] Building curved geometry path...")
+    curved_line = build_curved_route(G, path)
+
     # --- Visualization ---
     print("[OK] Rendering clean black map...")
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -54,9 +85,7 @@ def run_dijkstra_benchmark(
     )
 
     # Plot Dijkstra path (blue)
-    x_coords = [G.nodes[n]["x"] for n in path]
-    y_coords = [G.nodes[n]["y"] for n in path]
-    ax.plot(x_coords, y_coords, color="#2196F3", linewidth=2.8, label="Dijkstra Path", zorder=3)
+    ax.plot(*curved_line.xy, color="#2196F3", linewidth=2.8, label="Dijkstra Path", zorder=3)
 
     # Start / Goal markers
     x_start, y_start = G.nodes[start_node]["x"], G.nodes[start_node]["y"]
@@ -81,18 +110,26 @@ def run_dijkstra_benchmark(
     plt.close(fig)
     print(f"[OK] Saved Dijkstra visualization → {out_png}")
 
-    # --- GeoJSON Export ---
-    coords = [(G.nodes[n]["x"], G.nodes[n]["y"]) for n in path]
+    # --- GeoJSON Export (both straight and curved) ---
+    straight_coords = [(G.nodes[n]["x"], G.nodes[n]["y"]) for n in path]
+
     geojson = {
-        "type": "FeatureCollection",
-        "features": [
-            {"type": "Feature", "geometry": mapping(LineString(coords)), "properties": {"algorithm": "Dijkstra"}},
-            {"type": "Feature", "geometry": mapping(Point(x_start, y_start)), "properties": {"role": "start"}},
-            {"type": "Feature", "geometry": mapping(Point(x_goal, y_goal)), "properties": {"role": "goal"}},
+    "type": "FeatureCollection",
+    "features": [
+        {"type": "Feature", "geometry": mapping(curved_line),
+         "properties": {"algorithm": "Dijkstra", "geometry": "curved"}},
+        {"type": "Feature", "geometry": mapping(Point(x_start, y_start)),
+         "properties": {"role": "start"}},
+        {"type": "Feature", "geometry": mapping(Point(x_goal, y_goal)),
+         "properties": {"role": "goal"}},
         ],
     }
-    with open(os.path.join(output_dir, "dijkstra_path.geojson"), "w") as f:
+
+
+    out_geojson = os.path.join(output_dir, "dijkstra_path.geojson")
+    with open(out_geojson, "w") as f:
         json.dump(geojson, f)
+    print(f"[OK] Saved GeoJSON → {out_geojson}")
 
     # --- Return metrics ---
     return {
