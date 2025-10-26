@@ -43,8 +43,8 @@ def build_curved_route(G, path_nodes):
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(121.058495, 14.733691),
-    goal_coords=(121.067654, 14.663473),
+    start_coords=(121.0469586, 14.6500329), 
+    goal_coords=(121.0018562, 14.617906), 
     output_dir="data/outputs"
 ):
     print(f"🚆 Running Dijkstra on {graph_path}")

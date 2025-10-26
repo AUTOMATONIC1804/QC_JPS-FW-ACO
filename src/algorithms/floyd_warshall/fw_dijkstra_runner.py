@@ -14,23 +14,21 @@ import argparse
 import time
 import warnings
 from pathlib import Path
-from typing import Dict, Any
 import numpy as np
 import geopandas as gpd
 import osmnx as ox
 from shapely.geometry import LineString, MultiLineString
 from shapely.ops import unary_union
-from math import radians, sin, cos, asin, sqrt
+from math import radians, sin, cos, asin
 
 # Coordinate systems
 WGS84 = "EPSG:4326"
 METRIC = "EPSG:3857"
 
 
-# -------------------------------------------------------------------------
-# Distance + FW helpers
-# -------------------------------------------------------------------------
-
+# ---------------------------------------------------
+# Distance + FW
+# ---------------------------------------------------
 def _haversine_m(p1, p2):
     lon1, lat1 = p1
     lon2, lat2 = p2
@@ -60,10 +58,9 @@ def floyd_warshall_numpy(D):
     return dist
 
 
-# -------------------------------------------------------------------------
+# ---------------------------------------------------
 # Geo helpers
-# -------------------------------------------------------------------------
-
+# ---------------------------------------------------
 def load_route_line(route_geojson: str) -> LineString:
     """Load Dijkstra route (EPSG:4326) and unify to a LineString."""
     gdf = gpd.read_file(route_geojson)
@@ -76,7 +73,8 @@ def load_route_line(route_geojson: str) -> LineString:
         coords = []
         for ls in geom.geoms:
             coords.extend(ls.coords)
-        return LineString(coords)
+        geom = LineString(coords)
+    print(f"✅ Loaded Dijkstra route (length ≈ {LineString(geom).length:.0f})")
     return geom
 
 
@@ -123,68 +121,72 @@ def load_graph_within_buffer(graphml_path: str, buffer_gdf: gpd.GeoDataFrame):
     return nodes_clip.to_crs(WGS84), edges_clip.to_crs(WGS84)
 
 
-# -------------------------------------------------------------------------
-# Node filtering (real graph nodes ~500 m apart)
-# -------------------------------------------------------------------------
-
+# ---------------------------------------------------
+# Node filtering (distance-based thinning)
+# ---------------------------------------------------
 def filter_nodes_by_spacing(nodes_gdf: gpd.GeoDataFrame, spacing_m: float) -> gpd.GeoDataFrame:
-    """Keep roughly one node per 'spacing_m' grid cell (EPSG:3857)."""
+    """Keep nodes spaced at least `spacing_m` meters apart."""
     if nodes_gdf.empty:
         return nodes_gdf
 
-    nodes_m = nodes_gdf.to_crs(METRIC)
-    nodes_m["gx"] = (nodes_m.geometry.x // spacing_m).astype(int)
-    nodes_m["gy"] = (nodes_m.geometry.y // spacing_m).astype(int)
-    thinned = nodes_m.drop_duplicates(subset=["gx", "gy"]).drop(columns=["gx", "gy"])
-    print(f"✅ Filtered {len(nodes_gdf)} → {len(thinned)} nodes (~{spacing_m} m grid)")
+    nodes_m = nodes_gdf.to_crs(METRIC).copy()
+    nodes_m["x"] = nodes_m.geometry.x
+    nodes_m["y"] = nodes_m.geometry.y
+    nodes_m = nodes_m.sort_values(by=["x", "y"]).reset_index(drop=True)
+    nodes_m = nodes_m.drop(columns=["x", "y"])
+
+    kept_indices = []
+    kept_points = []
+
+    for idx, row in nodes_m.iterrows():
+        geom = row.geometry
+        if all(geom.distance(p) >= spacing_m for p in kept_points):
+            kept_indices.append(idx)
+            kept_points.append(geom)
+
+    thinned = nodes_m.loc[kept_indices].copy()
+    print(f"🧩 Filtered {len(nodes_gdf)} → {len(thinned)} nodes (~{spacing_m} m apart)")
     return thinned.to_crs(WGS84)
 
 
-# -------------------------------------------------------------------------
-# Main FW Dijkstra
-# -------------------------------------------------------------------------
+# ---------------------------------------------------
+# Runner
+# ---------------------------------------------------
+def run_fw_dijkstra(
+    route_geojson="data/outputs/dijkstra_path.geojson",
+    graphml_path=r"D:\Quezon_City\data\processed\qc_roads_major.graphml",
+    buffer_m=2000,
+    spacing_m=500,
+    output_dir="data/outputs/floyd_warshall"
+):
+    print("🚆 FW (Dijkstra + Real Road Network v5.3)")
+    print(f"Route: {route_geojson}")
+    print(f"Graph: {graphml_path}")
+    print(f"Buffer: ±{buffer_m} m | Spacing: {spacing_m} m")
 
-def run_fw_dijkstra(route_geojson,
-                    graphml_path,
-                    buffer_m=1000,
-                    spacing_m=500,
-                    output_dir="data/outputs/floyd_warshall") -> Dict[str, Any]:
-
-    timings = {}
     t0 = time.perf_counter()
 
-    # 1. Load Dijkstra route
-    t = time.perf_counter()
+    # 1) Load Dijkstra route
     route_line = load_route_line(route_geojson)
-    timings["load_route_ms"] = (time.perf_counter() - t) * 1000
 
-    # 2. Build buffer
-    t = time.perf_counter()
+    # 2) Buffer around route
     buffer_gdf = buffer_route(route_line, buffer_m)
-    timings["buffer_ms"] = (time.perf_counter() - t) * 1000
 
-    # 3. Clip graph to buffer
-    t = time.perf_counter()
+    # 3) Clip road network
     nodes, edges = load_graph_within_buffer(graphml_path, buffer_gdf)
-    timings["graph_clip_ms"] = (time.perf_counter() - t) * 1000
 
-    # 4. Filter nodes by spacing
-    t = time.perf_counter()
+    # 4) Filter nodes
     nodes_filtered = filter_nodes_by_spacing(nodes, spacing_m)
-    timings["filter_nodes_ms"] = (time.perf_counter() - t) * 1000
+    if len(nodes_filtered) == 0:
+        print("❌ No nodes available after filtering.")
+        return
 
-    # 5. Compute distances + FW
-    t = time.perf_counter()
+    # 5) Build distance + FW
     coords = [(p.x, p.y) for p in nodes_filtered.geometry]
     D = haversine_matrix(coords)
-    timings["build_matrix_ms"] = (time.perf_counter() - t) * 1000
-
-    t = time.perf_counter()
     FW = floyd_warshall_numpy(D)
-    timings["floyd_warshall_ms"] = (time.perf_counter() - t) * 1000
 
-    # 6. Save outputs
-    t = time.perf_counter()
+    # 6) Save outputs
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     buffer_gdf.to_crs(WGS84).to_file(out / "fw_dijkstra_buffer.geojson", driver="GeoJSON")
@@ -192,40 +194,25 @@ def run_fw_dijkstra(route_geojson,
     nodes_filtered.to_file(out / "fw_dijkstra_nodes.geojson", driver="GeoJSON")
     np.save(out / "fw_dijkstra_D.npy", D)
     np.save(out / "fw_dijkstra_FW.npy", FW)
-    timings["save_outputs_ms"] = (time.perf_counter() - t) * 1000
-    timings["total_ms"] = (time.perf_counter() - t0) * 1000
 
-    return {
-        "params": {"buffer_m": buffer_m, "spacing_m": spacing_m},
-        "counts": {"n_points": int(len(nodes_filtered)), "matrix_shape": list(D.shape)},
-        "timings_ms": {k: round(v, 2) for k, v in timings.items()},
-        "outputs": str(out)
-    }
+    # Summary
+    elapsed_ms = (time.perf_counter() - t0) * 1000
+    print("\n✅ Summary (Dijkstra + Real Nodes)")
+    print(f"🧩 Nodes: {len(nodes_filtered)} | 🛣️ Edges: {len(edges)}")
+    print(f"📐 Matrix {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
+    print("===================================")
 
 
-# -------------------------------------------------------------------------
-# Entry point
-# -------------------------------------------------------------------------
-
+# ---------------------------------------------------
+# Entry
+# ---------------------------------------------------
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--route_geojson", default="data/outputs/dijkstra_path.geojson")
     ap.add_argument("--graphml_path", default=r"D:\Quezon_City\data\processed\qc_roads_major.graphml")
-    ap.add_argument("--buffer_m", type=float, default=1000)
+    ap.add_argument("--buffer_m", type=float, default=2000)
     ap.add_argument("--spacing_m", type=float, default=500)
     ap.add_argument("--output_dir", default="data/outputs/floyd_warshall")
     args = ap.parse_args()
 
-    info = run_fw_dijkstra(
-        route_geojson=args.route_geojson,
-        graphml_path=args.graphml_path,
-        buffer_m=args.buffer_m,
-        spacing_m=args.spacing_m,
-        output_dir=args.output_dir
-    )
-
-    print("\n=== 🚆 Dijkstra → FW (real nodes only) ===")
-    print("Counts:", info["counts"])
-    print("Timings (ms):", info["timings_ms"])
-    print("Outputs →", info["outputs"])
-    print("=== ✅ Done ===")
+    run_fw_dijkstra(**vars(args))

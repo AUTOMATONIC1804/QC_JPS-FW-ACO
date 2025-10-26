@@ -67,6 +67,7 @@ roads_to_remove = {
     "Blumentritt Street",
     "Maria Clara Street",
     "C. Benitez Street",
+    "Belfast Avenue"
 }
 
 edges_to_remove = [

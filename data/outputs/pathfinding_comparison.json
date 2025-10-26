@@ -1,20 +1,20 @@
 [
   {
     "algorithm": "JPS",
-    "runtime_ms": 157.29469999999958,
-    "path_length_m": 12136.072144624379,
-    "steps": 296
+    "runtime_ms": 27.714799999998263,
+    "path_length_m": 6560.163773909262,
+    "steps": 198
   },
   {
     "algorithm": "Dijkstra",
-    "runtime_ms": 6.216526031494141,
-    "path_length_m": 10997.622346065238,
-    "steps": 79
+    "runtime_ms": 8.00323486328125,
+    "path_length_m": 6043.271907848607,
+    "steps": 41
   },
   {
     "algorithm": "A*",
-    "runtime_ms": 54.75939999999824,
-    "path_length_m": 12050.214280248183,
-    "steps": 1083
+    "runtime_ms": 20.64820000000367,
+    "path_length_m": 6548.448045156682,
+    "steps": 503
   }
 ]
