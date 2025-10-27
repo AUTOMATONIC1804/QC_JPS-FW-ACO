@@ -1,0 +1,4 @@
+Algorithm,RouteFile,RoadSource,Buffer_m,Spacing_m,MergeRadius_m,n_points,MatrixShape,Time_ms
+JPS,data/outputs/jps_path.geojson,Vector (GeoJSON),2000,600,450,71,"[71, 71]",4244.97
+A*,data/outputs/astar_path.geojson,Vector (GeoJSON),2000,600,450,71,"[71, 71]",990.18
+Dijkstra,data/outputs/dijkstra_path.geojson,GraphML (OSMnx),2000,600,-,55,"[55, 55]",2083.31

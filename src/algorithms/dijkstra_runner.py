@@ -1,6 +1,7 @@
 """
 src/algorithms/dijkstra_runner.py
 Clean and modular Dijkstra pathfinding — now with curved OSM edge geometries.
+Accepts (lat, lon) coordinate input for convenience when copying from QGIS.
 """
 
 import os
@@ -43,17 +44,25 @@ def build_curved_route(G, path_nodes):
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(121.0469586, 14.6500329), 
-    goal_coords=(121.0018562, 14.617906), 
+    start_coords=(14.73545509,121.06668635),  
+    goal_coords=(14.6522274,121.0477103),    
     output_dir="data/outputs"
 ):
+    """
+    Run Dijkstra pathfinding using (lat, lon) input.
+    Automatically swaps to (lon, lat) internally for processing.
+    """
     print(f"🚆 Running Dijkstra on {graph_path}")
 
     # --- Load and preprocess graph ---
     G = prepare_graph(graph_path)
 
+    # --- Swap (lat, lon) → (lon, lat) for internal OSMnx compatibility ---
+    start_coords_swapped = (start_coords[1], start_coords[0])
+    goal_coords_swapped = (goal_coords[1], goal_coords[0])
+
     # --- Snap coordinates to nearest nodes ---
-    start_node, goal_node, dist_start, dist_goal = snap_nodes(G, start_coords, goal_coords)
+    start_node, goal_node, dist_start, dist_goal = snap_nodes(G, start_coords_swapped, goal_coords_swapped)
     print(f"🎯 Start node: {start_node} ({dist_start:.2f} m away)")
     print(f"🏁 Goal  node: {goal_node} ({dist_goal:.2f} m away)")
 
@@ -91,8 +100,10 @@ def run_dijkstra_benchmark(
     x_start, y_start = G.nodes[start_node]["x"], G.nodes[start_node]["y"]
     x_goal, y_goal = G.nodes[goal_node]["x"], G.nodes[goal_node]["y"]
 
-    ax.scatter(x_start, y_start, s=120, facecolor="#00FF00", edgecolors="black", linewidth=1.2, zorder=5, label="Start")
-    ax.scatter(x_goal, y_goal, s=140, color="red", marker="X", zorder=5, label="Goal")
+    ax.scatter(x_start, y_start, s=120, facecolor="#00FF00", edgecolors="black",
+               linewidth=1.2, zorder=5, label="Start")
+    ax.scatter(x_goal, y_goal, s=140, color="red", marker="X",
+               zorder=5, label="Goal")
 
     # Legend styling (top-right, white text)
     leg = ax.legend(
@@ -114,17 +125,16 @@ def run_dijkstra_benchmark(
     straight_coords = [(G.nodes[n]["x"], G.nodes[n]["y"]) for n in path]
 
     geojson = {
-    "type": "FeatureCollection",
-    "features": [
-        {"type": "Feature", "geometry": mapping(curved_line),
-         "properties": {"algorithm": "Dijkstra", "geometry": "curved"}},
-        {"type": "Feature", "geometry": mapping(Point(x_start, y_start)),
-         "properties": {"role": "start"}},
-        {"type": "Feature", "geometry": mapping(Point(x_goal, y_goal)),
-         "properties": {"role": "goal"}},
+        "type": "FeatureCollection",
+        "features": [
+            {"type": "Feature", "geometry": mapping(curved_line),
+             "properties": {"algorithm": "Dijkstra", "geometry": "curved"}},
+            {"type": "Feature", "geometry": mapping(Point(x_start, y_start)),
+             "properties": {"role": "start"}},
+            {"type": "Feature", "geometry": mapping(Point(x_goal, y_goal)),
+             "properties": {"role": "goal"}},
         ],
     }
-
 
     out_geojson = os.path.join(output_dir, "dijkstra_path.geojson")
     with open(out_geojson, "w") as f:

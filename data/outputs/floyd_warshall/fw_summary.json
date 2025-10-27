@@ -1,0 +1,44 @@
+[
+  {
+    "Algorithm":"JPS",
+    "RouteFile":"data\/outputs\/jps_path.geojson",
+    "RoadSource":"Vector (GeoJSON)",
+    "Buffer_m":2000,
+    "Spacing_m":600,
+    "MergeRadius_m":450,
+    "n_points":71,
+    "MatrixShape":[
+      71,
+      71
+    ],
+    "Time_ms":4244.97
+  },
+  {
+    "Algorithm":"A*",
+    "RouteFile":"data\/outputs\/astar_path.geojson",
+    "RoadSource":"Vector (GeoJSON)",
+    "Buffer_m":2000,
+    "Spacing_m":600,
+    "MergeRadius_m":450,
+    "n_points":71,
+    "MatrixShape":[
+      71,
+      71
+    ],
+    "Time_ms":990.18
+  },
+  {
+    "Algorithm":"Dijkstra",
+    "RouteFile":"data\/outputs\/dijkstra_path.geojson",
+    "RoadSource":"GraphML (OSMnx)",
+    "Buffer_m":2000,
+    "Spacing_m":600,
+    "MergeRadius_m":"-",
+    "n_points":55,
+    "MatrixShape":[
+      55,
+      55
+    ],
+    "Time_ms":2083.31
+  }
+]

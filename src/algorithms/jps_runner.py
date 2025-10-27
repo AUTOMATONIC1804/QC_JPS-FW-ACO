@@ -44,11 +44,11 @@ def snap_to_nearest_road(grid, start_cell, max_radius=50):
 
 def run_jps_benchmark(
     tif_path="data/processed/qc_grid_clean.tif",
-    start_coords=(121.0469586, 14.6500329),
-    goal_coords=(121.0018562, 14.617906),
+    start_coords=(14.73545509,121.06668635),  
+    goal_coords=(14.6522274,121.0477103),    
     output_dir="data/outputs"
 ):
-    """Run JPS on QC grid and return metrics for comparison (final stable version)."""
+    """Run JPS on QC grid and return metrics for comparison (lat, lon input version)."""
     import traceback, geopandas as gpd, os, matplotlib.pyplot as plt
     from shapely.geometry import Point, LineString
 
@@ -68,8 +68,11 @@ def run_jps_benchmark(
         # -------------------------------------------------------
         print("[2] Preparing coordinates (EPSG:4326 → EPSG:3857)...")
         transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
-        sx, sy = transformer.transform(*start_coords)
-        gx, gy = transformer.transform(*goal_coords)
+
+        # 🔁 Swap (lat, lon) → (lon, lat) before transforming
+        sx, sy = transformer.transform(start_coords[1], start_coords[0])
+        gx, gy = transformer.transform(goal_coords[1], goal_coords[0])
+
         start = coords_to_cell(sx, sy, transform)
         goal = coords_to_cell(gx, gy, transform)
         start = snap_to_nearest_road(grid, start)

@@ -173,7 +173,6 @@ def run_fw_vector(
     np.save(out / "fw_jps_D.npy", D)
     np.save(out / "fw_jps_FW.npy", FW)
 
-    # ⏱ Time in milliseconds
     elapsed_ms = (time.perf_counter() - t0) * 1000
 
     print("\n✅ Summary")
