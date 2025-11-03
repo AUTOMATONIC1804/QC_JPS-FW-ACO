@@ -151,7 +151,6 @@ def run_fw_pipelines(
     print("\n")
     print("Summary")
     print("\n")
-    print("\n")
     print("Runtimes")
     print("JPS:      {:.2f} ms".format(results[0]["Time_ms"]))
     print("A*:       {:.2f} ms".format(results[1]["Time_ms"]))

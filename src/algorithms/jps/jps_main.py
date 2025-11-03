@@ -6,7 +6,7 @@ Based on Harabor & Grastien (2012, 2014).
 
 import heapq
 from src.algorithms.jps.jps_node import Node
-
+from src.algorithms.jps.jps_heuristics import octile_distance  
 
 # 8 directions
 DIRECTIONS = [
@@ -16,9 +16,7 @@ DIRECTIONS = [
 
 
 def jump(grid, row, col, dr, dc, goal):
-    """
-    Perform recursive jump in direction (dr, dc).
-    """
+    """Perform recursive jump in direction (dr, dc)."""
     r, c = row + dr, col + dc
     if not grid.passable(r, c):
         return None
@@ -50,14 +48,14 @@ def jump(grid, row, col, dr, dc, goal):
     return jump(grid, r, c, dr, dc, goal)
 
 
-def get_successors(grid, node, goal, heuristic):
+def get_successors(grid, node, goal):
     successors = []
     for dr, dc in DIRECTIONS:
         jp = jump(grid, node.row, node.col, dr, dc, goal)
         if jp:
             r, c = jp
             g_cost = node.g + ((dr * dc) and 1.414 or 1.0)
-            h_cost = heuristic((r, c), goal)
+            h_cost = octile_distance((r, c), goal)  # ✅ unified heuristic
             successors.append(Node(r, c, g_cost, h_cost, node))
     return successors
 
@@ -70,13 +68,10 @@ def reconstruct_path(node):
     return path[::-1]
 
 
-def jump_point_search(grid, start, goal, heuristic):
-    """
-    Run Jump Point Search.
-    start, goal: (row, col)
-    """
+def jump_point_search(grid, start, goal):
+    """Run Jump Point Search using octile distance heuristic."""
     open_list = []
-    start_node = Node(start[0], start[1], 0, heuristic(start, goal))
+    start_node = Node(start[0], start[1], 0, octile_distance(start, goal))
     heapq.heappush(open_list, (start_node.f, start_node))
     closed_set = set()
 
@@ -88,7 +83,7 @@ def jump_point_search(grid, start, goal, heuristic):
 
         closed_set.add((current.row, current.col))
 
-        for successor in get_successors(grid, current, goal, heuristic):
+        for successor in get_successors(grid, current, goal):
             if (successor.row, successor.col) in closed_set:
                 continue
             heapq.heappush(open_list, (successor.f, successor))

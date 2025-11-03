@@ -1,17 +1,29 @@
 """
 src/algorithms/jps/jps_heuristics.py
-Heuristic functions for JPS.
+Unified heuristic functions for grid-based pathfinding.
+Both JPS and A* use the same Octile distance heuristic for uniformity.
 """
 
-import math
+from math import sqrt
 
-def manhattan(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-def euclidean(a, b):
-    return math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
+def octile_distance(a, b):
+    """
+    Compute Octile distance — admissible heuristic for 8-directional movement.
 
-def octile(a, b):
+    Parameters
+    ----------
+    a, b : tuple(int, int)
+        Grid cell coordinates (row, col)
+
+    Returns
+    -------
+    float
+        Approximate distance between cells assuming:
+        - Orthogonal moves cost = 1
+        - Diagonal moves cost = √2
+    """
     dx = abs(a[0] - b[0])
     dy = abs(a[1] - b[1])
-    return max(dx, dy) + (2**0.5 - 1) * min(dx, dy)
+    F = sqrt(2) - 1
+    return F * min(dx, dy) + max(dx, dy)

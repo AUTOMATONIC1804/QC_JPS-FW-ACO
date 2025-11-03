@@ -6,7 +6,7 @@ Uses 8-directional movement and octile distance heuristic.
 
 import heapq
 from math import sqrt
-from .astar_heuristics import octile_distance
+from .astar_heuristics import octile_distance  
 
 
 def astar_search(grid, start, goal):
@@ -16,7 +16,7 @@ def astar_search(grid, start, goal):
     heapq.heappush(open_set, (0, start))
     came_from = {}
     g_score = {start: 0}
-    f_score = {start: octile_distance(start, goal)}
+    f_score = {start: octile_distance(start, goal)}  # ✅ unified heuristic
 
     directions = [
         (-1, 0), (1, 0), (0, -1), (0, 1),
@@ -47,7 +47,7 @@ def astar_search(grid, start, goal):
                 if tentative_g < g_score.get(neighbor, float("inf")):
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g
-                    f_score[neighbor] = tentative_g + octile_distance(neighbor, goal)
+                    f_score[neighbor] = tentative_g + octile_distance(neighbor, goal)  # ✅ unified
                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
     return None  # No path found
