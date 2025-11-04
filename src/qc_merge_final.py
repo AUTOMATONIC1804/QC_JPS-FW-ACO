@@ -36,7 +36,7 @@ polygons_only = polygons_gdf[polygons_gdf.geometry.type.isin(["Polygon", "MultiP
 print(f"  → After filtering: {len(polygons_only)} polygons kept")
 
 # === Keep only required columns ===
-keep_cols = ["Amenity", "Building", "Landuse", "Name", "Shop", "geometry"]
+keep_cols = ["name", "amenity", "building", "landuse", "shop", "geometry"]
 
 # Ensure missing columns exist before selecting
 for col in keep_cols:

@@ -10,8 +10,7 @@ import os
 
 # === Paths ===
 raw_dir = r"D:\Quezon_City\data\raw"
-out_poly = os.path.join(raw_dir, "qc_pois_1_polygons.geojson")
-out_pts  = os.path.join(raw_dir, "qc_pois_1_points.geojson")
+out_merged = os.path.join(raw_dir, "qc_pois_clean_merged.geojson")
 
 # === Your Overpass-exported POI files ===
 files = [
@@ -22,7 +21,7 @@ files = [
     #("qc_pois_commercial.geojson", "commercial"),
     #("qc_pois_government.geojson", "government"),
     #("qc_pois_residential.geojson", "residential"), 
-    #("qc_pois_recreation.geojson", "recreation"),  # removed for now, merged into one 
+    #("qc_pois_recreation.geojson", "recreation"),
 ]
 
 gdfs = []
@@ -70,10 +69,6 @@ print("\n✅ Merge Complete")
 print("📦 Total merged records:", len(pois))
 print("🧱 Columns preserved:", list(pois.columns))
 
-# === Save Polygon Version ===
-pois.to_file(out_poly, driver="GeoJSON")
-print("\n✅ Saved polygons to:", out_poly)
-
 # === Safe Centroid Conversion (UTM projection) ===
 print("\n🧭 Generating centroids safely using EPSG:32651...")
 pois_points = pois.copy()
@@ -96,20 +91,32 @@ dup_count_before = pois_points.duplicated(subset=["dup_key"]).sum()
 pois_points = pois_points.drop_duplicates(subset=["dup_key"])
 dup_count_after = pois_points.duplicated(subset=["dup_key"]).sum()
 
-# === Save Centroid Points ===
-pois_points.to_file(out_pts, driver="GeoJSON")
-print("✅ Saved centroid points to:", out_pts)
+print(f"\n🔍 Duplicate Summary:")
+print(f"Before deduplication: {dup_count_before}")
+print(f"After deduplication:  {dup_count_after}")
+
+# === Merge original polygons + centroid points into one unified file ===
+print("\n🔗 Combining original geometries and centroids into one dataset...")
+pois["geom_type"] = pois.geometry.geom_type.str.lower()
+pois_points["geom_type"] = "centroid"
+
+merged_all = gpd.GeoDataFrame(
+    pd.concat([pois, pois_points], ignore_index=True),
+    crs="EPSG:4326"
+)
+
+print(f"✅ Combined total features: {len(merged_all)}")
+
+# === Save unified GeoJSON ===
+merged_all.to_file(out_merged, driver="GeoJSON")
+print(f"💾 Saved unified POIs (original + centroids) to: {out_merged}")
 
 # === Validation Summaries ===
 print("\n📊 POI counts by category:")
-print(pois.groupby("category").size())
+print(merged_all.groupby("category").size())
 
-print("\n🧭 Bounding Box of merged POIs:")
-print(pois.total_bounds)  # [minx, miny, maxx, maxy]
-
-print("\n🔍 Duplicate Summary:")
-print(f"Before deduplication: {dup_count_before}")
-print(f"After deduplication:  {dup_count_after}")
+print("\n📊 Geometry type breakdown:")
+print(merged_all.geometry.type.value_counts())
 
 print("\n📋 Per-file Summary:")
 meta_df = pd.DataFrame(meta_summary)
@@ -120,9 +127,9 @@ try:
     qc_boundary_path = os.path.join(raw_dir, "qc_boundary.geojson")
     if os.path.exists(qc_boundary_path):
         qc = gpd.read_file(qc_boundary_path).to_crs(epsg=4326)
-        within = pois_points.within(qc.unary_union)
+        within = merged_all.within(qc.unary_union)
         outside_count = (~within).sum()
-        print(f"\n🧩 Outlier check: {outside_count} POI centroids lie outside QC boundary.")
+        print(f"\n🧩 Outlier check: {outside_count} POI features lie outside QC boundary.")
     else:
         print("\n⚠ No qc_boundary.geojson found — skipping outlier check.")
 except Exception as e:

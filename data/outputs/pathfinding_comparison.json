@@ -1,23 +1,23 @@
 [
   {
     "algorithm": "JPS",
-    "runtime_ms": 679.3515999999986,
-    "total_runtime_ms": 9049.860000610352,
-    "path_length_m": 14403.717164502552,
-    "steps": 486
+    "runtime_ms": 804.2903999999993,
+    "total_runtime_ms": 12272.816896438599,
+    "path_length_m": 10240.458146424466,
+    "steps": 285
   },
   {
     "algorithm": "Dijkstra",
-    "runtime_ms": 7.040262222290039,
-    "total_runtime_ms": 949.9640464782715,
-    "path_length_m": 13149.514069819363,
-    "steps": 110
+    "runtime_ms": 6.124734878540039,
+    "total_runtime_ms": 1058.8786602020264,
+    "path_length_m": 9817.859655982667,
+    "steps": 66
   },
   {
     "algorithm": "A*",
-    "runtime_ms": 68.23869999999843,
-    "total_runtime_ms": 8185.0996017456055,
-    "path_length_m": 14298.448045156754,
-    "steps": 1278
+    "runtime_ms": 53.812399999998206,
+    "total_runtime_ms": 8365.277290344238,
+    "path_length_m": 9578.031739553275,
+    "steps": 813
   }
 ]
