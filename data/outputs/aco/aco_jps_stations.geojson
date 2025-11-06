@@ -1,16 +1,3 @@
-{
-"type": "FeatureCollection",
-"name": "aco_jps_stations",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "order": 1, "fw_index": 0, "poi_norm": 0.128882 }, "geometry": { "type": "Point", "coordinates": [ 121.068046159391471, 14.706477119595396 ] } },
-{ "type": "Feature", "properties": { "order": 2, "fw_index": 6, "poi_norm": 0.330745 }, "geometry": { "type": "Point", "coordinates": [ 121.08709044341478, 14.690533326296471 ] } },
-{ "type": "Feature", "properties": { "order": 3, "fw_index": 7, "poi_norm": 0.310559 }, "geometry": { "type": "Point", "coordinates": [ 121.086264356318338, 14.68586653103397 ] } },
-{ "type": "Feature", "properties": { "order": 4, "fw_index": 8, "poi_norm": 0.341615 }, "geometry": { "type": "Point", "coordinates": [ 121.084485329090867, 14.681365502050085 ] } },
-{ "type": "Feature", "properties": { "order": 5, "fw_index": 9, "poi_norm": 0.20264 }, "geometry": { "type": "Point", "coordinates": [ 121.082419203937363, 14.676979419910541 ] } },
-{ "type": "Feature", "properties": { "order": 6, "fw_index": 10, "poi_norm": 0.205745 }, "geometry": { "type": "Point", "coordinates": [ 121.079594705613388, 14.672897134034224 ] } },
-{ "type": "Feature", "properties": { "order": 7, "fw_index": 14, "poi_norm": 0.423137 }, "geometry": { "type": "Point", "coordinates": [ 121.062886738009936, 14.661811833893772 ] } },
-{ "type": "Feature", "properties": { "order": 8, "fw_index": 15, "poi_norm": 0.411491 }, "geometry": { "type": "Point", "coordinates": [ 121.059498887182045, 14.657801262030397 ] } },
-{ "type": "Feature", "properties": { "order": 9, "fw_index": 16, "poi_norm": 0.604037 }, "geometry": { "type": "Point", "coordinates": [ 121.055294197956272, 14.655033036448261 ] } }
-]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f484ff529c3223885276fe66f6c4cb2a0563f26425cc0f8f88ca9ba38e06db0d
+size 1475

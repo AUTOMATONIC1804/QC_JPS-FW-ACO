@@ -1,4 +1,3 @@
-Algorithm,RouteFile,RoadSource,Buffer_m,Spacing_m,MergeRadius_m,n_points,MatrixShape,Time_ms
-JPS,data/outputs/jps_path.geojson,Vector (GeoJSON),2000,600,450,63,"[63, 63]",633.95
-A*,data/outputs/astar_path.geojson,Vector (GeoJSON),2000,600,450,63,"[63, 63]",596.39
-Dijkstra,data/outputs/dijkstra_path.geojson,GraphML (OSMnx),2000,600,-,53,"[53, 53]",827.09
+version https://git-lfs.github.com/spec/v1
+oid sha256:ebed200db7145780366ca22fcb6a9b2f85afd9f973bb4f1947e571e9a5123347
+size 360
