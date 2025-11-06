@@ -105,7 +105,7 @@ def refine_with_intersection_branches(
     refined_line : LineString (WGS84)
     debug_gdf    : GeoDataFrame of accepted detour segments (WGS84)
     """
-    print("🔍 Evaluating detours using road branches that rejoin later…")
+
 
     # Load and project
     roads = gpd.read_file(roads_file)
