@@ -6,13 +6,13 @@ ACO station optimization (JPS variant) with:
 ✅ ≥500 m spacing but maintains k total
 ✅ 1 km proximity-based POI scoring
 ✅ Route-following snapped output
-✅ Full POI validation report per FW node
+✅ Validation report per FW node (POI breakdown)
 """
 
 from pathlib import Path
 import geopandas as gpd
 import numpy as np
-from shapely.geometry import LineString, MultiPoint, Point
+from shapely.geometry import LineString, MultiPoint
 from shapely.ops import split, linemerge
 import warnings
 from shapely.errors import ShapelyDeprecationWarning
@@ -37,16 +37,15 @@ def _load_route_line(path_file: str) -> LineString:
     return LineString(coords)
 
 
-def _compute_proximity_scores(nodes_gdf, poi_path, radius_m=1000):
-    """
-    Compute proximity-based POI score for each node (within 1 km buffer).
-    """
+def _compute_proximity_scores(nodes, poi_path, radius_m=1000):
+    """Compute proximity-based POI score for each node (within 1 km buffer)."""
     print("📍 Computing 1 km POI proximity scores...")
     poi_gdf = gpd.read_file(poi_path).to_crs("EPSG:3857")
-    nodes_m = nodes_gdf.to_crs("EPSG:3857")
+
+    node_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(*zip(*nodes)), crs="EPSG:4326").to_crs("EPSG:3857")
 
     scores = []
-    for node in nodes_m.geometry:
+    for node in node_gdf.geometry:
         buf = node.buffer(radius_m)
         nearby = poi_gdf[poi_gdf.intersects(buf)]
         scores.append(nearby["NormalizedScore"].sum() if len(nearby) > 0 else 0)
@@ -145,13 +144,11 @@ def main():
 
     # Load FW & POI data
     nodes, D, _, _ = load_fw_data(POINTS_FILE, DIST_FILE, roads_file=ROADS_FILE)
-    nodes_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(*zip(*nodes)), crs="EPSG:4326")
-    prox_scores = _compute_proximity_scores(nodes_gdf, POI_FILE, radius_m=1000)
-    poi_scores = prox_scores  # could combine with base/category if needed
+    prox_scores = _compute_proximity_scores(nodes, POI_FILE, radius_m=1000)
+    poi_scores = prox_scores  # (extend with base/category if needed)
 
     # Load start/end
-    node_coords = [(pt.x, pt.y) for pt in nodes_gdf.geometry]
-    start_idx, end_idx = load_fixed_endpoints(PATH_FILE, node_coords)
+    start_idx, end_idx = load_fixed_endpoints(PATH_FILE, nodes)
 
     # Parameters
     valid_keys = {f.name for f in ACOStationParams.__dataclass_fields__.values()}
@@ -190,33 +187,6 @@ def main():
         OUTPUT_DIR / "aco_jps_path.geojson", driver="GeoJSON"
     )
 
-    # ----- Detailed Fitness Summary -----
-    subset_idx = result["best_subset"]
-    poi_sum = np.sum([poi_scores[i] for i in subset_idx])
-    dist_sum = sum([D[subset_idx[i], subset_idx[i + 1]] for i in range(len(subset_idx) - 1)])
-    k_used = len(subset_idx)
-    fitness = (
-        params.beta_poi * poi_sum
-        - params.alpha_dist * dist_sum
-        + params.gamma_station * k_used
-    )
-
-    print("\n✅ Saved outputs:")
-    print(f"  • Stations (≥500 m apart, exact k={k}) → {OUTPUT_DIR / 'aco_jps_stations.geojson'}")
-    print(f"  • Route line (snapped JPS path)       → {OUTPUT_DIR / 'aco_jps_path.geojson'}")
-
-    print("\n📊 Detailed Final Metrics:")
-    print(f"   Total POI benefit:   {poi_sum:.4f}")
-    print(f"   Total path distance: {dist_sum:.2f} m")
-    print(f"   Station count:       {k_used} / target {k}")
-    print(f"   ────────────────────────────────────────")
-    print(f"   β_poi * POI  = {params.beta_poi * poi_sum:.4f}")
-    print(f"   -α_dist * D  = {-params.alpha_dist * dist_sum:.4f}")
-    print(f"   +γ_station*k = {params.gamma_station * k_used:.4f}")
-    print(f"   ----------------------------------------")
-    print(f"🏁 Final computed fitness: {fitness:.4f}")
-    print(f"🧠 Recorded best fitness:  {result['best_fitness']:.4f}")
-
     # ---------------------------------------------------------
     # 🔍 Validation Report Export
     # ---------------------------------------------------------
@@ -226,49 +196,51 @@ def main():
         poi_gdf.set_crs("EPSG:4326", inplace=True)
     poi_m = poi_gdf.to_crs("EPSG:3857")
 
-    nodes_m = nodes_gdf.to_crs("EPSG:3857")
+    nodes_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(*zip(*nodes)), crs="EPSG:4326").to_crs("EPSG:3857")
     report_records = []
 
-    for i, node in enumerate(nodes_m.geometry):
+    for i, node in enumerate(nodes_gdf.geometry):
         buf = node.buffer(1000)
         nearby = poi_m[poi_m.intersects(buf)]
 
-    pois_detail = []
-    if len(nearby) > 0:
-        for _, row in nearby.iterrows():
-            name = row.get("name", "Unknown")
-            cat = row.get("Category", "Unclassified")
-            score = float(row.get("NormalizedScore", 0))
-            pois_detail.append(f"{name} ({cat}, {score:.3f})")
+        pois_detail = []
+        if len(nearby) > 0:
+            for _, row in nearby.iterrows():
+                name = row.get("name", "Unknown")
+                cat = row.get("Category", "Unclassified")
+                score = float(row.get("NormalizedScore", 0))
+                pois_detail.append(f"{name} ({cat}, {score:.3f})")
 
-    # Convert to WGS84 for coordinate export
-    node_wgs = gpd.GeoSeries([node], crs="EPSG:3857").to_crs("EPSG:4326").iloc[0]
+        node_wgs = gpd.GeoSeries([node], crs="EPSG:3857").to_crs("EPSG:4326").iloc[0]
 
-    report_records.append({
-        "fw_index": i,
-        "is_station": int(i in result["best_subset"]),
-        "poi_count": len(nearby),
-        "poi_score_sum": float(nearby["NormalizedScore"].sum()) if len(nearby) > 0 else 0.0,
-        "poi_details": "; ".join(pois_detail[:25]),
-        "lon": node_wgs.x,
-        "lat": node_wgs.y,
-    })
-
+        report_records.append({
+            "fw_index": i,
+            "is_station": int(i in result["best_subset"]),
+            "poi_count": int(len(nearby)),
+            "poi_score_sum": float(nearby["NormalizedScore"].sum()) if len(nearby) > 0 else 0.0,
+            "poi_details": "; ".join(pois_detail[:25]),
+            "lon": node_wgs.x,
+            "lat": node_wgs.y,
+        })
 
     report_gdf = gpd.GeoDataFrame(
         report_records,
-        geometry=[Point(xy) for xy in zip(
+        geometry=gpd.points_from_xy(
             [r["lon"] for r in report_records],
             [r["lat"] for r in report_records]
-        )],
+        ),
         crs="EPSG:4326"
     )
+
     report_gdf.to_file(OUTPUT_DIR / "aco_jps_validation_report.geojson", driver="GeoJSON")
     report_gdf.drop(columns="geometry").to_csv(OUTPUT_DIR / "aco_jps_validation_report.csv", index=False)
 
     print(f"✅ Validation report exported:")
     print(f"   • GeoJSON → {OUTPUT_DIR / 'aco_jps_validation_report.geojson'}")
     print(f"   • CSV     → {OUTPUT_DIR / 'aco_jps_validation_report.csv'}")
+    print(f"   • Total nodes written: {len(report_gdf)}")
+    print(f"   • Stations flagged: {report_gdf['is_station'].sum()}")
+    print(f"🏁 Best fitness: {result['best_fitness']:.4f}")
 
 
 if __name__ == "__main__":
