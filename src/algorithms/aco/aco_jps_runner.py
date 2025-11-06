@@ -1,21 +1,22 @@
 """
 aco_jps_runner.py
 --------------------------------------------------
-ACO station optimization (JPS variant) with:
+ACO station optimization (JPS variant)
+✅ Uses only existing FW nodes (no new/snapped points)
 ✅ Start/end inclusion
-✅ ≥500 m spacing but maintains k total
+✅ ≥500 m spacing (keeps exact k)
 ✅ 1 km proximity-based POI scoring
-✅ Route-following snapped output
-✅ Validation report per FW node (POI breakdown)
+✅ Validation report for ALL FW nodes
+✅ 1 km buffers per chosen station with POI summary
+✅ Deduplicates POIs using '@id' (or fallback keys)
+✅ Counts POIs by GEOMETRY INTERSECTION with buffer (touch/overlap counts) — robust to edge cases
 """
 
 from pathlib import Path
 import geopandas as gpd
 import numpy as np
-from shapely.geometry import LineString, MultiPoint
-from shapely.ops import split, linemerge
-import warnings
-from shapely.errors import ShapelyDeprecationWarning
+from shapely.geometry import Point
+from shapely.validation import make_valid
 
 from src.algorithms.aco.aco_utils import load_fw_data, load_fixed_endpoints
 from src.algorithms.aco.aco_core_stations import ACOStationOptimizer, ACOStationParams
@@ -23,107 +24,136 @@ from src.algorithms.aco.aco_config import ACO_CONFIG
 
 
 # ---------------------------------------------------------
-# Helper functions
+# Geometry utilities
 # ---------------------------------------------------------
 
-def _load_route_line(path_file: str) -> LineString:
-    gdf = gpd.read_file(path_file).to_crs("EPSG:4326")
-    geom = gdf.geometry.union_all()
-    if geom.geom_type == "LineString":
-        return geom
-    coords = []
-    for ls in geom.geoms:
-        coords.extend(list(ls.coords))
-    return LineString(coords)
+_EPS_M = 0.05  # 5 cm numeric tolerance in meters for boundary-touch cases
 
-
-def _compute_proximity_scores(nodes, poi_path, radius_m=1000):
-    """Compute proximity-based POI score for each node (within 1 km buffer)."""
-    print("📍 Computing 1 km POI proximity scores...")
-    poi_gdf = gpd.read_file(poi_path).to_crs("EPSG:3857")
-
-    node_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(*zip(*nodes)), crs="EPSG:4326").to_crs("EPSG:3857")
-
-    scores = []
-    for node in node_gdf.geometry:
-        buf = node.buffer(radius_m)
-        nearby = poi_gdf[poi_gdf.intersects(buf)]
-        scores.append(nearby["NormalizedScore"].sum() if len(nearby) > 0 else 0)
-    return np.array(scores)
-
-
-def _snap_points_to_line(points_lonlat, line_lonlat: LineString):
-    warnings.filterwarnings("ignore", category=RuntimeWarning)
-    warnings.filterwarnings("ignore", category=ShapelyDeprecationWarning)
-
-    line_m = gpd.GeoSeries([line_lonlat], crs="EPSG:4326").to_crs("EPSG:3857").iloc[0]
-    snapped, measures = [], []
-
-    for (x, y) in points_lonlat:
+def _make_valid_series(geom):
+    """Return a valid geometry (works for Shapely 1.x and 2.x)."""
+    try:
+        # Shapely 2.x
+        fixed = make_valid(geom)
+    except Exception:
+        # Fallback (older stacks): classic fix
         try:
-            pt_m = gpd.GeoSeries.from_xy([x], [y], crs="EPSG:4326").to_crs("EPSG:3857").iloc[0]
-            if not pt_m.is_valid or pt_m.is_empty:
-                snapped.append((x, y))
-                measures.append(0.0)
-                continue
-            m = line_m.project(pt_m)
-            q = line_m.interpolate(m)
-            q_wgs = gpd.GeoSeries([q], crs="EPSG:3857").to_crs("EPSG:4326").iloc[0]
-            snapped.append((q_wgs.x, q_wgs.y))
-            measures.append(float(m))
+            fixed = geom.buffer(0)
         except Exception:
-            snapped.append((x, y))
-            measures.append(0.0)
+            fixed = geom
+    return fixed
 
-    return snapped, measures, line_m
+def _clean_geoms(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Drop empties, fix invalid, keep CRS."""
+    gdf = gdf[~gdf.geometry.is_empty & gdf.geometry.notnull()].copy()
+    # Only fix invalids to save time
+    mask_invalid = ~gdf.is_valid
+    if mask_invalid.any():
+        gdf.loc[mask_invalid, "geometry"] = gdf.loc[mask_invalid, "geometry"].apply(_make_valid_series)
+    # Drop again if any became empty after fix
+    gdf = gdf[~gdf.geometry.is_empty & gdf.geometry.notnull()].copy()
+    return gdf
+
+def _query_intersects_or_touches(poi_m: gpd.GeoDataFrame, buf_geom) -> gpd.GeoDataFrame:
+    """
+    Robust 'intersects or touches' using:
+      1) spatial index bbox candidates
+      2) precise intersects
+      3) fallback: distance <= _EPS_M (catches boundary touches missed by numeric quirks)
+    """
+    # Use sindex for speed
+    if getattr(poi_m, "sindex", None) is None:
+        return poi_m.iloc[[]]
+
+    # bbox prefilter
+    candidates_idx = list(poi_m.sindex.intersection(buf_geom.bounds))
+    if not candidates_idx:
+        return poi_m.iloc[[]]
+
+    cand = poi_m.iloc[candidates_idx].copy()
+
+    # Exact intersects
+    intersects_mask = cand.intersects(buf_geom)
+
+    # Fallback boundary touch (distance ~ 0)
+    # Only compute for the non-intersecting subset to save time
+    if (~intersects_mask).any():
+        cand_non = cand.loc[~intersects_mask]
+        # distance to polygon buffer is 0 when touching boundary
+        dist = cand_non.distance(buf_geom)
+        touch_mask = dist <= _EPS_M
+        # merge masks
+        intersects_mask.loc[touch_mask.index] = intersects_mask.loc[touch_mask.index] | touch_mask
+
+    return cand.loc[intersects_mask]
 
 
-def _merge_close_stations(snapped_points, measures, poi_scores, min_spacing_m=100, k_target=None):
-    if not snapped_points or not measures:
-        return snapped_points, measures
+# ---------------------------------------------------------
+# Helper: Deduplicate POIs but KEEP original geometry
+# ---------------------------------------------------------
 
-    kept_pts, kept_meas, kept_scores = [snapped_points[0]], [measures[0]], [poi_scores[0]]
+def _prep_poi_dedup_keep_geom(poi_gdf_m: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """
+    Deduplicate POIs while preserving original geometry (points/polygons/multipolygons).
+    Priority for dedup key:
+      1) '@id'  2) 'id'  3) (name || Category)
+    """
+    gdf = poi_gdf_m.copy()
 
-    for i in range(1, len(snapped_points)):
-        if (measures[i] - kept_meas[-1]) >= min_spacing_m:
-            kept_pts.append(snapped_points[i])
-            kept_meas.append(measures[i])
-            kept_scores.append(poi_scores[i])
+    if "@id" in gdf.columns:
+        gdf["_dedup_key"] = gdf["@id"].astype(str)
+    elif "id" in gdf.columns:
+        gdf["_dedup_key"] = gdf["id"].astype(str)
+    else:
+        gdf["_dedup_key"] = (
+            gdf.get("name", "").astype(str).str.lower().fillna("")
+            + "||"
+            + gdf.get("Category", "").astype(str).str.lower().fillna("")
+        )
 
-    if k_target and len(kept_pts) < k_target:
-        deficit = k_target - len(kept_pts)
-        remaining = [
-            (p, m, s)
-            for p, m, s in zip(snapped_points, measures, poi_scores)
-            if (p, m) not in zip(kept_pts, kept_meas)
-        ]
-        remaining_sorted = sorted(remaining, key=lambda x: x[2])[:deficit]
-        for p, m, s in remaining_sorted:
-            kept_pts.append(p)
-            kept_meas.append(m)
-            kept_scores.append(s)
-
-        order = np.argsort(kept_meas)
-        kept_pts = [kept_pts[i] for i in order]
-        kept_meas = [kept_meas[i] for i in order]
-        kept_scores = [kept_scores[i] for i in order]
-
-    return kept_pts, kept_meas
+    gdf = gdf.drop_duplicates(subset=["_dedup_key"]).reset_index(drop=True)
+    return gdf
 
 
-def _build_route_by_measures(line_m, measures_sorted):
-    pts = [line_m.interpolate(m) for m in measures_sorted]
-    parts = split(line_m, MultiPoint(pts))
-    segments = []
-    intervals = list(zip(measures_sorted[:-1], measures_sorted[1:]))
-    for seg in parts.geoms:
-        mid_m = line_m.project(seg.centroid)
-        for a, b in intervals:
-            if a <= mid_m <= b:
-                segments.append(seg)
-                break
-    merged = linemerge(segments)
-    return gpd.GeoSeries([merged], crs="EPSG:3857").to_crs("EPSG:4326").iloc[0]
+# ---------------------------------------------------------
+# Helper: Compute POI proximity scores for FW nodes (ROBUST INTERSECTS/TOUCHES)
+# ---------------------------------------------------------
+
+def _compute_proximity_scores(nodes_xy, poi_path, radius_m=1000.0) -> np.ndarray:
+    """
+    Sum of NormalizedScore of all POIs whose geometry intersects OR touches
+    the buffer disk (radius_m) around each FW node (EPSG:3857), with robust fixes.
+    """
+    print("📍 Computing 1 km POI proximity scores (mode=intersects|touches, robust)...")
+    poi_gdf = gpd.read_file(poi_path)
+    if poi_gdf.crs is None:
+        poi_gdf.set_crs("EPSG:4326", inplace=True)
+
+    # Project → clean → dedup
+    poi_m = poi_gdf.to_crs("EPSG:3857")
+    poi_m = _clean_geoms(poi_m)
+    poi_m = _prep_poi_dedup_keep_geom(poi_m)
+
+    nodes_gdf = gpd.GeoDataFrame(
+        geometry=gpd.points_from_xy(*zip(*nodes_xy)), crs="EPSG:4326"
+    ).to_crs("EPSG:3857")
+
+    scores = np.zeros(len(nodes_gdf), dtype=float)
+
+    for i, pt in enumerate(nodes_gdf.geometry):
+        # Clean the buffer too, and add tiny epsilon growth to catch numeric misses
+        buf = pt.buffer(radius_m + _EPS_M)
+        buf = _make_valid_series(buf)
+
+        nearby = _query_intersects_or_touches(poi_m, buf)
+
+        if len(nearby) > 0 and "NormalizedScore" in nearby.columns:
+            scores[i] = float(nearby["NormalizedScore"].sum())
+
+    # normalize for stability
+    maxv = scores.max() if scores.size else 0.0
+    if maxv > 0:
+        scores = scores / maxv
+    return scores
 
 
 # ---------------------------------------------------------
@@ -134,113 +164,138 @@ def main():
     print("🚆 ACO Station Optimization (JPS variant)")
     k = int(input("Enter desired number of stations (k): ").strip())
 
+    # ---- Paths
     POINTS_FILE = r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_points.geojson"
-    DIST_FILE = r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_D.npy"
-    ROADS_FILE = r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_roads.geojson"
-    PATH_FILE = r"D:\Quezon_City\data\outputs\jps_path.geojson"
-    POI_FILE = r"D:\Quezon_City\data\processed\qc_pois_final_scored.geojson"
-    OUTPUT_DIR = Path(r"D:\Quezon_City\data\outputs\aco")
+    DIST_FILE   = r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_D.npy"
+    ROADS_FILE  = r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_roads.geojson"
+    PATH_FILE   = r"D:\Quezon_City\data\outputs\jps_path.geojson"
+    POI_FILE    = r"D:\Quezon_City\data\processed\qc_pois_final_scored.geojson"
+    OUTPUT_DIR  = Path(r"D:\Quezon_City\data\outputs\aco")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Load FW & POI data
-    nodes, D, _, _ = load_fw_data(POINTS_FILE, DIST_FILE, roads_file=ROADS_FILE)
-    prox_scores = _compute_proximity_scores(nodes, POI_FILE, radius_m=1000)
-    poi_scores = prox_scores  # (extend with base/category if needed)
+    # ---- Load FW data (nodes as list[(lon,lat)], D as np.ndarray)
+    nodes_xy, D, _, _ = load_fw_data(POINTS_FILE, DIST_FILE, roads_file=ROADS_FILE)
 
-    # Load start/end
-    start_idx, end_idx = load_fixed_endpoints(PATH_FILE, nodes)
+    # ---- Compute POI proximity score per node (ROBUST INTERSECTS/TOUCHES)
+    poi_scores = _compute_proximity_scores(nodes_xy, POI_FILE, radius_m=1000.0)
 
-    # Parameters
+    # ---- Start/End indices
+    start_idx, end_idx = load_fixed_endpoints(PATH_FILE, nodes_xy)
+
+    # ---- ACO parameters
     valid_keys = {f.name for f in ACOStationParams.__dataclass_fields__.values()}
     params_kwargs = {k: v for k, v in ACO_CONFIG.items() if k in valid_keys}
     params = ACOStationParams(**params_kwargs)
-    optimizer = ACOStationOptimizer(D, poi_scores, params, start_idx, end_idx, k)
-    result = optimizer.run()
 
-    # Snap to route
-    ordered_idx = result["best_subset"]
-    ordered_nodes = [nodes[i] for i in ordered_idx]
-    base_line_wgs = _load_route_line(PATH_FILE)
-    snapped_lonlat, measures, base_line_m = _snap_points_to_line(ordered_nodes, base_line_wgs)
-
-    order = np.argsort(measures)
-    measures_sorted = [measures[i] for i in order]
-    snapped_sorted = [snapped_lonlat[i] for i in order]
-    idx_sorted = [ordered_idx[i] for i in order]
-
-    snapped_sorted, measures_sorted = _merge_close_stations(
-        snapped_sorted, measures_sorted, [poi_scores[i] for i in idx_sorted],
-        min_spacing_m=500, k_target=k
+    # ---- Run ACO
+    optimizer = ACOStationOptimizer(
+        D=D,
+        poi_scores=poi_scores,
+        params=params,
+        start_idx=start_idx,
+        end_idx=end_idx,
+        k_target=k,
+        min_spacing_m=500.0,
     )
+    result = optimizer.run()
+    chosen_idx = result["best_subset"]
+    best_fit = result["best_fitness"]
 
-    route_wgs = _build_route_by_measures(base_line_m, measures_sorted)
+    # =========================================================
+    # Outputs
+    # =========================================================
 
-    # Save outputs
+    # ---- Stations (exact FW nodes)
+    stations_lon = [nodes_xy[i][0] for i in chosen_idx]
+    stations_lat = [nodes_xy[i][1] for i in chosen_idx]
     stations_gdf = gpd.GeoDataFrame(
-        {"order": list(range(1, len(snapped_sorted) + 1))},
-        geometry=gpd.points_from_xy(*zip(*snapped_sorted)),
+        {
+            "order": list(range(1, len(chosen_idx) + 1)),
+            "fw_index": chosen_idx,
+            "poi_norm": [float(poi_scores[i]) for i in chosen_idx],
+        },
+        geometry=gpd.points_from_xy(stations_lon, stations_lat),
         crs="EPSG:4326",
     )
-    stations_gdf.to_file(OUTPUT_DIR / "aco_jps_stations.geojson", driver="GeoJSON")
+    stations_path = OUTPUT_DIR / "aco_jps_stations.geojson"
+    stations_gdf.to_file(stations_path, driver="GeoJSON")
 
-    gpd.GeoDataFrame({"id": [0]}, geometry=[route_wgs], crs="EPSG:4326").to_file(
-        OUTPUT_DIR / "aco_jps_path.geojson", driver="GeoJSON"
-    )
+    # ---- Prepare POIs in metric CRS, clean + dedup, for buffers/validation
+    poi_src = gpd.read_file(POI_FILE)
+    if poi_src.crs is None:
+        poi_src.set_crs("EPSG:4326", inplace=True)
+    poi_m = poi_src.to_crs("EPSG:3857")
+    poi_m = _clean_geoms(poi_m)
+    poi_m = _prep_poi_dedup_keep_geom(poi_m)
 
-    # ---------------------------------------------------------
-    # 🔍 Validation Report Export
-    # ---------------------------------------------------------
-    print("\n🧾 Generating validation report (POI composition per FW node)...")
-    poi_gdf = gpd.read_file(POI_FILE)
-    if poi_gdf.crs is None:
-        poi_gdf.set_crs("EPSG:4326", inplace=True)
-    poi_m = poi_gdf.to_crs("EPSG:3857")
+    # ---- Buffers for visual validation (ROBUST INTERSECTS/TOUCHES)
+    print("🟢 Generating 1 km buffers for station POI validation (mode=intersects|touches, robust)...")
+    stations_m = stations_gdf.to_crs("EPSG:3857")
+    buffers, poi_counts, poi_sums, poi_cats = [], [], [], []
+    for geom in stations_m.geometry:
+        buf = _make_valid_series(geom.buffer(1000.0 + _EPS_M))
+        near = _query_intersects_or_touches(poi_m, buf)
+        buffers.append(buf)
+        poi_counts.append(int(len(near)))
+        poi_sums.append(float(near["NormalizedScore"].sum()) if len(near) > 0 else 0.0)
+        cats = near["Category"].value_counts().head(6).to_dict() if len(near) > 0 else {}
+        poi_cats.append(str(cats))
 
-    nodes_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(*zip(*nodes)), crs="EPSG:4326").to_crs("EPSG:3857")
+    buffers_gdf = gpd.GeoDataFrame(
+        {
+            "fw_index": chosen_idx,
+            "poi_count": poi_counts,
+            "poi_score_sum": poi_sums,
+            "top_categories": poi_cats,
+            "radius_m": 1000,
+            "count_mode": "intersects|touches",
+            "dedup_key": "@id_then_id_then_name||Category",
+            "tolerance_m": _EPS_M,
+        },
+        geometry=buffers,
+        crs="EPSG:3857",
+    ).to_crs("EPSG:4326")
+    buffers_path = OUTPUT_DIR / "aco_jps_station_buffers.geojson"
+    buffers_gdf.to_file(buffers_path, driver="GeoJSON")
+
+    # ---- Validation report for ALL FW nodes (ROBUST INTERSECTS/TOUCHES)
+    print("🧾 Generating validation report (all FW nodes, mode=intersects|touches, robust)...")
+    nodes_m = gpd.GeoDataFrame(
+        geometry=gpd.points_from_xy(*zip(*nodes_xy)), crs="EPSG:4326"
+    ).to_crs("EPSG:3857")
+
     report_records = []
-
-    for i, node in enumerate(nodes_gdf.geometry):
-        buf = node.buffer(1000)
-        nearby = poi_m[poi_m.intersects(buf)]
-
-        pois_detail = []
-        if len(nearby) > 0:
-            for _, row in nearby.iterrows():
-                name = row.get("name", "Unknown")
-                cat = row.get("Category", "Unclassified")
-                score = float(row.get("NormalizedScore", 0))
-                pois_detail.append(f"{name} ({cat}, {score:.3f})")
-
+    for i, node in enumerate(nodes_m.geometry):
+        buf = _make_valid_series(node.buffer(1000.0 + _EPS_M))
+        near = _query_intersects_or_touches(poi_m, buf)
         node_wgs = gpd.GeoSeries([node], crs="EPSG:3857").to_crs("EPSG:4326").iloc[0]
-
         report_records.append({
             "fw_index": i,
-            "is_station": int(i in result["best_subset"]),
-            "poi_count": int(len(nearby)),
-            "poi_score_sum": float(nearby["NormalizedScore"].sum()) if len(nearby) > 0 else 0.0,
-            "poi_details": "; ".join(pois_detail[:25]),
-            "lon": node_wgs.x,
-            "lat": node_wgs.y,
+            "is_station": int(i in chosen_idx),
+            "poi_count": int(len(near)),
+            "poi_score_sum": float(near["NormalizedScore"].sum()) if len(near) > 0 else 0.0,
+            "lon": float(node_wgs.x),
+            "lat": float(node_wgs.y),
         })
 
     report_gdf = gpd.GeoDataFrame(
         report_records,
         geometry=gpd.points_from_xy(
-            [r["lon"] for r in report_records],
-            [r["lat"] for r in report_records]
+            [r["lon"] for r in report_records], [r["lat"] for r in report_records]
         ),
-        crs="EPSG:4326"
+        crs="EPSG:4326",
     )
+    report_geojson = OUTPUT_DIR / "aco_jps_validation_report.geojson"
+    report_csv = OUTPUT_DIR / "aco_jps_validation_report.csv"
+    report_gdf.to_file(report_geojson, driver="GeoJSON")
+    report_gdf.drop(columns="geometry").to_csv(report_csv, index=False)
 
-    report_gdf.to_file(OUTPUT_DIR / "aco_jps_validation_report.geojson", driver="GeoJSON")
-    report_gdf.drop(columns="geometry").to_csv(OUTPUT_DIR / "aco_jps_validation_report.csv", index=False)
-
-    print(f"✅ Validation report exported:")
-    print(f"   • GeoJSON → {OUTPUT_DIR / 'aco_jps_validation_report.geojson'}")
-    print(f"   • CSV     → {OUTPUT_DIR / 'aco_jps_validation_report.csv'}")
-    print(f"   • Total nodes written: {len(report_gdf)}")
-    print(f"   • Stations flagged: {report_gdf['is_station'].sum()}")
-    print(f"🏁 Best fitness: {result['best_fitness']:.4f}")
+    # ---- Summary
+    print("\n✅ Outputs generated successfully:")
+    print(f"📍 Stations (points) → {stations_path}")
+    print(f"🗺️ Buffers (1 km, robust intersects|touches) → {buffers_path}")
+    print(f"🧾 Full validation CSV → {report_csv}")
+    print(f"🏁 Best fitness: {best_fit:.4f}")
 
 
 if __name__ == "__main__":
