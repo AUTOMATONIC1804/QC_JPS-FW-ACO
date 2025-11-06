@@ -1,26 +1,21 @@
 """
 aco_config.py
 --------------
-Global configuration for the ACO station optimization system.
-Applies to all variants (JPS, A*, Dijkstra).
+ACO metaheuristic and station scoring parameters.
 """
 
 ACO_CONFIG = {
-    # === ACO Metaheuristic Parameters ===
-    "alpha": 1.0,        # pheromone importance
-    "beta": 2.0,         # heuristic importance
-    "rho": 0.1,          # pheromone evaporation rate
-    "Q": 100.0,          # pheromone deposit constant
-    "iterations": 100,   # number of iterations per run
-    "num_ants": 50,      # number of ants per iteration
-    "seed": 42,          # random seed for reproducibility
+    # === ACO Parameters ===
+    "alpha": 1.0,         # pheromone importance
+    "beta": 3.0,          # heuristic importance (POI influence)
+    "rho": 0.25,          # pheromone evaporation rate
+    "Q": 1.0,             # pheromone deposit factor
+    "iterations": 100,    # total iterations
+    "num_ants": 50,       # ants per iteration
+    "seed": 42,           # random seed for reproducibility
 
     # === Station Fitness Weights ===
-    "alpha_dist": 0.6,   # weight for minimizing total distance
-    "beta_poi": 0.4,     # weight for maximizing POI coverage
-    "gamma_station": 0.3,# penalty for deviating from target k
-
-    # === Data Paths ===
-    "data_dir": "data/processed/",
-    "output_dir": "data/output/"
+    "alpha_dist": 0.005,  # minimize distance
+    "beta_poi": 1.0,      # maximize POI coverage
+    "gamma_station": 0.2, # balance for station count
 }
