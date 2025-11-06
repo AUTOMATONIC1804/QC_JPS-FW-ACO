@@ -20,8 +20,8 @@ from src.algorithms.astar.astar_utils import snap_to_nearest_road
 
 def run_astar_benchmark(
     tif_path="data/processed/qc_grid_clean.tif",
-    start_coords=(14.7064939,121.0680891),  
-    goal_coords=(14.6550249,121.0549384),    
+    start_coords=(14.7065345,121.0680065),  
+    goal_coords=(14.6442107,121.0375645),    
     output_dir="data/outputs"
 ):
     """Run A* on QC grid and return performance metrics (lat, lon input version)."""

@@ -46,8 +46,8 @@ def snap_to_nearest_road(grid, start_cell, max_radius=50):
 
 def run_jps_benchmark(
     tif_path="data/processed/qc_grid_clean.tif",
-    start_coords=(14.7064939,121.0680891),  
-    goal_coords=(14.6550249,121.0549384),    
+    start_coords=(14.7065345,121.0680065),  
+    goal_coords=(14.6442107,121.0375645),    
     output_dir="data/outputs"
 ):
     """Run JPS on QC grid and return metrics for comparison (lat, lon input version)."""
