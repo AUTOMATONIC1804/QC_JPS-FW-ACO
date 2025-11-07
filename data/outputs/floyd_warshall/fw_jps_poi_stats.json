@@ -1,467 +1,1118 @@
 {
   "0": {
-    "count": 40.0,
-    "score": 40.0,
-    "score_norm": 0.2185792349726776
+    "count": 24.0,
+    "score": 24.0,
+    "score_norm": 0.2696629213483146,
+    "top_pois": [
+      "Unnamed",
+      "La Mesa Eco Park",
+      "Children's House Of Learning And Development",
+      "Easylane Supermarket",
+      "Gateways Institute of Science & Technology"
+    ]
   },
   "1": {
-    "count": 32.0,
-    "score": 32.0,
-    "score_norm": 0.17486338797814208
+    "count": 21.0,
+    "score": 21.0,
+    "score_norm": 0.23595505617977527,
+    "top_pois": [
+      "Unnamed",
+      "Unnamed",
+      "La Mesa Eco Park",
+      "Puregold",
+      "Children's House Of Learning And Development"
+    ]
   },
   "2": {
-    "count": 36.0,
-    "score": 36.0,
-    "score_norm": 0.19672131147540983
+    "count": 24.0,
+    "score": 24.0,
+    "score_norm": 0.2696629213483146,
+    "top_pois": [
+      "Unnamed",
+      "ShopKing by Xentro Mall",
+      "Unnamed",
+      "La Mesa Eco Park",
+      "Cordis Mariae School"
+    ]
   },
   "3": {
-    "count": 43.0,
-    "score": 43.0,
-    "score_norm": 0.23497267759562843
-  },
-  "4": {
-    "count": 61.0,
-    "score": 61.0,
-    "score_norm": 0.3333333333333333
-  },
-  "5": {
-    "count": 74.0,
-    "score": 74.0,
-    "score_norm": 0.40437158469945356
-  },
-  "6": {
-    "count": 71.0,
-    "score": 71.0,
-    "score_norm": 0.3879781420765027
-  },
-  "7": {
-    "count": 56.0,
-    "score": 56.0,
-    "score_norm": 0.30601092896174864
-  },
-  "8": {
-    "count": 61.0,
-    "score": 61.0,
-    "score_norm": 0.3333333333333333
-  },
-  "9": {
-    "count": 41.0,
-    "score": 41.0,
-    "score_norm": 0.22404371584699453
-  },
-  "10": {
-    "count": 41.0,
-    "score": 41.0,
-    "score_norm": 0.22404371584699453
-  },
-  "11": {
-    "count": 32.0,
-    "score": 32.0,
-    "score_norm": 0.17486338797814208
-  },
-  "12": {
-    "count": 52.0,
-    "score": 52.0,
-    "score_norm": 0.28415300546448086
-  },
-  "13": {
-    "count": 84.0,
-    "score": 84.0,
-    "score_norm": 0.45901639344262296
-  },
-  "14": {
-    "count": 85.0,
-    "score": 85.0,
-    "score_norm": 0.4644808743169399
-  },
-  "15": {
-    "count": 65.0,
-    "score": 65.0,
-    "score_norm": 0.3551912568306011
-  },
-  "16": {
-    "count": 66.0,
-    "score": 66.0,
-    "score_norm": 0.36065573770491804
-  },
-  "17": {
-    "count": 72.0,
-    "score": 72.0,
-    "score_norm": 0.39344262295081966
-  },
-  "18": {
-    "count": 149.0,
-    "score": 149.0,
-    "score_norm": 0.8142076502732241
-  },
-  "19": {
-    "count": 183.0,
-    "score": 183.0,
-    "score_norm": 1.0
-  },
-  "20": {
-    "count": 168.0,
-    "score": 168.0,
-    "score_norm": 0.9180327868852459
-  },
-  "21": {
-    "count": 117.0,
-    "score": 117.0,
-    "score_norm": 0.639344262295082
-  },
-  "22": {
-    "count": 25.0,
-    "score": 25.0,
-    "score_norm": 0.1366120218579235
-  },
-  "23": {
-    "count": 16.0,
-    "score": 16.0,
-    "score_norm": 0.08743169398907104
-  },
-  "24": {
-    "count": 25.0,
-    "score": 25.0,
-    "score_norm": 0.1366120218579235
-  },
-  "25": {
-    "count": 36.0,
-    "score": 36.0,
-    "score_norm": 0.19672131147540983
-  },
-  "26": {
-    "count": 25.0,
-    "score": 25.0,
-    "score_norm": 0.1366120218579235
-  },
-  "27": {
-    "count": 11.0,
-    "score": 11.0,
-    "score_norm": 0.060109289617486336
-  },
-  "28": {
-    "count": 13.0,
-    "score": 13.0,
-    "score_norm": 0.07103825136612021
-  },
-  "29": {
-    "count": 17.0,
-    "score": 17.0,
-    "score_norm": 0.09289617486338798
-  },
-  "30": {
-    "count": 60.0,
-    "score": 60.0,
-    "score_norm": 0.32786885245901637
-  },
-  "31": {
-    "count": 43.0,
-    "score": 43.0,
-    "score_norm": 0.23497267759562843
-  },
-  "32": {
-    "count": 35.0,
-    "score": 35.0,
-    "score_norm": 0.1912568306010929
-  },
-  "33": {
-    "count": 23.0,
-    "score": 23.0,
-    "score_norm": 0.12568306010928962
-  },
-  "34": {
-    "count": 50.0,
-    "score": 50.0,
-    "score_norm": 0.273224043715847
-  },
-  "35": {
-    "count": 65.0,
-    "score": 65.0,
-    "score_norm": 0.3551912568306011
-  },
-  "36": {
-    "count": 77.0,
-    "score": 77.0,
-    "score_norm": 0.4207650273224044
-  },
-  "37": {
-    "count": 80.0,
-    "score": 80.0,
-    "score_norm": 0.4371584699453552
-  },
-  "38": {
-    "count": 61.0,
-    "score": 61.0,
-    "score_norm": 0.3333333333333333
-  },
-  "39": {
-    "count": 75.0,
-    "score": 75.0,
-    "score_norm": 0.4098360655737705
-  },
-  "40": {
-    "count": 60.0,
-    "score": 60.0,
-    "score_norm": 0.32786885245901637
-  },
-  "41": {
-    "count": 73.0,
-    "score": 73.0,
-    "score_norm": 0.3989071038251366
-  },
-  "42": {
-    "count": 58.0,
-    "score": 58.0,
-    "score_norm": 0.31693989071038253
-  },
-  "43": {
-    "count": 86.0,
-    "score": 86.0,
-    "score_norm": 0.46994535519125685
-  },
-  "44": {
-    "count": 56.0,
-    "score": 56.0,
-    "score_norm": 0.30601092896174864
-  },
-  "45": {
-    "count": 62.0,
-    "score": 62.0,
-    "score_norm": 0.33879781420765026
-  },
-  "46": {
-    "count": 72.0,
-    "score": 72.0,
-    "score_norm": 0.39344262295081966
-  },
-  "47": {
-    "count": 59.0,
-    "score": 59.0,
-    "score_norm": 0.3224043715846995
-  },
-  "48": {
-    "count": 46.0,
-    "score": 46.0,
-    "score_norm": 0.25136612021857924
-  },
-  "49": {
-    "count": 32.0,
-    "score": 32.0,
-    "score_norm": 0.17486338797814208
-  },
-  "50": {
-    "count": 25.0,
-    "score": 25.0,
-    "score_norm": 0.1366120218579235
-  },
-  "51": {
-    "count": 61.0,
-    "score": 61.0,
-    "score_norm": 0.3333333333333333
-  },
-  "52": {
-    "count": 80.0,
-    "score": 80.0,
-    "score_norm": 0.4371584699453552
-  },
-  "53": {
-    "count": 79.0,
-    "score": 79.0,
-    "score_norm": 0.43169398907103823
-  },
-  "54": {
-    "count": 64.0,
-    "score": 64.0,
-    "score_norm": 0.34972677595628415
-  },
-  "55": {
-    "count": 50.0,
-    "score": 50.0,
-    "score_norm": 0.273224043715847
-  },
-  "56": {
-    "count": 58.0,
-    "score": 58.0,
-    "score_norm": 0.31693989071038253
-  },
-  "57": {
-    "count": 84.0,
-    "score": 84.0,
-    "score_norm": 0.45901639344262296
-  },
-  "58": {
-    "count": 79.0,
-    "score": 79.0,
-    "score_norm": 0.43169398907103823
-  },
-  "59": {
-    "count": 28.0,
-    "score": 28.0,
-    "score_norm": 0.15300546448087432
-  },
-  "60": {
-    "count": 36.0,
-    "score": 36.0,
-    "score_norm": 0.19672131147540983
-  },
-  "61": {
-    "count": 38.0,
-    "score": 38.0,
-    "score_norm": 0.20765027322404372
-  },
-  "62": {
-    "count": 39.0,
-    "score": 39.0,
-    "score_norm": 0.21311475409836064
-  },
-  "63": {
     "count": 27.0,
     "score": 27.0,
-    "score_norm": 0.14754098360655737
+    "score_norm": 0.30337078651685395,
+    "top_pois": [
+      "ShopKing by Xentro Mall",
+      "Unnamed",
+      "La Mesa Eco Park",
+      "Cordis Mariae School",
+      "Puregold"
+    ]
   },
-  "64": {
-    "count": 28.0,
-    "score": 28.0,
-    "score_norm": 0.15300546448087432
+  "4": {
+    "count": 39.0,
+    "score": 39.0,
+    "score_norm": 0.43820224719101125,
+    "top_pois": [
+      "ShopKing by Xentro Mall",
+      "Cordis Mariae School",
+      "Puregold",
+      "Commonwealth Christian Academy Foundation",
+      "Commonwealth Adventist Elementary School"
+    ]
   },
-  "65": {
-    "count": 25.0,
-    "score": 25.0,
-    "score_norm": 0.1366120218579235
+  "5": {
+    "count": 44.0,
+    "score": 44.0,
+    "score_norm": 0.4943820224719101,
+    "top_pois": [
+      "Cordis Mariae School",
+      "Commonwealth Christian Academy Foundation",
+      "Commonwealth Adventist Elementary School",
+      "Jeepney Terminal: Litex-Montalban",
+      "Department of Social Welfare and Development"
+    ]
   },
-  "66": {
+  "6": {
+    "count": 38.0,
+    "score": 38.0,
+    "score_norm": 0.42696629213483145,
+    "top_pois": [
+      "Unnamed",
+      "ABE Fairview",
+      "Unnamed",
+      "ABE College",
+      "Riverside Terminal"
+    ]
+  },
+  "7": {
+    "count": 33.0,
+    "score": 33.0,
+    "score_norm": 0.3707865168539326,
+    "top_pois": [
+      "Ever Jeepney Terminal",
+      "Ever Gotesco Commonwealth",
+      "Royal Place",
+      "Aics Extension",
+      "Riverside Terminal"
+    ]
+  },
+  "8": {
+    "count": 39.0,
+    "score": 39.0,
+    "score_norm": 0.43820224719101125,
+    "top_pois": [
+      "Sari-sari Store",
+      "The Rock",
+      "Ever Jeepney Terminal",
+      "Ever Gotesco Commonwealth",
+      "Royal Place"
+    ]
+  },
+  "9": {
+    "count": 29.0,
+    "score": 29.0,
+    "score_norm": 0.3258426966292135,
+    "top_pois": [
+      "Sari-sari Store",
+      "Ever Jeepney Terminal",
+      "Ever Gotesco Commonwealth",
+      "Royal Place",
+      "MAK English Academy"
+    ]
+  },
+  "10": {
+    "count": 29.0,
+    "score": 29.0,
+    "score_norm": 0.3258426966292135,
+    "top_pois": [
+      "Sari-sari Store",
+      "Ever Jeepney Terminal",
+      "Ever Gotesco Commonwealth",
+      "Royal Place",
+      "IELTS Toefls"
+    ]
+  },
+  "11": {
+    "count": 23.0,
+    "score": 23.0,
+    "score_norm": 0.25842696629213485,
+    "top_pois": [
+      "Puregold Commonwealth",
+      "Old Balara Christian Community School",
+      "Balara Academy",
+      "IELTS Toefls",
+      "National Commission on Muslim Filipinos"
+    ]
+  },
+  "12": {
     "count": 26.0,
     "score": 26.0,
-    "score_norm": 0.14207650273224043
+    "score_norm": 0.29213483146067415,
+    "top_pois": [
+      "Puregold Commonwealth",
+      "IE/ME Swell Room",
+      "Old Balara Christian Community School",
+      "Balara Academy",
+      "IELTS Toefls"
+    ]
   },
-  "67": {
+  "13": {
+    "count": 30.0,
+    "score": 30.0,
+    "score_norm": 0.33707865168539325,
+    "top_pois": [
+      "Puregold Commonwealth",
+      "New Era University",
+      "IE/ME Swell Room",
+      "U.P. - Ayala Land Technohub",
+      "Old Balara Christian Community School"
+    ]
+  },
+  "14": {
+    "count": 26.0,
+    "score": 26.0,
+    "score_norm": 0.29213483146067415,
+    "top_pois": [
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Old Balara Christian Community School",
+      "Diliman Christian Academy",
+      "Commision on Human Rights Central Office"
+    ]
+  },
+  "15": {
+    "count": 25.0,
+    "score": 25.0,
+    "score_norm": 0.2808988764044944,
+    "top_pois": [
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Diliman Christian Academy",
+      "Commision on Human Rights Central Office",
+      "UP Diliman Varsity Training Center"
+    ]
+  },
+  "16": {
+    "count": 36.0,
+    "score": 36.0,
+    "score_norm": 0.4044943820224719,
+    "top_pois": [
+      "Creative Explorers",
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Department of Environment and Natural Resources",
+      "Bureau of Agricultural Extension"
+    ]
+  },
+  "17": {
+    "count": 42.0,
+    "score": 42.0,
+    "score_norm": 0.47191011235955055,
+    "top_pois": [
+      "Creative Explorers",
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Sugar Regulatory Administration",
+      "Department of Environment and Natural Resources"
+    ]
+  },
+  "18": {
+    "count": 74.0,
+    "score": 74.0,
+    "score_norm": 0.8314606741573034,
+    "top_pois": [
+      "Creative Explorers",
+      "U.P. - Ayala Land Technohub",
+      "National Center for Pulmonary Research",
+      "Sugar Regulatory Administration",
+      "Metro Manila Commission"
+    ]
+  },
+  "19": {
+    "count": 89.0,
+    "score": 89.0,
+    "score_norm": 1.0,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "U.P. - Ayala Land Technohub",
+      "National Center for Pulmonary Research",
+      "Sugar Regulatory Administration",
+      "Metro Manila Commission"
+    ]
+  },
+  "20": {
+    "count": 86.0,
+    "score": 86.0,
+    "score_norm": 0.9662921348314607,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "Unnamed",
+      "Isuzu",
+      "Vertis North",
+      "Bantayog ng mga Bayani Museum"
+    ]
+  },
+  "21": {
+    "count": 67.0,
+    "score": 67.0,
+    "score_norm": 0.7528089887640449,
+    "top_pois": [
+      "Unnamed",
+      "WalterMart",
+      "Isuzu",
+      "Vertis North",
+      "Bantayog ng mga Bayani Museum"
+    ]
+  },
+  "22": {
+    "count": 14.0,
+    "score": 14.0,
+    "score_norm": 0.15730337078651685,
+    "top_pois": [
+      "Our Lady of Fatima",
+      "Center For Children With Special Needs Special Education And Therapy Center",
+      "BIR Revenue District Office \u2116 28",
+      "STI College Fairview",
+      "AMA Computer College-Fairview"
+    ]
+  },
+  "23": {
+    "count": 11.0,
+    "score": 11.0,
+    "score_norm": 0.12359550561797752,
+    "top_pois": [
+      "Our Lady of Fatima",
+      "Center For Children With Special Needs Special Education And Therapy Center",
+      "BIR Revenue District Office \u2116 28",
+      "STI College Fairview",
+      "AMA Computer College-Fairview"
+    ]
+  },
+  "24": {
+    "count": 16.0,
+    "score": 16.0,
+    "score_norm": 0.1797752808988764,
+    "top_pois": [
+      "Our Lady of Fatima",
+      "Center For Children With Special Needs Special Education And Therapy Center",
+      "BIR Revenue District Office \u2116 28",
+      "STI College Fairview",
+      "AMA Computer College-Fairview"
+    ]
+  },
+  "25": {
+    "count": 21.0,
+    "score": 21.0,
+    "score_norm": 0.23595505617977527,
+    "top_pois": [
+      "La Mesa Eco Park",
+      "STI College Fairview",
+      "Easylane Supermarket",
+      "Gateways Institute of Science & Technology",
+      "Timothy Christian Academy"
+    ]
+  },
+  "26": {
+    "count": 16.0,
+    "score": 16.0,
+    "score_norm": 0.1797752808988764,
+    "top_pois": [
+      "ShopKing by Xentro Mall",
+      "Jeepney Terminal: Litex-Montalban",
+      "Payatas Academy",
+      "Milda House",
+      "ClE New Life Christian School"
+    ]
+  },
+  "27": {
+    "count": 6.0,
+    "score": 6.0,
+    "score_norm": 0.06741573033707865,
+    "top_pois": [
+      "ClE New Life Christian School",
+      "Justice Cecilia Mu\u00f1oz-Palma High School",
+      "Payatas C Elementary School",
+      "Fiore del Carmelo School",
+      "Siloam Christian Academy"
+    ]
+  },
+  "28": {
+    "count": 7.0,
+    "score": 7.0,
+    "score_norm": 0.07865168539325842,
+    "top_pois": [
+      "Milda House",
+      "Justice Cecilia Mu\u00f1oz-Palma High School",
+      "Payatas C Elementary School",
+      "Siloam Christian Academy",
+      "Blessed Exodus Christian Academy"
+    ]
+  },
+  "29": {
+    "count": 10.0,
+    "score": 10.0,
+    "score_norm": 0.11235955056179775,
+    "top_pois": [
+      "Milda House",
+      "Learning development center Inc.",
+      "Justice Cecilia Mu\u00f1oz-Palma High School",
+      "Payatas C Elementary School",
+      "Justice Cecilia Mu\u00f1oz Palma Senior High School"
+    ]
+  },
+  "30": {
+    "count": 34.0,
+    "score": 34.0,
+    "score_norm": 0.38202247191011235,
+    "top_pois": [
+      "Commonwealth Christian Academy Foundation",
+      "Commonwealth Adventist Elementary School",
+      "Jeepney Terminal: Litex-Montalban",
+      "Department of Social Welfare and Development",
+      "Payatas Academy"
+    ]
+  },
+  "31": {
+    "count": 22.0,
+    "score": 22.0,
+    "score_norm": 0.24719101123595505,
+    "top_pois": [
+      "Commonwealth Christian Academy Foundation",
+      "Commonwealth Adventist Elementary School",
+      "Department of Social Welfare and Development",
+      "Capitol Hills Christian School, Inc.",
+      "Publication Department"
+    ]
+  },
+  "32": {
     "count": 18.0,
     "score": 18.0,
-    "score_norm": 0.09836065573770492
+    "score_norm": 0.20224719101123595,
+    "top_pois": [
+      "Department of Social Welfare and Development",
+      "Capitol Hills Christian School, Inc.",
+      "Our Lord Saviour Academy",
+      "Ideal Montessori",
+      "Publication Department"
+    ]
   },
-  "68": {
-    "count": 138.0,
-    "score": 138.0,
-    "score_norm": 0.7540983606557377
+  "33": {
+    "count": 12.0,
+    "score": 12.0,
+    "score_norm": 0.1348314606741573,
+    "top_pois": [
+      "Capitol Hills Christian School, Inc.",
+      "Our Lord Saviour Academy",
+      "Ideal Montessori",
+      "Batasan Hills National High School",
+      "Batasan Hills National High School"
+    ]
   },
-  "69": {
-    "count": 135.0,
-    "score": 135.0,
-    "score_norm": 0.7377049180327869
+  "34": {
+    "count": 25.0,
+    "score": 25.0,
+    "score_norm": 0.2808988764044944,
+    "top_pois": [
+      "Department of Social Welfare and Development",
+      "Capitol Hills Christian School, Inc.",
+      "Riverside Terminal",
+      "Publication Department",
+      "Batasan Hills National High School"
+    ]
   },
-  "70": {
-    "count": 151.0,
-    "score": 151.0,
-    "score_norm": 0.825136612021858
-  },
-  "71": {
+  "35": {
     "count": 37.0,
     "score": 37.0,
-    "score_norm": 0.20218579234972678
+    "score_norm": 0.4157303370786517,
+    "top_pois": [
+      "Puregold Commonwealth",
+      "Cesar E.A. Virata School of Business",
+      "IE/ME Swell Room",
+      "UP Town Center Mall (second home)",
+      "Old Balara Christian Community School"
+    ]
   },
-  "72": {
+  "36": {
+    "count": 34.0,
+    "score": 34.0,
+    "score_norm": 0.38202247191011235,
+    "top_pois": [
+      "Cesar E.A. Virata School of Business",
+      "IE/ME Swell Room",
+      "UP Town Center Mall (second home)",
+      "Advanced Science and Technology Institute",
+      "U.P. Town Center"
+    ]
+  },
+  "37": {
+    "count": 39.0,
+    "score": 39.0,
+    "score_norm": 0.43820224719101125,
+    "top_pois": [
+      "Cesar E.A. Virata School of Business",
+      "IE/ME Swell Room",
+      "UP Town Center Mall (second home)",
+      "Advanced Science and Technology Institute",
+      "U.P. Town Center"
+    ]
+  },
+  "38": {
+    "count": 39.0,
+    "score": 39.0,
+    "score_norm": 0.43820224719101125,
+    "top_pois": [
+      "Quezon City Central Depository & Archival Center",
+      "Oxy Flow Water Station",
+      "Aqua Health",
+      "Department of Budget and Management - MIMAROPA Regional Office",
+      "GL Supermarket"
+    ]
+  },
+  "39": {
+    "count": 46.0,
+    "score": 46.0,
+    "score_norm": 0.5168539325842697,
+    "top_pois": [
+      "ppk petshop",
+      "Quezon City Central Depository & Archival Center",
+      "Oxy Flow Water Station",
+      "Aqua Health",
+      "St. Mark's Learning Center"
+    ]
+  },
+  "40": {
+    "count": 38.0,
+    "score": 38.0,
+    "score_norm": 0.42696629213483145,
+    "top_pois": [
+      "Little Sandbox Preschool",
+      "ppk petshop",
+      "Quezon City Central Depository & Archival Center",
+      "Oxy Flow Water Station",
+      "Aqua Health"
+    ]
+  },
+  "41": {
     "count": 49.0,
     "score": 49.0,
-    "score_norm": 0.2677595628415301
+    "score_norm": 0.550561797752809,
+    "top_pois": [
+      "Little Sandbox Preschool",
+      "PMI QZC",
+      "ppk petshop",
+      "Oxy Flow Water Station",
+      "Aqua Health"
+    ]
   },
-  "73": {
-    "count": 34.0,
-    "score": 34.0,
-    "score_norm": 0.18579234972677597
-  },
-  "74": {
-    "count": 55.0,
-    "score": 55.0,
-    "score_norm": 0.3005464480874317
-  },
-  "75": {
+  "42": {
     "count": 40.0,
     "score": 40.0,
-    "score_norm": 0.2185792349726776
+    "score_norm": 0.449438202247191,
+    "top_pois": [
+      "PMI QZC",
+      "ppk petshop",
+      "Quezon City Central Depository & Archival Center",
+      "Oxy Flow Water Station",
+      "Aqua Health"
+    ]
+  },
+  "43": {
+    "count": 57.0,
+    "score": 57.0,
+    "score_norm": 0.6404494382022472,
+    "top_pois": [
+      "Bulwagang Pambarangay ng Katipunan",
+      "Alfamart",
+      "Robinsons Easymart",
+      "St. Therese Learning Center",
+      "Eco Mu\u00f1oz Enterprises Corp."
+    ]
+  },
+  "44": {
+    "count": 39.0,
+    "score": 39.0,
+    "score_norm": 0.43820224719101125,
+    "top_pois": [
+      "PMI QZC",
+      "National Book Store",
+      "Robinsons Easymart",
+      "WalterMart",
+      "Isuzu"
+    ]
+  },
+  "45": {
+    "count": 40.0,
+    "score": 40.0,
+    "score_norm": 0.449438202247191,
+    "top_pois": [
+      "Alfamart",
+      "WalterMart",
+      "Isuzu",
+      "Vertis North",
+      "Montessori West School"
+    ]
+  },
+  "46": {
+    "count": 45.0,
+    "score": 45.0,
+    "score_norm": 0.5056179775280899,
+    "top_pois": [
+      "Alfamart",
+      "St. Therese Learning Center",
+      "Vertis North",
+      "SM City North EDSA",
+      "Montessori West School"
+    ]
+  },
+  "47": {
+    "count": 35.0,
+    "score": 35.0,
+    "score_norm": 0.39325842696629215,
+    "top_pois": [
+      "St. Therese Learning Center",
+      "SM City North EDSA",
+      "City Center",
+      "J. P. Sioson General Hospital And Colleges",
+      "Puregold Mindanao Avenue - BJMP"
+    ]
+  },
+  "48": {
+    "count": 26.0,
+    "score": 26.0,
+    "score_norm": 0.29213483146067415,
+    "top_pois": [
+      "St. Therese Learning Center",
+      "Robinson's Supermarket",
+      "Puregold Mindanao Avenue - BJMP",
+      "SM Cherry",
+      "Saint paul educational ctr"
+    ]
+  },
+  "49": {
+    "count": 21.0,
+    "score": 21.0,
+    "score_norm": 0.23595505617977527,
+    "top_pois": [
+      "St. Therese Learning Center",
+      "Trinity Polytechnic College",
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "Puregold Mindanao Avenue - BJMP"
+    ]
+  },
+  "50": {
+    "count": 17.0,
+    "score": 17.0,
+    "score_norm": 0.19101123595505617,
+    "top_pois": [
+      "Trinity Polytechnic College",
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "St Vincent School of Theology",
+      "Puregold Mindanao Avenue - BJMP"
+    ]
+  },
+  "51": {
+    "count": 38.0,
+    "score": 38.0,
+    "score_norm": 0.42696629213483145,
+    "top_pois": [
+      "Isuzu",
+      "Vertis North",
+      "SM City North EDSA",
+      "Montessori West School",
+      "Mightee Mart"
+    ]
+  },
+  "52": {
+    "count": 47.0,
+    "score": 47.0,
+    "score_norm": 0.5280898876404494,
+    "top_pois": [
+      "PMI QZC",
+      "Unnamed",
+      "National Book Store",
+      "Robinsons Easymart",
+      "WalterMart"
+    ]
+  },
+  "53": {
+    "count": 48.0,
+    "score": 48.0,
+    "score_norm": 0.5393258426966292,
+    "top_pois": [
+      "St. Therese Learning Center",
+      "Vertis North",
+      "SM City North EDSA",
+      "Montessori West School",
+      "City Center"
+    ]
+  },
+  "54": {
+    "count": 43.0,
+    "score": 43.0,
+    "score_norm": 0.48314606741573035,
+    "top_pois": [
+      "Creative Explorers",
+      "St. Therese Learning Center",
+      "Vertis North",
+      "SM City North EDSA",
+      "City Center"
+    ]
+  },
+  "55": {
+    "count": 31.0,
+    "score": 31.0,
+    "score_norm": 0.34831460674157305,
+    "top_pois": [
+      "St. Therese Learning Center",
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "Wilcon City Center",
+      "Puregold Mindanao Avenue - BJMP"
+    ]
+  },
+  "56": {
+    "count": 40.0,
+    "score": 40.0,
+    "score_norm": 0.449438202247191,
+    "top_pois": [
+      "PMI QZC",
+      "ppk petshop",
+      "National Book Store",
+      "Robinsons Easymart",
+      "WalterMart"
+    ]
+  },
+  "57": {
+    "count": 51.0,
+    "score": 51.0,
+    "score_norm": 0.5730337078651685,
+    "top_pois": [
+      "Unnamed",
+      "Isuzu",
+      "Vertis North",
+      "Bantayog ng mga Bayani Museum",
+      "City Center"
+    ]
+  },
+  "58": {
+    "count": 49.0,
+    "score": 49.0,
+    "score_norm": 0.550561797752809,
+    "top_pois": [
+      "Unnamed",
+      "WalterMart",
+      "Isuzu",
+      "Vertis North",
+      "Bantayog ng mga Bayani Museum"
+    ]
+  },
+  "59": {
+    "count": 17.0,
+    "score": 17.0,
+    "score_norm": 0.19101123595505617,
+    "top_pois": [
+      "Trinity Polytechnic College",
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "St Vincent School of Theology",
+      "Saint Mark's Child Development Center"
+    ]
+  },
+  "60": {
+    "count": 21.0,
+    "score": 21.0,
+    "score_norm": 0.23595505617977527,
+    "top_pois": [
+      "Trinity Polytechnic College",
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "St Vincent School of Theology",
+      "Coronado's School of Quezon City"
+    ]
+  },
+  "61": {
+    "count": 23.0,
+    "score": 23.0,
+    "score_norm": 0.25842696629213485,
+    "top_pois": [
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "St Vincent School of Theology",
+      "Coronado's School of Quezon City",
+      "Coronado's School of Quezon City (annex)"
+    ]
+  },
+  "62": {
+    "count": 21.0,
+    "score": 21.0,
+    "score_norm": 0.23595505617977527,
+    "top_pois": [
+      "New Era University",
+      "Coronado's School of Quezon City",
+      "Saint Mark's Child Development Center",
+      "Unnamed",
+      "Unnamed"
+    ]
+  },
+  "63": {
+    "count": 14.0,
+    "score": 14.0,
+    "score_norm": 0.15730337078651685,
+    "top_pois": [
+      "New Era University",
+      "Diliman Christian Academy",
+      "New Era High School",
+      "Unnamed",
+      "Unnamed"
+    ]
+  },
+  "64": {
+    "count": 14.0,
+    "score": 14.0,
+    "score_norm": 0.15730337078651685,
+    "top_pois": [
+      "New Era University",
+      "Diliman Christian Academy",
+      "New Era High School",
+      "Unnamed",
+      "Shining Hope Academy"
+    ]
+  },
+  "65": {
+    "count": 16.0,
+    "score": 16.0,
+    "score_norm": 0.1797752808988764,
+    "top_pois": [
+      "Puregold Commonwealth",
+      "Old Balara Christian Community School",
+      "IELTS Toefls",
+      "Unnamed",
+      "Old Balara Elementary School"
+    ]
+  },
+  "66": {
+    "count": 18.0,
+    "score": 18.0,
+    "score_norm": 0.20224719101123595,
+    "top_pois": [
+      "Our Lady of Fatima",
+      "Center For Children With Special Needs Special Education And Therapy Center",
+      "BIR Revenue District Office \u2116 28",
+      "STI College Fairview",
+      "AMA Computer College-Fairview"
+    ]
+  },
+  "67": {
+    "count": 14.0,
+    "score": 14.0,
+    "score_norm": 0.15730337078651685,
+    "top_pois": [
+      "Our Lady of Fatima",
+      "Center For Children With Special Needs Special Education And Therapy Center",
+      "BIR Revenue District Office \u2116 28",
+      "STI College Fairview",
+      "AMA Computer College-Fairview"
+    ]
+  },
+  "68": {
+    "count": 75.0,
+    "score": 75.0,
+    "score_norm": 0.8426966292134831,
+    "top_pois": [
+      "Unnamed",
+      "WalterMart",
+      "Isuzu",
+      "Bantayog ng mga Bayani Museum",
+      "CIIT"
+    ]
+  },
+  "69": {
+    "count": 71.0,
+    "score": 71.0,
+    "score_norm": 0.797752808988764,
+    "top_pois": [
+      "Little Sandbox Preschool",
+      "JAC Liner",
+      "Gerald Barbershop & Salon",
+      "Bantayog ng mga Bayani Museum",
+      "CIIT"
+    ]
+  },
+  "70": {
+    "count": 80.0,
+    "score": 80.0,
+    "score_norm": 0.898876404494382,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "Unnamed",
+      "Bantayog ng mga Bayani Museum",
+      "National Center for Pulmonary Research",
+      "National Economic Development Administration"
+    ]
+  },
+  "71": {
+    "count": 23.0,
+    "score": 23.0,
+    "score_norm": 0.25842696629213485,
+    "top_pois": [
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "St Vincent School of Theology",
+      "Wilcon City Center",
+      "Coronado's School of Quezon City"
+    ]
+  },
+  "72": {
+    "count": 32.0,
+    "score": 32.0,
+    "score_norm": 0.3595505617977528,
+    "top_pois": [
+      "Trinity Polytechnic College",
+      "Robinson's Supermarket",
+      "Little Achievers Learning Center",
+      "St Vincent School of Theology",
+      "Wilcon City Center"
+    ]
+  },
+  "73": {
+    "count": 24.0,
+    "score": 24.0,
+    "score_norm": 0.2696629213483146,
+    "top_pois": [
+      "Creative Explorers",
+      "Robinson's Supermarket",
+      "Wilcon City Center",
+      "Puregold Mindanao Avenue - BJMP",
+      "San Agustin Center of Studies"
+    ]
+  },
+  "74": {
+    "count": 24.0,
+    "score": 24.0,
+    "score_norm": 0.2696629213483146,
+    "top_pois": [
+      "Puregold Commonwealth",
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Old Balara Christian Community School",
+      "Diliman Christian Academy"
+    ]
+  },
+  "75": {
+    "count": 19.0,
+    "score": 19.0,
+    "score_norm": 0.21348314606741572,
+    "top_pois": [
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Diliman Christian Academy",
+      "New Era University",
+      "New Era High School"
+    ]
   },
   "76": {
-    "count": 34.0,
-    "score": 34.0,
-    "score_norm": 0.18579234972677597
+    "count": 17.0,
+    "score": 17.0,
+    "score_norm": 0.19101123595505617,
+    "top_pois": [
+      "New Era University",
+      "Diliman Christian Academy",
+      "New Era University",
+      "New Era High School",
+      "Unnamed"
+    ]
   },
   "77": {
-    "count": 119.0,
-    "score": 119.0,
-    "score_norm": 0.6502732240437158
+    "count": 70.0,
+    "score": 70.0,
+    "score_norm": 0.7865168539325843,
+    "top_pois": [
+      "Little Sandbox Preschool",
+      "PMI QZC",
+      "JAC Liner",
+      "ppk petshop",
+      "Robinsons Easymart"
+    ]
   },
   "78": {
-    "count": 76.0,
-    "score": 76.0,
-    "score_norm": 0.41530054644808745
+    "count": 48.0,
+    "score": 48.0,
+    "score_norm": 0.5393258426966292,
+    "top_pois": [
+      "Little Sandbox Preschool",
+      "JAC Liner",
+      "ppk petshop",
+      "Gerald Barbershop & Salon",
+      "St. Mark's Learning Center"
+    ]
   },
   "79": {
-    "count": 111.0,
-    "score": 111.0,
-    "score_norm": 0.6065573770491803
+    "count": 67.0,
+    "score": 67.0,
+    "score_norm": 0.7528089887640449,
+    "top_pois": [
+      "Little Sandbox Preschool",
+      "Coda Lines Terminal",
+      "First North Luzon transit, Cubao terminal",
+      "JAC Liner",
+      "Victory Liner Cubao Terminal"
+    ]
   },
   "80": {
-    "count": 135.0,
-    "score": 135.0,
-    "score_norm": 0.7377049180327869
+    "count": 68.0,
+    "score": 68.0,
+    "score_norm": 0.7640449438202247,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "Creative Explorers",
+      "Vertis North",
+      "National Center for Pulmonary Research",
+      "Sugar Regulatory Administration"
+    ]
   },
   "81": {
-    "count": 169.0,
-    "score": 169.0,
-    "score_norm": 0.9234972677595629
+    "count": 81.0,
+    "score": 81.0,
+    "score_norm": 0.9101123595505618,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "U.P. - Ayala Land Technohub",
+      "National Center for Pulmonary Research",
+      "Sugar Regulatory Administration",
+      "Metro Manila Commission"
+    ]
   },
   "82": {
-    "count": 87.0,
-    "score": 87.0,
-    "score_norm": 0.47540983606557374
+    "count": 47.0,
+    "score": 47.0,
+    "score_norm": 0.5280898876404494,
+    "top_pois": [
+      "Nest School",
+      "JAC Liner",
+      "Savemore Market",
+      "Gerald Barbershop & Salon",
+      "National Economic Development Administration"
+    ]
   },
   "83": {
-    "count": 100.0,
-    "score": 100.0,
-    "score_norm": 0.546448087431694
+    "count": 59.0,
+    "score": 59.0,
+    "score_norm": 0.6629213483146067,
+    "top_pois": [
+      "Coda Lines Terminal",
+      "First North Luzon transit, Cubao terminal",
+      "JAC Liner",
+      "Victory Liner Cubao Terminal",
+      "Gerald Barbershop & Salon"
+    ]
   },
   "84": {
-    "count": 64.0,
-    "score": 64.0,
-    "score_norm": 0.34972677595628415
+    "count": 37.0,
+    "score": 37.0,
+    "score_norm": 0.4157303370786517,
+    "top_pois": [
+      "Nest School",
+      "JAC Liner",
+      "Savemore Market",
+      "Gerald Barbershop & Salon",
+      "Victoria School Foundation"
+    ]
   },
   "85": {
-    "count": 161.0,
-    "score": 161.0,
-    "score_norm": 0.8797814207650273
+    "count": 74.0,
+    "score": 74.0,
+    "score_norm": 0.8314606741573034,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "U.P. - Ayala Land Technohub",
+      "National Center for Pulmonary Research",
+      "Metro Manila Commission",
+      "Bureau of Forest Development Region IV"
+    ]
   },
   "86": {
-    "count": 113.0,
-    "score": 113.0,
-    "score_norm": 0.6174863387978142
+    "count": 55.0,
+    "score": 55.0,
+    "score_norm": 0.6179775280898876,
+    "top_pois": [
+      "Quezon City Civil Registrar",
+      "Nest School",
+      "Savemore Market",
+      "Metro Manila Commission",
+      "Quezon City Hall"
+    ]
   },
   "87": {
-    "count": 147.0,
-    "score": 147.0,
-    "score_norm": 0.8032786885245902
+    "count": 65.0,
+    "score": 65.0,
+    "score_norm": 0.7303370786516854,
+    "top_pois": [
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Metro Manila Commission",
+      "Department of Environment and Natural Resources",
+      "Bureau of Agricultural Extension"
+    ]
   },
   "88": {
-    "count": 88.0,
-    "score": 88.0,
-    "score_norm": 0.4808743169398907
+    "count": 29.0,
+    "score": 29.0,
+    "score_norm": 0.3258426966292135,
+    "top_pois": [
+      "New Era University",
+      "U.P. - Ayala Land Technohub",
+      "Diliman Christian Academy",
+      "Commision on Human Rights Central Office",
+      "UP Diliman Varsity Training Center"
+    ]
   },
   "89": {
-    "count": 136.0,
-    "score": 136.0,
-    "score_norm": 0.7431693989071039
+    "count": 51.0,
+    "score": 51.0,
+    "score_norm": 0.5730337078651685,
+    "top_pois": [
+      "U.P. - Ayala Land Technohub",
+      "Unnamed",
+      "Quezon City Hall",
+      "Quezon Memorial Circle",
+      "Children's Park"
+    ]
   },
   "90": {
-    "count": 69.0,
-    "score": 69.0,
-    "score_norm": 0.3770491803278688
+    "count": 37.0,
+    "score": 37.0,
+    "score_norm": 0.4157303370786517,
+    "top_pois": [
+      "Unnamed",
+      "Headway School for Giftedness",
+      "San Vicente Elementary School",
+      "National College of Public Administration and Governance",
+      "Holy Family School of Quezon City"
+    ]
   },
   "91": {
-    "count": 77.0,
-    "score": 77.0,
-    "score_norm": 0.4207650273224044
+    "count": 35.0,
+    "score": 35.0,
+    "score_norm": 0.39325842696629215,
+    "top_pois": [
+      "Advanced Science and Technology Institute",
+      "U.P. Town Center",
+      "Unnamed",
+      "Holy Family School of Quezon City",
+      "Unnamed"
+    ]
   },
   "92": {
-    "count": 79.0,
-    "score": 79.0,
-    "score_norm": 0.43169398907103823
+    "count": 43.0,
+    "score": 43.0,
+    "score_norm": 0.48314606741573035,
+    "top_pois": [
+      "Cesar E.A. Virata School of Business",
+      "Tricycle Station",
+      "UP Town Center Mall (second home)",
+      "Advanced Science and Technology Institute",
+      "U.P. Town Center"
+    ]
   }
 }

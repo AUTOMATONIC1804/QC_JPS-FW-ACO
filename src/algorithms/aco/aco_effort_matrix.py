@@ -9,38 +9,23 @@ Adapts Korzeń & Kruszyna (2025) "effort"-based ACO to our corridor problem.
 Population potential is omitted. Attractiveness is derived from POI density/scores
 within a 1 km buffer around each candidate node.
 
-Inputs (per `method`: "jps" | "dijkstra" | "astar"):
-  - data/processed/fw_<method>_points.geojson  (candidate nodes)
-  - data/processed/fw_<method>_roads.geojson   (optional; not required here)
-  - data/processed/fw_<method>_buffer.geojson  (corridor polygon; not required here)
-  - data/processed/fw_<method>_FW.npy          (distance/time matrix)
-  - data/processed/fw_<method>_D.npy           (distance matrix; used if present)
-
-POIs:
-  - a GeoDataFrame you pass in (already cleaned/merged)
-  - we’ll read a POI score from `poi_score_col` if present; otherwise,
-    we compute score from `category_col` with weights you pass in (poi_weights)
-    and an optional `base_score_col`.
-
-Outputs:
-  - data/processed/fw_<method>_effort.npy
-  - data/processed/fw_<method>_poi_stats.json  (per-node count, score, normalized score)
-
-Effort definition (per edge i→j):
-  e_ij = (L_ij / L_c) * (V_o / V_sr_ij) * A_ij
+Includes:
+✅ Deduplication of POIs by @id or id (polygon/point merged)
+✅ Weighted score by category (from poi_weights)
+✅ Proper CRS handling (EPSG:4326 → EPSG:3857)
+✅ Normalized per-node score
+✅ Top-POI name extraction per node (for ACO output inspection)
 """
 
 from __future__ import annotations
 
 import json
-import math
 import os
 from dataclasses import dataclass
 from typing import Dict, Tuple, Optional
 
 import numpy as np
 import geopandas as gpd
-from shapely.geometry import Point
 
 
 # ---- configuration -----------------------------------------------------------
@@ -80,6 +65,7 @@ def compute_effort_matrix(
         base_score_col=params.base_score_col,
         poi_weights=poi_weights or {},
     )
+
     node_scores_norm = {int(k): v["score_norm"] for k, v in node_stats.items()}
     A = _build_attractiveness_matrix(len(points_gdf), node_scores_norm)
 
@@ -105,48 +91,40 @@ def compute_effort_matrix(
     return E, node_stats
 
 
-# ---- UPDATED PATH HANDLER ----------------------------------------------------
+# ---- PATH HANDLER ------------------------------------------------------------
 
 def _load_method_inputs(params: EffortParams) -> Tuple[gpd.GeoDataFrame, Optional[np.ndarray], Optional[np.ndarray]]:
     """Load points and matrices for the selected method, future-proofed for multiple variants."""
     method = params.method.lower()
 
+    base_dir = "data/outputs/floyd_warshall"
     if method == "jps":
-        base_dir = "data/outputs/floyd_warshall"
         points_fp = os.path.join(base_dir, "fw_jps_points.geojson")
         D_fp = os.path.join(base_dir, "fw_jps_D.npy")
         FW_fp = os.path.join(base_dir, "fw_jps_FW.npy")
-
     elif method in ["dijkstra", "dj"]:
-        base_dir = "data/outputs/floyd_warshall"
         points_fp = os.path.join(base_dir, "fw_dijkstra_points.geojson")
         D_fp = os.path.join(base_dir, "fw_dijkstra_D.npy")
         FW_fp = os.path.join(base_dir, "fw_dijkstra_FW.npy")
-
     elif method in ["astar", "a_star", "a*"]:
-        base_dir = "data/outputs/floyd_warshall"
         points_fp = os.path.join(base_dir, "fw_astar_points.geojson")
         D_fp = os.path.join(base_dir, "fw_astar_D.npy")
         FW_fp = os.path.join(base_dir, "fw_astar_FW.npy")
-
     else:
-        # default fallback for future methods
-        base_dir = params.processed_dir
         points_fp = params.path("points.geojson")
         D_fp = params.path("D.npy")
         FW_fp = params.path("FW.npy")
 
     if not os.path.exists(points_fp):
         raise FileNotFoundError(points_fp)
-    points_gdf = gpd.read_file(points_fp)
 
+    points_gdf = gpd.read_file(points_fp)
     D = np.load(D_fp) if os.path.exists(D_fp) else None
     FW = np.load(FW_fp) if os.path.exists(FW_fp) else None
-
     return points_gdf, D, FW
 
 
-# ---- helpers -----------------------------------------------------------------
+# ---- CRS + HELPER ------------------------------------------------------------
 
 def _ensure_metric_crs(points_gdf, pois_gdf, metric_crs: str):
     """Project to metric CRS if necessary."""
@@ -168,8 +146,10 @@ def _is_metric_crs(crs) -> bool:
         return False
 
 
+# ---- UPDATED POI SCORING (DEDUP + BUFFER INTERSECTS + TOP POIS) --------------
+
 def _compute_node_poi_stats(points_gdf, pois_gdf, buffer_radius_m, poi_score_col, category_col, base_score_col, poi_weights):
-    """Compute per-node POI stats (counts, weighted scores, normalized)."""
+    """Compute per-node POI stats (dedup by ID, count + weighted score, normalized, with top POI names)."""
     if points_gdf.crs is None:
         points_gdf = points_gdf.set_crs("EPSG:4326")
     if pois_gdf.crs is None:
@@ -178,6 +158,18 @@ def _compute_node_poi_stats(points_gdf, pois_gdf, buffer_radius_m, poi_score_col
     points_m = points_gdf.to_crs("EPSG:3857")
     pois_m = pois_gdf.to_crs("EPSG:3857")
 
+    # --- Deduplicate by @id or id (prefer polygons)
+    id_field = "@id" if "@id" in pois_m.columns else ("id" if "id" in pois_m.columns else None)
+    if id_field:
+        pois_m["_poly_priority"] = pois_m.geometry.geom_type.isin(["Polygon", "MultiPolygon"])
+        pois_m = (
+            pois_m.sort_values(by=[id_field, "_poly_priority"], ascending=[True, False])
+                  .drop_duplicates(subset=[id_field], keep="first")
+                  .drop(columns=["_poly_priority"])
+                  .reset_index(drop=True)
+        )
+
+    # --- Buffer-based spatial join (intersects)
     buffers = points_m.copy()
     buffers["__buf_geom__"] = buffers.geometry.buffer(buffer_radius_m)
     right = buffers.set_geometry("__buf_geom__")[["__buf_geom__"]].rename_geometry("geometry")
@@ -185,30 +177,59 @@ def _compute_node_poi_stats(points_gdf, pois_gdf, buffer_radius_m, poi_score_col
 
     joined = gpd.sjoin(pois_m, right, how="inner", predicate="intersects")
 
+    # --- Compute per-POI score
     if poi_score_col in joined.columns:
         joined["__poi_score__"] = joined[poi_score_col].astype(float)
     else:
         w = joined[category_col].map(poi_weights).fillna(1.0)
-        if base_score_col in joined.columns:
-            joined["__poi_score__"] = w * joined[base_score_col].astype(float)
-        else:
-            joined["__poi_score__"] = w
+        joined["__poi_score__"] = w * joined.get(base_score_col, 1.0)
 
+    # --- Deduplicate within each node by ID again (for safety)
+    if id_field and id_field in joined.columns:
+        joined = joined.sort_values(by=["__node_idx__", id_field])
+        joined = joined.drop_duplicates(subset=["__node_idx__", id_field], keep="first")
+
+    # --- Group by node
     grp = joined.groupby("__node_idx__")
     counts = grp.size().to_dict()
     scores = grp["__poi_score__"].sum().to_dict()
-
     max_score = max(scores.values()) if scores else 0.0
+
+    # --- Extract top POI names per node
     node_stats = {}
     n_nodes = len(points_gdf)
+    name_cols = [col for col in ["name", "name_left", "name_right"] if col in joined.columns]
+
     for idx in range(n_nodes):
         c = float(counts.get(idx, 0))
         s = float(scores.get(idx, 0.0))
         sn = (s / max_score) if max_score > 0 else 0.0
-        node_stats[str(idx)] = {"count": c, "score": s, "score_norm": sn}
+
+        near = joined[joined["__node_idx__"] == idx]
+        if len(near) > 0:
+            if name_cols:
+                near["_poi_name_"] = near[name_cols].bfill(axis=1).iloc[:, 0]
+            else:
+                near["_poi_name_"] = "Unnamed"
+
+            top_pois = (
+                near.sort_values("__poi_score__", ascending=False)
+                    .head(5)["_poi_name_"].fillna("Unnamed").tolist()
+            )
+        else:
+            top_pois = []
+
+        node_stats[str(idx)] = {
+            "count": c,
+            "score": s,
+            "score_norm": sn,
+            "top_pois": top_pois,
+        }
 
     return node_stats
 
+
+# ---- MATRICES ---------------------------------------------------------------
 
 def _build_attractiveness_matrix(n, node_scores_norm):
     """A_ij = 1 - mean(norm_poi_i, norm_poi_j)."""
