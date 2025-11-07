@@ -1,90 +1,87 @@
 """
 aco_jps_runner.py
 --------------------------------------------------
-Run integrated ACO (path + stations) on FW/JPS graph, with
-intersection-aware detours and POI-aware scoring.
-
-Inputs (FW/JPS variant):
-  data/outputs/floyd_warshall/
-    ├─ fw_jps_points.geojson   (FW nodes)
-    ├─ fw_jps_D.npy            (FW distance matrix, meters)
-    ├─ fw_jps_FW.npy           (FW next/parent matrix)
-    └─ fw_jps_roads.geojson    (roads geometry; used for intersections)
-
-  data/outputs/jps_path.geojson           (to auto-pick start/end)
-  data/processed/qc_pois_final_scored.geojson (POIs with NormalizedScore)
-
-Outputs (to data/outputs/aco/):
-  ├─ aco_path_stations.geojson
-  ├─ aco_path_route.geojson
-  ├─ aco_intersections_debug.geojson
-  ├─ aco_route_refined.geojson           (optional detour refinement)
-  └─ aco_detours_debug.geojson           (optional detour segments)
+ACO FW–JPS Integrated Runner (FW-only mode)
+✅ Uses only FW nodes (no generated points)
+✅ FW D.npy and NEXT.npy for routing
+✅ POI scores from qc_pois_final_scored.geojson
+✅ Respects fw_jps_buffer.geojson (spatial limits)
+✅ Stations spaced ≈800 m apart
+✅ Roads from fw_jps_roads.geojson for path constraint
+✅ Exports stations, route, and validation report
 """
 
 from pathlib import Path
 import geopandas as gpd
-from shapely.geometry import Point, LineString
-
+import numpy as np
+import pandas as pd
+from shapely.geometry import LineString
+from shapely.ops import unary_union
 from src.algorithms.aco.aco_path_station_optimizer import (
-    ACOPathStationOptimizer, ACOPathParams
+    ACOPathStationOptimizer,
+    ACOPathParams,
 )
-from src.algorithms.aco.aco_detour_refiner import (
-    export_refined_route_with_debug, DetourConfig
-)
+from src.algorithms.aco.aco_utils import load_fw_data, load_fixed_endpoints
 from src.algorithms.aco.aco_config import ACO_CONFIG
 
 
-def _nearest_fw_index(points_file: str, lon: float, lat: float) -> int:
-    nodes = gpd.read_file(points_file)
-    if nodes.crs is None:
-        nodes.set_crs("EPSG:4326", inplace=True)
-    nodes_m = nodes.to_crs(3857)
-    p_m = gpd.GeoSeries([Point(lon, lat)], crs="EPSG:4326").to_crs(3857).iloc[0]
-    return int(nodes_m.distance(p_m).idxmin())
-
-
-def _start_end_from_jps(points_file: str, jps_path_file: str):
-    jps = gpd.read_file(jps_path_file)
-    if jps.crs is None:
-        jps.set_crs("EPSG:4326", inplace=True)
-    line = jps.geometry.iloc[0]
-    (lon_s, lat_s) = line.coords[0]
-    (lon_e, lat_e) = line.coords[-1]
-    s = _nearest_fw_index(points_file, lon_s, lat_s)
-    e = _nearest_fw_index(points_file, lon_e, lat_e)
-    print(f"🔍 Start FW idx: {s} | End FW idx: {e}")
-    return s, e
-
-
+# ---------------------------------------------------------
+# Main runner
+# ---------------------------------------------------------
 def main():
-    print("🚆 ACO Path+Station Optimization (FW/JPS, intersection-aware)")
+    print("🚆 ACO FW–JPS Integrated Runner (FW-only mode)")
 
-    # --- Project root & standard paths (adjust base if needed) ---
-    BASE = Path(r"D:\Quezon_City")
-    FW_DIR = BASE / "data" / "outputs" / "floyd_warshall"
+    # === Input files ===
+    POINTS_FILE = Path(r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_points.geojson")
+    DIST_FILE = Path(r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_D.npy")
+    NEXT_FILE = Path(r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_FW.npy")
+    ROADS_FILE = Path(r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_roads.geojson")
+    BUFFER_FILE = Path(r"D:\Quezon_City\data\outputs\floyd_warshall\fw_jps_buffer.geojson")
+    POI_FILE = Path(r"D:\Quezon_City\data\processed\qc_pois_final_scored.geojson")
+    PATH_FILE = Path(r"D:\Quezon_City\data\outputs\jps_path.geojson")
 
-    POINTS_FILE = str(FW_DIR / "fw_jps_points.geojson")
-    DIST_FILE   = str(FW_DIR / "fw_jps_D.npy")
-    NEXT_FILE   = str(FW_DIR / "fw_jps_FW.npy")
-    ROADS_FILE  = str(FW_DIR / "fw_jps_roads.geojson")   # intersections only
-    JPS_PATH    = str(BASE / "data" / "outputs" / "jps_path.geojson")
-    POI_FILE    = str(BASE / "data" / "processed" / "qc_pois_final_scored.geojson")
-    OUTPUT_DIR  = str(BASE / "data" / "outputs" / "aco")
-    Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR = Path(r"D:\Quezon_City\data\outputs\aco")
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # --- Params: merge config dict into dataclass safely ---
-    valid = {name for name in ACOPathParams.__dataclass_fields__.keys()}
-    kwargs = {k: v for k, v in ACO_CONFIG.items() if k in valid}
-    params = ACOPathParams(**kwargs)
+    # === Load FW base data ===
+    nodes, D, _, _ = load_fw_data(POINTS_FILE, DIST_FILE, roads_file=ROADS_FILE)
+    start_idx, end_idx = load_fixed_endpoints(PATH_FILE, nodes)
 
-    # --- User input: station count k ---
+    # === ACO parameters ===
+    params = ACOPathParams(
+        alpha=1.0,
+        beta=2.0,
+        rho=0.4,
+        q=1.0,
+        n_ants=40,
+        n_iter=50,
+        w_poi=1.0,
+        w_dist=0.05,
+        min_station_spacing_m=800.0,
+        local_search_m=6000.0,
+        poi_radius_m=1000.0,
+        poi_decay_rate=0.001,
+        intersection_snap_m=30.0,
+        detour_max_extra_m=1500.0,
+        detour_min_gain_ratio=0.25,
+    )
+
+    # === Apply FW buffer (optional) ===
+    buffer_union = None
+    try:
+        buffer_gdf = gpd.read_file(BUFFER_FILE)
+        if buffer_gdf.crs is None:
+            buffer_gdf.set_crs("EPSG:4326", inplace=True)
+        try:
+            buffer_union = buffer_gdf.union_all()
+        except Exception:
+            buffer_union = unary_union(buffer_gdf.geometry)
+        print("✅ FW buffer loaded and applied.")
+    except Exception as e:
+        print(f"⚠️ No valid FW buffer found ({e})")
+
+    # === Run optimizer ===
     k = int(input("Enter desired number of stations (k): ").strip())
-
-    # --- Start/End from JPS endpoints → nearest FW nodes ---
-    start_idx, end_idx = _start_end_from_jps(POINTS_FILE, JPS_PATH)
-
-    # --- Run intersection-aware ACO ---
     optimizer = ACOPathStationOptimizer(
         points_file=POINTS_FILE,
         dist_file=DIST_FILE,
@@ -96,25 +93,72 @@ def main():
         end_idx=end_idx,
         k_target=k,
     )
+
     result = optimizer.run(OUTPUT_DIR)
+    print(f"✅ Optimization complete. Best fitness: {result['best_fitness']:.4f}")
 
-    # --- Optional: refine final route by adding acceptable detours ---
-    try:
-        route_path = Path(OUTPUT_DIR) / "aco_path_route.geojson"
-        route_gdf = gpd.read_file(route_path)
-        route_line: LineString = route_gdf.geometry.iloc[0]
-        export_refined_route_with_debug(
-            main_path_line=route_line,
-            roads_file=ROADS_FILE,
-            pois_file=POI_FILE,
-            output_dir=OUTPUT_DIR,
-            cfg=DetourConfig(),  # use defaults; tweak in aco_config if desired
-        )
-    except Exception as e:
-        print(f"⚠️ Skipped detour refinement due to error: {e}")
+    # ---------------------------------------------------------
+    # Validation report
+    # ---------------------------------------------------------
+    print("\n🧾 Generating validation report...")
+    poi_gdf = gpd.read_file(POI_FILE)
+    if poi_gdf.crs is None:
+        poi_gdf.set_crs("EPSG:4326", inplace=True)
+    poi_m = poi_gdf.to_crs(3857)
 
-    print("\n✅ Done.")
+    nodes_gdf = gpd.GeoDataFrame(
+        geometry=gpd.points_from_xy(*zip(*nodes)),
+        crs="EPSG:4326"
+    ).to_crs(3857)
+
+    report_records = []
+    for i, node in enumerate(nodes_gdf.geometry):
+        buf = node.buffer(1000)
+        nearby = poi_m[poi_m.intersects(buf)]
+
+        pois_detail = []
+        if len(nearby) > 0:
+            for _, row in nearby.iterrows():
+                name = row.get("name", "Unknown")
+                cat = row.get("Category", "Unclassified")
+                score = float(row.get("NormalizedScore", 0))
+                pois_detail.append(f"{name} ({cat}, {score:.3f})")
+
+        node_wgs = gpd.GeoSeries([node], crs="EPSG:3857").to_crs("EPSG:4326").iloc[0]
+        report_records.append({
+            "fw_index": i,
+            "is_station": int(i in result["best_subset"]),
+            "poi_count": int(len(nearby)),
+            "poi_score_sum": float(nearby["NormalizedScore"].sum()) if len(nearby) > 0 else 0.0,
+            "poi_details": "; ".join(pois_detail[:25]),
+            "lon": node_wgs.x,
+            "lat": node_wgs.y,
+        })
+
+    report_gdf = gpd.GeoDataFrame(
+        report_records,
+        geometry=gpd.points_from_xy(
+            [r["lon"] for r in report_records],
+            [r["lat"] for r in report_records]
+        ),
+        crs="EPSG:4326"
+    )
+
+    report_gdf.to_file(OUTPUT_DIR / "aco_jps_validation_report.geojson", driver="GeoJSON")
+    pd.DataFrame(report_records).drop(columns="geometry", errors="ignore").to_csv(
+        OUTPUT_DIR / "aco_jps_validation_report.csv", index=False
+    )
+
+    print(f"✅ Saved:\n"
+          f"   • {OUTPUT_DIR / 'aco_path_stations.geojson'}\n"
+          f"   • {OUTPUT_DIR / 'aco_path_route.geojson'}\n"
+          f"   • {OUTPUT_DIR / 'aco_jps_validation_report.geojson'}\n"
+          f"   • {OUTPUT_DIR / 'aco_jps_validation_report.csv'}")
+    print(f"🏁 Best fitness: {result['best_fitness']:.4f}")
 
 
+# ---------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------
 if __name__ == "__main__":
     main()

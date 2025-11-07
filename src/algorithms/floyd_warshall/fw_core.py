@@ -1,7 +1,8 @@
 """
 fw_core.py
 -----------
-Shared Floyd–Warshall pipeline for building an APSP matrix around a route corridor.
+Shared Floyd–Warshall (base) pipeline for building route corridors and adjacency structures.
+(Refactored for JPS/FW/ACO integration — no distance computation inside.)
 
 Key features
 ============
@@ -12,8 +13,7 @@ Key features
 - Projects the route to EPSG:3857, buffers it (default 5 km), then collects all passable
   road geometries within that buffer using either a local GeoPackage (GPKG) or OSMnx.
 - Samples points along every road segment inside the buffer (default every 500 m).
-- Builds a dense pairwise distance matrix (meters) using Haversine on WGS84.
-- Runs vectorized Floyd–Warshall to compute APSP.
+- Builds a *structural adjacency matrix* (no distances, no Haversine).
 - Saves buffer/roads/points as GeoJSON and matrices as .npy.
 - Returns detailed timing (ms) for each stage + counts.
 
@@ -23,23 +23,20 @@ In <output_dir> with <prefix>:
 - {prefix}_buffer.geojson
 - {prefix}_roads.geojson
 - {prefix}_points.geojson
-- {prefix}_D.npy         (pairwise distances, meters)
-- {prefix}_FW.npy        (APSP distances, meters)
-
-Dependencies
-============
-- numpy, geopandas, shapely, pyproj (implicit), optionally osmnx for live road data.
+- {prefix}_D.npy         (adjacency/placeholder matrix)
+- {prefix}_FW.npy        (identical copy for compatibility)
 
 Notes
 =====
-- "Passable roads" filter is best-effort: if a 'highway' column exists, we keep common
-  drivable classes; otherwise we keep edges as-is.
+- Distances will now be filled in later by algorithm-specific runners
+  (e.g., JPS, A*, Dijkstra).
+- "Passable roads" filter remains unchanged.
 - For large buffers / dense networks, the point count (and thus matrix size) can explode.
   Tune `buffer_m` and `spacing_m` accordingly.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict, Any
+from typing import Optional, List, Dict, Any
 from pathlib import Path
 import time
 import warnings
@@ -47,7 +44,6 @@ import numpy as np
 import geopandas as gpd
 from shapely.geometry import LineString, MultiLineString
 from shapely.ops import unary_union
-from math import radians, sin, cos, asin, sqrt
 
 try:
     import osmnx as ox
@@ -56,7 +52,6 @@ except Exception:
 
 WGS84 = "EPSG:4326"
 METRIC = "EPSG:3857"
-
 
 # --------------------------------------------------------------------------------------
 # Configuration
@@ -79,55 +74,7 @@ class FWConfig:
     use_osmnx: bool = False
     edges_gpkg: Optional[str] = None
     edges_layer: Optional[str] = None
-    expected_route_crs: Optional[str] = None   # "EPSG:4326" for Dijkstra, "EPSG:3857" for A*/JPS
-
-
-# --------------------------------------------------------------------------------------
-# Math utilities
-# --------------------------------------------------------------------------------------
-
-def _haversine_m(p1: Tuple[float, float], p2: Tuple[float, float]) -> float:
-    """
-    Haversine distance in meters between two points in lon/lat (WGS84).
-    """
-    lon1, lat1 = p1
-    lon2, lat2 = p2
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * asin(min(1.0, sqrt(a)))
-    R = 6371008.8  # mean Earth radius
-    return R * c
-
-
-def haversine_matrix(coords_lonlat: List[Tuple[float, float]]) -> np.ndarray:
-    """
-    Build a symmetric pairwise distance matrix (meters) for lon/lat coordinates.
-    """
-    n = len(coords_lonlat)
-    D = np.full((n, n), np.inf, dtype=float)
-    if n == 0:
-        return D
-    np.fill_diagonal(D, 0.0)
-    for i in range(n):
-        xi = coords_lonlat[i]
-        for j in range(i + 1, n):
-            d = _haversine_m(xi, coords_lonlat[j])
-            D[i, j] = D[j, i] = d
-    return D
-
-
-def floyd_warshall_numpy(D: np.ndarray) -> np.ndarray:
-    """
-    Vectorized Floyd–Warshall. Returns APSP matrix (meters).
-    Complexity is O(n^3) so be mindful of n (number of sampled points).
-    """
-    dist = D.copy()
-    n = dist.shape[0]
-    for k in range(n):
-        dist = np.minimum(dist, dist[:, [k]] + dist[[k], :])
-    return dist
+    expected_route_crs: Optional[str] = None
 
 
 # --------------------------------------------------------------------------------------
@@ -148,7 +95,6 @@ def _ensure_crs(gdf: gpd.GeoDataFrame, expected: Optional[str]) -> gpd.GeoDataFr
         return gdf
 
     if expected and str(gdf.crs) != expected:
-        # If the user asserts a specific CRS, reproject to that first to be precise.
         gdf = gdf.to_crs(expected)
     return gdf
 
@@ -157,8 +103,6 @@ def load_route_line(route_geojson: str, expected_route_crs: Optional[str]) -> Li
     """
     Load a route GeoJSON (LineString or MultiLineString), validate/apply its CRS,
     then reproject to EPSG:3857 and return a single LineString.
-
-    For MultiLineString, segments are concatenated in read order for sampling convenience.
     """
     gdf = gpd.read_file(route_geojson)
     gdf = _ensure_crs(gdf, expected_route_crs)
@@ -176,9 +120,6 @@ def load_route_line(route_geojson: str, expected_route_crs: Optional[str]) -> Li
 
 
 def buffer_around_line(line_3857: LineString, buffer_m: float) -> gpd.GeoDataFrame:
-    """
-    Build a buffer polygon around a metric LineString and return as GeoDataFrame (EPSG:3857).
-    """
     buf = line_3857.buffer(buffer_m)
     return gpd.GeoDataFrame({"id": [0]}, geometry=[buf], crs=METRIC)
 
@@ -197,7 +138,7 @@ def _filter_drivable(edges: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     def ok(x):
         if x is None:
-            return True  # keep unknowns
+            return True
         if isinstance(x, str):
             return (x in drivable)
         try:
@@ -211,13 +152,6 @@ def _filter_drivable(edges: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 def get_roads_within_buffer(line_3857: LineString,
                             cfg: FWConfig,
                             buffer_gdf: Optional[gpd.GeoDataFrame] = None) -> gpd.GeoDataFrame:
-    """
-    Retrieve passable roads within the buffer polygon. Two sources:
-    - Local GeoPackage (edges_gpkg[/edges_layer])
-    - OSMnx (use_osmnx=True)
-
-    Returns LineString/MultiLineString GeoDataFrame in EPSG:3857.
-    """
     if buffer_gdf is None:
         buffer_gdf = buffer_around_line(line_3857, cfg.buffer_m)
 
@@ -236,7 +170,6 @@ def get_roads_within_buffer(line_3857: LineString,
     if cfg.use_osmnx:
         if ox is None:
             raise ImportError("osmnx not installed but use_osmnx=True")
-        # Build polygon in WGS84 for OSMnx retrieval
         poly_wgs84 = buffer_gdf.to_crs(WGS84).geometry.iloc[0]
         G = ox.graph_from_polygon(poly_wgs84, network_type="drive")
         edges = ox.graph_to_gdfs(G, nodes=False, fill_edge_geometry=True)
@@ -250,35 +183,26 @@ def get_roads_within_buffer(line_3857: LineString,
 def sample_points_along_roads(edges_3857: gpd.GeoDataFrame, spacing_m: float) -> gpd.GeoDataFrame:
     """
     Sample points at exact 'spacing_m' intervals along each road geometry (EPSG:3857).
-    This ensures true 500 m (or custom) spacing, not vertex-based density.
-
-    Deduplicates by snapping to a 1 m grid.
+    Deduplicates by snapping to 1 m grid.
     """
     rows = []
     for idx, geom in edges_3857.geometry.items():
         if geom is None:
             continue
-
-        # Handle MultiLineString and LineString uniformly
         lines = [geom] if geom.geom_type == "LineString" else list(geom.geoms) if geom.geom_type == "MultiLineString" else []
         for ls in lines:
             length = ls.length
             if length < spacing_m:
-                # include only start and end
                 pts = [ls.interpolate(0), ls.interpolate(length)]
             else:
                 dists = np.arange(0, length + spacing_m, spacing_m)
                 pts = [ls.interpolate(d) for d in dists]
-
             for p in pts:
                 rows.append({"edge_id": idx, "geometry": p})
 
-    pts = gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:3857")
-
+    pts = gpd.GeoDataFrame(rows, geometry="geometry", crs=METRIC)
     if len(pts) == 0:
         return pts
-
-    # Snap to 1 m grid (avoid duplicates)
     pts["X"] = (pts.geometry.x / 1).round(0)
     pts["Y"] = (pts.geometry.y / 1).round(0)
     pts = pts.drop_duplicates(subset=["X", "Y"]).drop(columns=["X", "Y"]).reset_index(drop=True)
@@ -286,7 +210,7 @@ def sample_points_along_roads(edges_3857: gpd.GeoDataFrame, spacing_m: float) ->
 
 
 # --------------------------------------------------------------------------------------
-# Main pipeline
+# Main pipeline (adjacency-only)
 # --------------------------------------------------------------------------------------
 
 def run_fw_pipeline(
@@ -295,21 +219,10 @@ def run_fw_pipeline(
     prefix: str,
     cfg: FWConfig
 ) -> Dict[str, Any]:
-    """
-    Execute the full FW pipeline with detailed timing.
-
-    Returns
-    -------
-    dict with:
-        - counts: n_points, matrix shape
-        - timings_ms: per-stage timings in ms
-        - outputs: output directory path
-        - params: effective params used
-    """
     timings: Dict[str, float] = {}
     t0 = time.perf_counter()
 
-    # 1) Load route & project to metric
+    # 1) Load route & project
     t = time.perf_counter()
     line_3857 = load_route_line(route_geojson, cfg.expected_route_crs)
     timings["load_route_and_project_ms"] = (time.perf_counter() - t) * 1000
@@ -329,19 +242,23 @@ def run_fw_pipeline(
     points_3857 = sample_points_along_roads(roads_3857, cfg.spacing_m)
     timings["sample_points_ms"] = (time.perf_counter() - t) * 1000
 
-    # 5) Build distance matrix
+    # 5) Build adjacency/placeholder matrix (no distances)
     t = time.perf_counter()
-    pts_wgs84 = points_3857.to_crs(WGS84) if len(points_3857) > 0 else points_3857
-    coords = [(geom.x, geom.y) for geom in pts_wgs84.geometry] if len(points_3857) > 0 else []
-    D = haversine_matrix(coords)
+    n = len(points_3857)
+    D = np.full((n, n), np.inf, dtype=float)
+    np.fill_diagonal(D, 0.0)
+
+    # Optionally connect consecutive samples along each edge
+    if "edge_id" in points_3857.columns:
+        for eid in points_3857["edge_id"].unique():
+            pts = points_3857[points_3857["edge_id"] == eid].index.to_list()
+            for a, b in zip(pts[:-1], pts[1:]):
+                D[a, b] = D[b, a] = 1.0
+
+    FW = D.copy()
     timings["build_matrix_ms"] = (time.perf_counter() - t) * 1000
 
-    # 6) Floyd–Warshall
-    t = time.perf_counter()
-    FW = floyd_warshall_numpy(D) if D.size > 0 else D
-    timings["floyd_warshall_ms"] = (time.perf_counter() - t) * 1000
-
-    # 7) Save outputs
+    # 6) Save outputs
     t = time.perf_counter()
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -350,7 +267,6 @@ def run_fw_pipeline(
     if len(points_3857) > 0:
         points_3857.to_crs(WGS84).to_file(out / f"{prefix}_points.geojson", driver="GeoJSON")
     else:
-        # Write empty GDF if no points to avoid confusion
         gpd.GeoDataFrame(geometry=[], crs=WGS84).to_file(out / f"{prefix}_points.geojson", driver="GeoJSON")
     np.save(out / f"{prefix}_D.npy", D)
     np.save(out / f"{prefix}_FW.npy", FW)
