@@ -80,7 +80,8 @@ def commercial_poi(fields):
     mapping = {
         "mall": 3, "supermarket": 2, "wholesale": 2, "market": 2, "retail": 1,
         "office": 2, "bank": 2, "restaurant": 2, "cafe": 1, "convenience": 1,
-        "bar": 1, "hotel": 2, "store": 1, "shop": 1, "furniture": 1, "hardware": 1, "commercial": 2, "electronics": 1
+        "bar": 1, "hotel": 2, "store": 1, "shop": 1, "furniture": 1, "hardware": 1,
+        "commercial": 2, "electronics": 1
     }
     score = match_keywords(fields, mapping)
     return "Commercial / Offices", score if score > 0 else 0
@@ -206,3 +207,27 @@ summary = gdf["Category"].value_counts().to_frame("Count")
 summary["AvgWeighted"] = gdf.groupby("Category")["WeightedScore"].mean()
 print("\n📊 Category Summary:")
 print(summary.sort_index())
+
+
+# ======================================================
+# ✅ Helper: Load POIs + Category Weights for ACO
+# ======================================================
+
+def load_pois_and_weights(pois_file=None):
+    """
+    Load POI GeoDataFrame and category weights for ACO integration.
+    If pois_file is None, defaults to the final classified POI file.
+    """
+    import geopandas as gpd
+    from pathlib import Path
+
+    base_dir = Path(r"D:\Quezon_City\data\processed")
+    pois_file = pois_file or base_dir / "qc_pois_final_scored.geojson"
+
+    print(f"📦 Loading POIs from {pois_file}")
+    gdf = gpd.read_file(pois_file)
+    if gdf.crs is None:
+        gdf = gdf.set_crs("EPSG:4326")
+
+    print(f"✅ Loaded {len(gdf)} POIs with scores.")
+    return gdf, CATEGORY_WEIGHTS
