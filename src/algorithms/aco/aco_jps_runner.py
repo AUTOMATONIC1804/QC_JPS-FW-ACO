@@ -254,6 +254,9 @@ def run_aco_jps(
     # --------------------------------------------------
     # 9️⃣ Rebuild route
     # --------------------------------------------------
+        # --------------------------------------------------
+    # 9️⃣ Rebuild route
+    # --------------------------------------------------
     coords = [points_gdf.iloc[i].geometry for i in best_route if not points_gdf.iloc[i].geometry.is_empty]
     if len(coords) > 1:
         line = LineString(coords)
@@ -264,13 +267,47 @@ def run_aco_jps(
         print("⚠️ Not enough points to create route line.")
 
     # --------------------------------------------------
-    # 🔟 Save extended summary
+    # 🔟 Save extended summary + comparison CSV
     # --------------------------------------------------
     summary["selected_nodes"] = best_route
     summary["node_stats"] = {str(i): node_stats.get(str(i), {}) for i in best_route}
-    with open(Path(output_dir) / "aco_jps_summary.json", "w", encoding="utf-8") as f:
+
+    summary_path = Path(output_dir) / "aco_jps_summary.json"
+    with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
-    print(f"📄 Saved summary → {output_dir}/aco_jps_summary.json")
+    print(f"📄 Saved summary → {summary_path}")
+
+    # --------------------------------------------------
+    # 11️⃣ Export full CSV (chosen + unchosen nodes)
+    # --------------------------------------------------
+    print("🧾 Exporting detailed node comparison CSV...")
+
+    all_nodes = points_gdf.to_crs("EPSG:4326").copy()
+    all_nodes["fw_index"] = np.arange(len(all_nodes))
+    all_nodes["is_station"] = all_nodes["fw_index"].isin(best_route).astype(int)
+    all_nodes["poi_count"] = all_nodes["fw_index"].map(
+        lambda i: node_stats.get(str(i), {}).get("count", 0)
+    )
+    all_nodes["poi_score"] = all_nodes["fw_index"].map(
+        lambda i: node_stats.get(str(i), {}).get("score", 0)
+    )
+    all_nodes["poi_norm"] = all_nodes["fw_index"].map(
+        lambda i: node_stats.get(str(i), {}).get("score_norm", 0)
+    )
+    all_nodes["top_pois"] = all_nodes["fw_index"].map(
+        lambda i: ", ".join(node_stats.get(str(i), {}).get("top_pois", [])[:5])
+    )
+    all_nodes["order"] = all_nodes["fw_index"].map(
+        lambda i: best_route.index(i) + 1 if i in best_route else 0
+    )
+
+    # Extract lon/lat for clarity
+    all_nodes["lon"] = all_nodes.geometry.x
+    all_nodes["lat"] = all_nodes.geometry.y
+
+    csv_path = Path(output_dir) / "aco_jps_all_nodes.csv"
+    all_nodes.drop(columns="geometry").to_csv(csv_path, index=False)
+    print(f"✅ Saved full node comparison → {csv_path}")
 
 
 # ======================================================
