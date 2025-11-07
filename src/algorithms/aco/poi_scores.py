@@ -1,5 +1,5 @@
 """
-poi_scores_updated.py
+poi_scores.py
 -----------------------------------------------------
 Enhanced POI scoring system for Quezon City.
 
@@ -15,17 +15,14 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 
-# === CONFIG ===
-UPDATE_MODE = False  # 🔁 Set to True to reclassify only unclassified rows
+UPDATE_MODE = False  # Set to True to reclassify only unclassified rows
 
-# === Paths ===
+
 base_dir = Path(r"D:\Quezon_City\data\processed")
 input_path = base_dir / "qc_pois_final_scored.geojson"
 output_path = base_dir / "qc_pois_final_scored.geojson"
 
-# ------------------------------------------------------------
-# Helper: merge left/right fields with rules
-# ------------------------------------------------------------
+# Left and Right Merge
 def merge_lr(row, field_base):
     left_val = str(row.get(f"{field_base}_left", "")).lower()
     right_val = str(row.get(f"{field_base}_right", "")).lower()
@@ -38,9 +35,7 @@ def merge_lr(row, field_base):
         return right_val
     return f"{left_val} {right_val}"  # both exist, combine for keyword detection
 
-# ------------------------------------------------------------
-# Collect all text fields to check per row
-# ------------------------------------------------------------
+
 def get_all_text_fields(row):
     fields = []
 
@@ -64,9 +59,8 @@ def get_all_text_fields(row):
 
     return " ".join(fields)
 
-# ------------------------------------------------------------
-# CATEGORY FUNCTIONS
-# ------------------------------------------------------------
+
+# Categories
 def match_keywords(fields, mapping):
     for k, v in mapping.items():
         if k in fields:
@@ -134,9 +128,8 @@ def residential_poi(fields):
     score = match_keywords(fields, mapping)
     return "Residential / Housing", score if score > 0 else 0
 
-# ------------------------------------------------------------
-# CATEGORY WEIGHTS
-# ------------------------------------------------------------
+
+# Category Scores
 CATEGORY_WEIGHTS = {
     "Transport Facilities": 30,
     "Commercial / Offices": 20,
@@ -157,9 +150,7 @@ category_funcs = [
     residential_poi,
 ]
 
-# ------------------------------------------------------------
-# CLASSIFICATION FUNCTION
-# ------------------------------------------------------------
+# Classification and Scoring
 def classify_and_score(row):
     fields = get_all_text_fields(row)
     best_cat, best_score, best_weighted = "Unclassified", 0, 0
@@ -174,9 +165,8 @@ def classify_and_score(row):
     classified = "Yes" if best_cat != "Unclassified" else "No"
     return best_cat, best_score, best_weighted, classified
 
-# ------------------------------------------------------------
-# MAIN EXECUTION
-# ------------------------------------------------------------
+
+
 if not UPDATE_MODE:
     print("📂 Loading merged POI file...")
     gdf = gpd.read_file(input_path)
@@ -211,9 +201,7 @@ else:
     else:
         print("✅ No unclassified rows left to update.")
 
-# ------------------------------------------------------------
-# SUMMARY
-# ------------------------------------------------------------
+
 summary = gdf["Category"].value_counts().to_frame("Count")
 summary["AvgWeighted"] = gdf.groupby("Category")["WeightedScore"].mean()
 print("\n📊 Category Summary:")

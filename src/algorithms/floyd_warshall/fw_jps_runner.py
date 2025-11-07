@@ -175,7 +175,7 @@ class GridAdapter:
 # ===================================================
 def jps_distance_pixels(grid: GridAdapter, start_rc, goal_rc) -> float:
     """
-    Compute the path length in pixels between two raster cells using your JPS implementation.
+    Compute octile distance between two raster cells using your JPS implementation.
     Integrates with src/algorithms/jps_runner.py.
     """
     import numpy as np
@@ -184,29 +184,22 @@ def jps_distance_pixels(grid: GridAdapter, start_rc, goal_rc) -> float:
         from src.algorithms.jps.jps_grid import Grid
         from src.algorithms.jps.jps_main import jump_point_search
 
-        # Wrap grid
         g = Grid(grid.array)
-
-        # Run your JPS (no heuristic arg needed — handled internally)
         path = jump_point_search(g, start_rc, goal_rc)
 
-        # If no path found
-        if path is None or len(path) < 2:
+        if not path or len(path) < 2:
             return np.inf
 
-        # Compute pixel length (1 for straight, √2 for diagonal)
         pix_len = 0.0
         for (r0, c0), (r1, c1) in zip(path[:-1], path[1:]):
             dr, dc = abs(r1 - r0), abs(c1 - c0)
-            pix_len += np.sqrt(2.0) if (dr == 1 and dc == 1) else 1.0
+            pix_len += np.sqrt(2) * min(dr, dc) + abs(dr - dc)
 
         return pix_len
 
     except Exception as e:
         print(f"⚠️ JPS failed between {start_rc} → {goal_rc}: {e}")
         return np.inf
-
-
 
 def jps_distance_meters(grid: GridAdapter, start_xy_m, goal_xy_m) -> float:
     """
