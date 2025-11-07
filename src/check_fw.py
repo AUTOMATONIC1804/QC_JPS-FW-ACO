@@ -58,7 +58,7 @@ if n <= 20:
     print(np.round(FW, 1))
 else:
     print(f"\n⚙️ Matrix too large ({n}x{n}). Showing top-left 10x10 slice:")
-    print("\nD (Haversine pairwise):")
+    print("\nD (Result):")
     print(np.round(D[:10, :10], 1))
     print("\nFW (Floyd–Warshall result):")
     print(np.round(FW[:10, :10], 1))
