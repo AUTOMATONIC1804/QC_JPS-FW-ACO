@@ -14,7 +14,7 @@ from pathlib import Path
 # === CONFIG ===
 # Change this path to your current FW output directory
 fw_dir = Path(r"D:\Quezon_City\data\outputs\floyd_warshall")
-prefix = "fw_dijkstra"   # or "fw_dijkstra", "fw_aco", etc.
+prefix = "fw_astar"   # or "fw_dijkstra", "fw_aco", etc.
 
 # === Load files ===
 D_path = fw_dir / f"{prefix}_D.npy"

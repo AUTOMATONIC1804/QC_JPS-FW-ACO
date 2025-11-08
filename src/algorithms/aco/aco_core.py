@@ -2,18 +2,24 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Callable, List, Optional, Sequence, Tuple, Dict
 import numpy as np
 import math
 import random
 
+# ---------------------------------------------------------------------
+# Type aliases
+# ---------------------------------------------------------------------
 
 Route = List[int]
 CostFn = Callable[[Route], Tuple[float, bool]]  # returns (cost, is_valid)
 HeuristicFn = Callable[[int, int], float]       # eta(i,j)
 
+
+# ---------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------
 
 @dataclass
 class ACOConfig:
@@ -33,19 +39,19 @@ class ACOConfig:
     pheromone_max: float = 1e6
 
 
+# ---------------------------------------------------------------------
+# Core ACO Engine
+# ---------------------------------------------------------------------
+
 class AntColony:
     """
     Generic Ant Colony Optimization engine operating on an effort/cost matrix.
     - Lower matrix values = better (we minimize).
-    - Infeasible edges should be set to np.inf (or very large).
+    - Infeasible edges should be np.inf or very large.
 
     You can inject:
-      - route_cost_fn(route) -> (cost, valid): to add spacing/coverage penalties, etc.
-      - heuristic_fn(i, j)   -> eta_ij: default is 1/(eps + cost_ij).
-
-    Typical use:
-        ac = AntColony(E, ACOConfig(...))
-        best_route, best_cost, history = ac.run(route_cost_fn=my_cost_fn)
+      - route_cost_fn(route) -> (cost, valid)
+      - heuristic_fn(i, j)   -> eta_ij
     """
 
     def __init__(
@@ -70,12 +76,12 @@ class AntColony:
         # Initialize pheromones
         self.tau = np.full_like(self.C, fill_value=self.cfg.pheromone_init, dtype=float)
 
-        # Default heuristic: eta = 1 / (epsilon + cost)
+        # Default heuristic: eta = 1 / (eps + cost)
         eps = 1e-9
         if heuristic_fn is None:
             with np.errstate(divide="ignore", invalid="ignore"):
                 eta = 1.0 / (eps + self.C)
-                eta[np.isinf(self.C)] = 0.0  # no heuristic on infeasible edges
+                eta[np.isinf(self.C)] = 0.0
             self.eta_matrix = eta
             self.heuristic_fn = None
         else:
@@ -85,14 +91,13 @@ class AntColony:
         # Precompute feasible adjacency mask
         self.feasible = np.isfinite(self.C) & (self.C < np.inf)
 
-    # ------------------------ main loop ------------------------
+    # -----------------------------------------------------------------
+    # Main ACO Loop
+    # -----------------------------------------------------------------
 
-    def run(
-        self,
-        route_cost_fn: Optional[CostFn] = None,
-    ) -> Tuple[Route, float, Dict[str, List[float]]]:
+    def run(self, route_cost_fn: Optional[CostFn] = None) -> Tuple[Route, float, Dict[str, List[float]]]:
         """
-        Execute ACO and return the best route, its cost, and training history.
+        Execute ACO and return the best route, its cost, and convergence history.
         """
         best_route: Route = []
         best_cost: float = math.inf
@@ -101,83 +106,72 @@ class AntColony:
         for it in range(self.cfg.n_iterations):
             routes, costs = self._construct_solutions(route_cost_fn)
 
-            # Pheromone evaporation
+            # Evaporation
             self._evaporate()
 
             # Deposit pheromone for valid routes
-            any_valid = False
-            for route, cost in zip(routes, costs):
-                if math.isfinite(cost):
-                    any_valid = True
-                    self._deposit(route, cost)
+            valid_costs = [c for c in costs if math.isfinite(c)]
+            if valid_costs:
+                for route, cost in zip(routes, costs):
+                    if math.isfinite(cost) and cost > 0:
+                        self._deposit(route, cost)
 
-            # Track iteration stats
-            if any_valid:
-                valid_costs = [c for c in costs if math.isfinite(c)]
-                iter_best_cost = min(valid_costs)
+                iter_best_cost = float(min(valid_costs))
                 iter_mean_cost = float(np.mean(valid_costs))
-            else:
-                iter_best_cost = math.inf
-                iter_mean_cost = math.inf
 
-            history["best_cost"].append(iter_best_cost)
-            history["mean_cost"].append(iter_mean_cost)
+                # Track best route of this iteration
+                idx_best = valid_costs.index(iter_best_cost)
+                valid_routes = [r for r, c in zip(routes, costs) if math.isfinite(c)]
+                candidate_route = valid_routes[idx_best]
 
-            # Update global best
-            if any_valid:
-                idx = valid_costs.index(iter_best_cost)
-                candidate_route = [r for r, c in zip(routes, costs) if math.isfinite(c)][idx]
                 if iter_best_cost < best_cost:
                     best_cost = iter_best_cost
                     best_route = candidate_route
 
-            # Optional: bounding pheromone to avoid numeric explosion
+            else:
+                iter_best_cost = math.inf
+                iter_mean_cost = math.inf
+
+            # Record convergence
+            history["best_cost"].append(iter_best_cost)
+            history["mean_cost"].append(iter_mean_cost)
+
+            # Clip pheromone to avoid numerical explosion
             np.clip(self.tau, self.cfg.pheromone_min, self.cfg.pheromone_max, out=self.tau)
 
         return best_route, best_cost, history
 
-    # ------------------------ construction ------------------------
+    # -----------------------------------------------------------------
+    # Route construction & sampling
+    # -----------------------------------------------------------------
 
-    def _construct_solutions(
-        self,
-        route_cost_fn: Optional[CostFn],
-    ) -> Tuple[List[Route], List[float]]:
-        routes: List[Route] = []
-        costs: List[float] = []
+    def _construct_solutions(self, route_cost_fn: Optional[CostFn]) -> Tuple[List[Route], List[float]]:
+        routes, costs = [], []
 
         for _ in range(self.cfg.n_ants):
             route = self._build_single_route()
             if route_cost_fn is None:
-                # default cost = sum of edge costs if path reaches end
                 cost, ok = self._default_route_cost(route)
             else:
                 cost, ok = route_cost_fn(route)
-
             if not ok:
                 cost = math.inf
-
             routes.append(route)
             costs.append(cost)
 
         return routes, costs
 
     def _build_single_route(self) -> Route:
-        start = self.cfg.start_idx
-        end = self.cfg.end_idx
-
+        start, end = self.cfg.start_idx, self.cfg.end_idx
         route: Route = [start]
-        visited = set([start])
-
+        visited = {start}
         current = start
         steps = 0
 
         while current != end and steps < (self.cfg.max_steps or self.n * 2):
             nbrs = self._allowed_neighbors(current, visited)
-
             if not nbrs:
-                # dead end; stop and return partial route (will be invalid)
-                break
-
+                break  # dead end
             j = self._sample_next(current, nbrs)
             route.append(j)
             if not self.cfg.allow_revisit:
@@ -192,7 +186,7 @@ class AntColony:
         if not self.cfg.allow_revisit:
             for v in visited:
                 feas[v] = False
-        feas[i] = False  # no self-loop
+        feas[i] = False
         return np.where(feas)[0].tolist()
 
     def _eta(self, i: int, j: int) -> float:
@@ -201,10 +195,7 @@ class AntColony:
         return float(self.eta_matrix[i, j])
 
     def _sample_next(self, i: int, neighbors: Sequence[int]) -> int:
-        # transition probability p_ij ∝ (tau_ij^alpha) * (eta_ij^beta)
-        alpha = self.cfg.alpha
-        beta = self.cfg.beta
-
+        alpha, beta = self.cfg.alpha, self.cfg.beta
         tau_i = self.tau[i, neighbors]
         eta_i = np.array([self._eta(i, j) for j in neighbors], dtype=float)
 
@@ -213,7 +204,6 @@ class AntColony:
 
         total = float(np.sum(weights))
         if total <= 0.0 or not np.isfinite(total):
-            # fall back: pick neighbor with minimal raw cost
             j = int(neighbors[int(np.argmin(self.C[i, neighbors]))])
             return j
 
@@ -221,12 +211,13 @@ class AntColony:
         choice_idx = np.random.choice(len(neighbors), p=probs)
         return int(neighbors[choice_idx])
 
-    # ------------------------ costs & pheromones ------------------------
+    # -----------------------------------------------------------------
+    # Cost and pheromone handling
+    # -----------------------------------------------------------------
 
     def _default_route_cost(self, route: Route) -> Tuple[float, bool]:
         if not route or route[-1] != self.cfg.end_idx:
             return math.inf, False
-        # Sum edge costs along route
         total = 0.0
         for u, v in zip(route[:-1], route[1:]):
             c = self.C[u, v]
