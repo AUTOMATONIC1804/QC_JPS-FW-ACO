@@ -1,5 +1,5 @@
 """
-fw_dijkstra_runner.py (v8.1)
+fw_dijkstra_runner.py 
 --------------------------------------------------------
 Floyd–Warshall (FW) for Dijkstra corridor.
 Now rebuilt to compute true Dijkstra-based distances
@@ -15,6 +15,7 @@ import argparse
 import time
 import warnings
 from pathlib import Path
+import pandas as pd
 import numpy as np
 import geopandas as gpd
 import networkx as nx
@@ -169,7 +170,7 @@ def run_fw_dijkstra(
     route_line = load_route_line(route_geojson)
     buffer_gdf = buffer_route(route_line, buffer_m)
 
-    # 2️⃣ Prepare graph (no clipping yet)
+    # 2️⃣ Prepare graph
     print("📦 Preparing OSMnx graph...")
     G_full = prepare_graph(graphml_path)
     G_full = ox.project_graph(G_full, to_crs=METRIC)
@@ -180,7 +181,7 @@ def run_fw_dijkstra(
                 (G_full.nodes[v]["x"], G_full.nodes[v]["y"]),
             ]).length
 
-    # 3️⃣ Try clipping to buffer polygon (best effort)
+    # 3️⃣ Clip to buffer
     poly = buffer_gdf.to_crs(WGS84).geometry.iloc[0]
     try:
         try:
@@ -219,7 +220,7 @@ def run_fw_dijkstra(
             edge_rows.append({"u": u, "v": v, "geometry": geom})
         edges_gdf = gpd.GeoDataFrame(edge_rows, geometry="geometry", crs=WGS84)
 
-    # 5️⃣ Filter nodes by spacing and clip to buffer
+    # 5️⃣ Filter nodes and clip
     nodes_filtered = filter_nodes_by_spacing(nodes_gdf, spacing_m)
     poly_m = buffer_gdf.to_crs(METRIC).geometry.iloc[0]
     nodes_filtered = nodes_filtered.to_crs(METRIC)
@@ -230,6 +231,38 @@ def run_fw_dijkstra(
     edges_clip = gpd.overlay(edges_gdf.to_crs(METRIC), buffer_gdf, how="intersection").to_crs(WGS84)
     print(f"🛣️ Clipped roads: {len(edges_clip)}")
 
+    # ===================== NEW: endpoint guard (CRS-safe) =====================
+    clearance_m = 300.0  # adjust if you want
+    # Build endpoints in WGS84 (route_line is WGS84), then project to METRIC
+    endpoints_wgs = gpd.GeoDataFrame(
+        geometry=[Point(route_line.coords[0]), Point(route_line.coords[-1])],
+        crs=WGS84
+    )
+    endpoints_m = endpoints_wgs.to_crs(METRIC)
+    start_m, end_m = endpoints_m.geometry.iloc[0], endpoints_m.geometry.iloc[1]
+
+    # Work in METRIC for distances and merging
+    nodes_m = nodes_filtered.to_crs(METRIC).copy()
+
+    # Remove any node within clearance of start/end
+    d_start = nodes_m.geometry.distance(start_m)
+    d_end   = nodes_m.geometry.distance(end_m)
+    remove_mask = (d_start < clearance_m) | (d_end < clearance_m)
+    pruned = nodes_m.loc[~remove_mask].copy()
+
+    # Force insert start & end (in METRIC), then (light) duplicate drop
+    filtered_m = gpd.GeoDataFrame(
+        pd.concat([pruned, endpoints_m], ignore_index=True),
+        geometry="geometry",
+        crs=METRIC
+    ).drop_duplicates(subset=["geometry"]).reset_index(drop=True)
+
+    print(f"🎯 Endpoint rule: from {len(nodes_m)} → {len(filtered_m)} (kept exact start & end)")
+
+    # Back to WGS84 for exports / downstream
+    nodes_filtered = filtered_m.to_crs(WGS84)
+    # ========================================================================
+
     # 6️⃣ Export preliminary outputs
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -237,7 +270,7 @@ def run_fw_dijkstra(
     edges_clip.to_file(out / "fw_dijkstra_roads.geojson", driver="GeoJSON")
     nodes_filtered.to_file(out / "fw_dijkstra_nodes.geojson", driver="GeoJSON")
 
-    # 7️⃣ Compute Dijkstra + FW from exported roads/nodes
+    # 7️⃣ Compute Dijkstra + FW
     roads_path = out / "fw_dijkstra_roads.geojson"
     nodes_path = out / "fw_dijkstra_nodes.geojson"
     D = compute_local_dijkstra_matrix(roads_path, nodes_path)

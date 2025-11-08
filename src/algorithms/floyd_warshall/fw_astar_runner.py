@@ -119,7 +119,7 @@ def sample_points_along(line, spacing):
 def sample_points_on_lines(gdf_lines, spacing):
     all_pts = []
     for geom in gdf_lines.geometry:
-        if geom is None or geom.is_empty: 
+        if geom is None or geom.is_empty:
             continue
         if geom.geom_type == "LineString":
             all_pts.append(sample_points_along(geom, spacing))
@@ -142,6 +142,18 @@ def merge_nearby(points_gdf, rad_m):
     cleaned = points_gdf.iloc[keep].copy()
     print(f"🧹 Dedup {len(points_gdf)} → {len(cleaned)} pts (r={rad_m} m)")
     return cleaned.reset_index(drop=True)
+
+# Tiny dedup helper (used after forcing endpoints)
+def dedup_tiny(points_gdf, tol_m=1.0):
+    if len(points_gdf) == 0: return points_gdf
+    coords = np.array([[p.x, p.y] for p in points_gdf.geometry])
+    tree = cKDTree(coords)
+    groups = tree.query_ball_tree(tree, tol_m)
+    seen, keep = set(), []
+    for i, g in enumerate(groups):
+        if i in seen: continue
+        seen.update(g); keep.append(i)
+    return points_gdf.iloc[keep].reset_index(drop=True)
 
 # ===================================================
 # Raster ⇄ metric adapters
@@ -193,21 +205,17 @@ def astar_distance_pixels(grid: GridAdapter, start_rc, goal_rc) -> float:
     The astar_search(grid, start, goal) must return a list of (r,c) cells or None.
     """
     import numpy as np
-
     try:
         g = Grid(grid.array)  # reuse your Grid wrapper
-
-        path = astar_search(g, start_rc, goal_rc)  # your A* signature (no heuristic kw)
+        path = astar_search(g, start_rc, goal_rc)
         if not path or len(path) < 2:
             return np.inf
-
         # pixel length (cardinal=1, diagonal=√2)
         pix_len = 0.0
         for (r0, c0), (r1, c1) in zip(path[:-1], path[1:]):
             dr, dc = abs(r1 - r0), abs(c1 - c0)
             pix_len += (np.sqrt(2.0) if (dr == 1 and dc == 1) else 1.0)
         return pix_len
-
     except Exception as e:
         print(f"⚠️ A* failed between {start_rc} → {goal_rc}: {e}")
         return np.inf
@@ -215,10 +223,8 @@ def astar_distance_pixels(grid: GridAdapter, start_rc, goal_rc) -> float:
 def astar_distance_meters(grid: GridAdapter, start_xy_m, goal_xy_m) -> float:
     r0, c0 = grid.metric_to_rowcol(start_xy_m[0], start_xy_m[1])
     r1, c1 = grid.metric_to_rowcol(goal_xy_m[0], goal_xy_m[1])
-
     if not (grid.is_passable(r0, c0) and grid.is_passable(r1, c1)):
         return np.inf
-
     pix_len = astar_distance_pixels(grid, (r0, c0), (r1, c1))
     if not np.isfinite(pix_len):
         return np.inf
@@ -268,24 +274,44 @@ def run_fw_astar_vector(
     road_pts = sample_points_on_lines(roads_plus, spacing_m)
     print(f"🟨 A* pts: {len(astar_pts)} | 🛣️ Road pts: {len(road_pts)}")
 
-    # 5) Merge & deduplicate
+    # 5) Merge & deduplicate (coarse)
     all_pts = gpd.GeoDataFrame(pd.concat([astar_pts, road_pts], ignore_index=True), crs=METRIC)
     merged = merge_nearby(all_pts, merge_radius_m)
     if len(merged) == 0:
         print("❌ No points generated."); return
 
+    # ===================== NEW: endpoint guard =====================
+    # Always keep the *exact* start & end, remove others within 100 m
+    clearance_m = 100.0
+    start_pt = Point(route.coords[0])
+    end_pt   = Point(route.coords[-1])
+
+    # Remove all points within clearance of start/end
+    d_start = merged.geometry.distance(start_pt)
+    d_end   = merged.geometry.distance(end_pt)
+    remove_mask = (d_start < clearance_m) | (d_end < clearance_m)
+    pruned = merged.loc[~remove_mask].copy()
+
+    # Force-insert exact start/end, then tiny dedup to avoid duplicates
+    endpoints_gdf = gpd.GeoDataFrame(geometry=[start_pt, end_pt], crs=METRIC)
+    filtered = gpd.GeoDataFrame(pd.concat([pruned, endpoints_gdf], ignore_index=True), crs=METRIC)
+    filtered = dedup_tiny(filtered, tol_m=1.0)
+
+    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
+    # ===============================================================
+
     # 6) Save *spatial* outputs first
     out = Path(output_dir); out.mkdir(parents=True, exist_ok=True)
     buffer_gdf.to_crs(WGS84).to_file(out / "fw_astar_buffer.geojson", driver="GeoJSON")
     roads_plus.to_crs(WGS84).to_file(out / "fw_astar_roads.geojson", driver="GeoJSON")
-    merged.to_crs(WGS84).to_file(out / "fw_astar_points.geojson", driver="GeoJSON")
+    filtered.to_crs(WGS84).to_file(out / "fw_astar_points.geojson", driver="GeoJSON")
     print("💾 Saved buffer/roads/points GeoJSON.")
 
     # 7) Build A*-based distance matrix over raster grid
     print(f"🗺️ Loading raster grid: {tif_path}")
     grid = GridAdapter(tif_path)
 
-    coords_xy_m = np.column_stack([merged.geometry.x.values, merged.geometry.y.values])
+    coords_xy_m = np.column_stack([filtered.geometry.x.values, filtered.geometry.y.values])
     n = coords_xy_m.shape[0]
     D = np.full((n, n), np.inf, dtype=float)
     np.fill_diagonal(D, 0.0)
@@ -324,7 +350,7 @@ def run_fw_astar_vector(
     # 10) Summary
     elapsed_ms = (time.perf_counter() - t0) * 1000
     print("\n✅ Summary (A* + Vector, grid distances)")
-    print(f"🟨 A* pts: {len(astar_pts)} | 🛣️ Road pts: {len(road_pts)} | 🧹 Unique: {len(merged)}")
+    print(f"🟨 A* pts: {len(astar_pts)} | 🛣️ Road pts: {len(road_pts)} | 🧹 Unique (pre-filter): {len(merged)} | ✅ After endpoint rule: {len(filtered)}")
     print(f"📐 Matrix {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
     print("===================================")
 
