@@ -3,12 +3,13 @@
 ACO + JPS Integrated Runner
 ----------------------------
 1. Loads candidate points (from JPS–FW pipeline)
-2. Computes effort matrix based on POIs within 1 km buffers
-3. Runs Ant Colony Optimization (station selection)
-4. Locks start/end points
-5. Enforces path order along the JPS route
-6. Rebuilds final route
-7. Exports detailed POI stats for each chosen station
+2. Merges start/end nodes from JPS path (removing nearby duplicates)
+3. Computes effort matrix based on POIs within 1 km buffers
+4. Runs Ant Colony Optimization (station selection)
+5. Locks start/end points
+6. Enforces path order along the JPS route
+7. Exports full node comparison CSV (chosen + unchosen)
+8. Exports 1 km buffers for chosen stations (for visual verification)
 """
 
 import os
@@ -16,41 +17,40 @@ import json
 import argparse
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import geopandas as gpd
+import warnings
 from shapely.geometry import LineString
-
 from src.algorithms.aco.aco_effort_matrix import compute_effort_matrix, EffortParams
 from src.algorithms.aco.aco_station_selector import select_optimal_stations
 from src.algorithms.aco.poi_scores import load_pois_and_weights
 
-
+warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 # ======================================================
 # Helper functions
 # ======================================================
 
-def ensure_start_end(route, start_idx, end_idx):
-    """Ensure route starts and ends at locked indices."""
-    r = list(route)
-    if not r:
-        return [start_idx, end_idx] if start_idx != end_idx else [start_idx]
-    if r[0] != start_idx:
-        if start_idx not in r:
-            r = [start_idx] + r
-        else:
-            r.remove(start_idx)
-            r = [start_idx] + r
-    if r[-1] != end_idx:
-        if end_idx not in r:
-            r = r + [end_idx]
-        else:
-            r.remove(end_idx)
-            r = r + [end_idx]
-    # Deduplicate consecutive indices
-    dedup = []
-    for v in r:
-        if not dedup or dedup[-1] != v:
-            dedup.append(v)
-    return dedup
+def merge_jps_points_with_path(points_gdf, route_gdf, proximity_threshold_m=100):
+    """Merge FW candidate nodes with JPS path start/end nodes, removing near duplicates."""
+    start_geom = route_gdf.loc[route_gdf["role"] == "start", "geometry"].iloc[0]
+    end_geom = route_gdf.loc[route_gdf["role"] == "goal", "geometry"].iloc[0]
+
+    points_m = points_gdf.to_crs("EPSG:3857")
+    start_m = gpd.GeoSeries([start_geom], crs="EPSG:4326").to_crs("EPSG:3857").iloc[0]
+    end_m = gpd.GeoSeries([end_geom], crs="EPSG:4326").to_crs("EPSG:3857").iloc[0]
+
+    start_dists = points_m.distance(start_m)
+    end_dists = points_m.distance(end_m)
+    mask_near = (start_dists < proximity_threshold_m) | (end_dists < proximity_threshold_m)
+    cleaned = points_gdf.loc[~mask_near].copy()
+
+    merged = gpd.GeoDataFrame(pd.concat([
+        gpd.GeoDataFrame({"fw_index": [-1], "role": ["start"], "geometry": [start_geom]}, crs="EPSG:4326"),
+        cleaned.to_crs("EPSG:4326"),
+        gpd.GeoDataFrame({"fw_index": [-2], "role": ["goal"], "geometry": [end_geom]}, crs="EPSG:4326")
+    ], ignore_index=True), crs="EPSG:4326")
+
+    return merged
 
 
 def _route_line_from_geojson(route_gdf):
@@ -72,7 +72,7 @@ def _sort_indices_along_line(points_gdf, line, indices):
     return [i for i, _ in dists]
 
 
-def _enforce_exact_k(sorted_indices, k, start_idx, end_idx, node_stats):
+def _enforce_exact_k(sorted_indices, k, start_idx, end_idx):
     """Trim or subsample to ensure exactly k nodes (with start & end)."""
     keep = [i for i in sorted_indices if i not in (start_idx, end_idx)]
     result = [start_idx]
@@ -83,7 +83,6 @@ def _enforce_exact_k(sorted_indices, k, start_idx, end_idx, node_stats):
     else:
         chosen = keep
     result += chosen + [end_idx]
-    # Deduplicate
     final = []
     for i in result:
         if i not in final:
@@ -103,211 +102,115 @@ def run_aco_jps(
 ):
     print("=== 🧠 Running ACO + JPS Integrated Optimization ===")
 
-    # --------------------------------------------------
-    # 1️⃣ Load Floyd–Warshall outputs (method-specific)
-    # --------------------------------------------------
     base_fw_dir = Path("data/outputs/floyd_warshall")
-    if method == "jps":
-        points_path = base_fw_dir / "fw_jps_points.geojson"
-        D_path = base_fw_dir / "fw_jps_D.npy"
-        FW_path = base_fw_dir / "fw_jps_FW.npy"
-    elif method == "dijkstra":
-        points_path = base_fw_dir / "fw_dijkstra_points.geojson"
-        D_path = base_fw_dir / "fw_dijkstra_D.npy"
-        FW_path = base_fw_dir / "fw_dijkstra_FW.npy"
-    elif method == "astar":
-        points_path = base_fw_dir / "fw_astar_points.geojson"
-        D_path = base_fw_dir / "fw_astar_D.npy"
-        FW_path = base_fw_dir / "fw_astar_FW.npy"
-    else:
-        raise ValueError(f"Unsupported method: {method}")
-
-    if not points_path.exists():
-        raise FileNotFoundError(f"Missing candidate points: {points_path}")
+    points_path = base_fw_dir / f"fw_{method}_points.geojson"
+    D_path = base_fw_dir / f"fw_{method}_D.npy"
+    FW_path = base_fw_dir / f"fw_{method}_FW.npy"
 
     points_gdf = gpd.read_file(points_path)
-    print(f"📍 Loaded {len(points_gdf)} candidate nodes")
+    route_gdf = gpd.read_file("data/outputs/jps_path.geojson")
+
+    # Merge FW nodes + start/end points
+    print("🧩 Merging start/end nodes with FW candidates...")
+    points_gdf = merge_jps_points_with_path(points_gdf, route_gdf)
+    print(f"📍 Merged total nodes: {len(points_gdf)}")
 
     D = np.load(D_path)
     FW = np.load(FW_path)
-
-    # --------------------------------------------------
-    # 2️⃣ Load POIs and weights
-    # --------------------------------------------------
     pois_gdf, poi_weights = load_pois_and_weights()
 
-    # --------------------------------------------------
-    # 3️⃣ Compute Effort Matrix
-    # --------------------------------------------------
-    params = EffortParams(
-        method=method,
-        processed_dir=str(base_fw_dir),
-        buffer_radius_m=buffer_radius_m,
-    )
+    # Effort matrix
+    params = EffortParams(method=method, processed_dir=str(base_fw_dir), buffer_radius_m=buffer_radius_m)
     E, node_stats = compute_effort_matrix(params, pois_gdf, poi_weights)
-    print(f"📊 Effort matrix shape: {E.shape}")
-
-    # --- Connectivity repair ---
     E = np.where(np.isfinite(E), E, FW * 1.2)
     E[~np.isfinite(E)] = 1e9
-    print(f"🔍 Connectivity repaired. Finite ratio: {(np.isfinite(E).sum() / E.size):.2%}")
 
-    # --------------------------------------------------
-    # 4️⃣ Get start and end nodes from JPS route
-    # --------------------------------------------------
-    route_path = Path("data/outputs/jps_path.geojson")
-    if not route_path.exists():
-        raise FileNotFoundError(f"Missing JPS path: {route_path}")
+    start_idx = points_gdf[points_gdf["role"] == "start"].index[0]
+    end_idx = points_gdf[points_gdf["role"] == "goal"].index[0]
+    print(f"🔒 Start idx={start_idx}, End idx={end_idx}")
 
-    route_gdf = gpd.read_file(route_path)
-    start_pt = route_gdf[route_gdf["role"] == "start"].geometry.iloc[0]
-    goal_pt = route_gdf[route_gdf["role"] == "goal"].geometry.iloc[0]
+    user_input = input(f"Enter number of stations [default={n_stations}]: ").strip()
+    if user_input:
+        n_stations = int(user_input)
 
-    points_m = points_gdf.to_crs("EPSG:3857")
-    start_idx = points_m.distance(start_pt).idxmin()
-    end_idx = points_m.distance(goal_pt).idxmin()
-
-    if start_idx == end_idx:
-        print(f"⚠️ Start and end snapped to same node ({start_idx}); reassigning end.")
-        dists = points_m.distance(goal_pt)
-        end_idx = int(np.argmax(dists.values))
-    print(f"🔒 Locked start_idx={start_idx}, end_idx={end_idx}")
-
-    # --------------------------------------------------
-    # 5️⃣ Station count
-    # --------------------------------------------------
-    try:
-        user_input = input(
-            f"Enter number of stations to select (including start/end) [default={n_stations}]: "
-        ).strip()
-        if user_input:
-            n_stations = int(user_input)
-    except Exception:
-        pass
-    print(f"🎯 Selecting {n_stations} stations (including start/end).")
-
-    # --------------------------------------------------
-    # 6️⃣ ACO parameters
-    # --------------------------------------------------
     aco_params = {
-        "n_ants": 40,
-        "n_iterations": 80,
-        "alpha": 1.0,
-        "beta": 3.0,
-        "rho": 0.5,
-        "Q": 1.0,
-        "ideal_spacing_min": 500,
-        "ideal_spacing_max": 800,
-        "buffer_radius": 1000,
-        "target_coverage": 0.9,
+        "n_ants": 40, "n_iterations": 80,
+        "alpha": 1.0, "beta": 3.0, "rho": 0.5, "Q": 1.0,
+        "ideal_spacing_min": 500, "ideal_spacing_max": 800,
+        "buffer_radius": 1000, "target_coverage": 0.9,
         "weights": {"spacing": 0.4, "coverage": 0.3, "poi": 0.3},
         "seed": 42,
     }
 
-    # --------------------------------------------------
-    # 7️⃣ Run ACO selection
-    # --------------------------------------------------
     best_route, summary = select_optimal_stations(
-        E=E,
-        node_stats=node_stats,
-        points_gdf=points_gdf,
-        corridor_gdf=route_gdf,
-        start_idx=start_idx,
-        end_idx=end_idx,
-        params=aco_params,
+        E=E, node_stats=node_stats, points_gdf=points_gdf,
+        corridor_gdf=route_gdf, start_idx=start_idx, end_idx=end_idx, params=aco_params,
     )
 
-    # --- Order and enforce exact count ---
     line = _route_line_from_geojson(route_gdf.to_crs("EPSG:3857"))
-    if line is None:
-        raise RuntimeError("Could not extract path LineString from jps_path.geojson.")
-
     all_candidates = list(dict.fromkeys(best_route + [start_idx, end_idx]))
     ordered = _sort_indices_along_line(points_gdf, line, all_candidates)
-    best_route = _enforce_exact_k(ordered, n_stations, start_idx, end_idx, node_stats)
+    best_route = _enforce_exact_k(ordered, n_stations, start_idx, end_idx)
 
-    # --------------------------------------------------
-    # 🧠 Print detailed station POI info
-    # --------------------------------------------------
-    print("\n🚉 Detailed Station Summary:")
-    for i, idx in enumerate(best_route):
-        stats = node_stats.get(str(idx), {})
-        top_pois = ", ".join(stats.get("top_pois", [])[:5]) or "None"
-        print(f"  {i+1:02d}. Node {idx} → Count={stats.get('count', 0):.0f}, "
-              f"Score={stats.get('score', 0):.2f}, Norm={stats.get('score_norm', 0):.2f}")
-        print(f"     Top POIs: {top_pois}")
-
-    # --------------------------------------------------
-    # 8️⃣ Export stations with POI details
-    # --------------------------------------------------
     os.makedirs(output_dir, exist_ok=True)
+
+    # --- Export chosen stations
     chosen = points_gdf.iloc[best_route].copy()
     chosen["fw_index"] = best_route
-    chosen["poi_count"] = [node_stats.get(str(i), {}).get("count", 0) for i in best_route]
-    chosen["poi_score"] = [node_stats.get(str(i), {}).get("score", 0) for i in best_route]
-    chosen["poi_norm"] = [node_stats.get(str(i), {}).get("score_norm", 0) for i in best_route]
-    chosen["top_pois"] = [", ".join(node_stats.get(str(i), {}).get("top_pois", [])[:5]) for i in best_route]
-    chosen["order"] = np.arange(1, len(chosen) + 1)
     chosen.to_crs("EPSG:4326").to_file(f"{output_dir}/aco_jps_stations.geojson", driver="GeoJSON")
-    print(f"✅ Saved chosen stations → {output_dir}/aco_jps_stations.geojson")
 
-    # --------------------------------------------------
-    # 9️⃣ Rebuild route
-    # --------------------------------------------------
-        # --------------------------------------------------
-    # 9️⃣ Rebuild route
-    # --------------------------------------------------
+    # --- Export route
     coords = [points_gdf.iloc[i].geometry for i in best_route if not points_gdf.iloc[i].geometry.is_empty]
     if len(coords) > 1:
         line = LineString(coords)
-        gdf = gpd.GeoDataFrame({"role": ["path"], "geometry": [line]}, crs="EPSG:3857")
-        gdf.to_crs("EPSG:4326").to_file(f"{output_dir}/aco_jps_path.geojson", driver="GeoJSON")
-        print(f"✅ Saved final route → {output_dir}/aco_jps_path.geojson")
-    else:
-        print("⚠️ Not enough points to create route line.")
+        gpd.GeoDataFrame({"role": ["path"], "geometry": [line]}, crs="EPSG:3857").to_crs("EPSG:4326").to_file(
+            f"{output_dir}/aco_jps_path.geojson", driver="GeoJSON")
+    print(f"✅ Saved final route and stations in {output_dir}")
 
-    # --------------------------------------------------
-    # 🔟 Save extended summary + comparison CSV
-    # --------------------------------------------------
-    summary["selected_nodes"] = best_route
-    summary["node_stats"] = {str(i): node_stats.get(str(i), {}) for i in best_route}
+    # --- Export station buffers
+    print("🟢 Generating 1 km buffers for station verification...")
+    pois_m = pois_gdf.to_crs("EPSG:3857")
+    stations_m = chosen.to_crs("EPSG:3857")
+    buffers, poi_counts, poi_scores, poi_cats = [], [], [], []
 
-    summary_path = Path(output_dir) / "aco_jps_summary.json"
-    with open(summary_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
-    print(f"📄 Saved summary → {summary_path}")
+    for geom in stations_m.geometry:
+        buf = geom.buffer(1000)
+        near = pois_m[pois_m.intersects(buf)]
+        buffers.append(buf)
+        poi_counts.append(int(len(near)))
+        if len(near) > 0 and "score" in near.columns:
+            poi_scores.append(float(near["score"].sum()))
+        else:
+            poi_scores.append(0.0)
+        cats = near["category"].value_counts().head(5).to_dict() if "category" in near.columns else {}
+        poi_cats.append(str(cats))
 
-    # --------------------------------------------------
-    # 11️⃣ Export full CSV (chosen + unchosen nodes)
-    # --------------------------------------------------
-    print("🧾 Exporting detailed node comparison CSV...")
+    buffers_gdf = gpd.GeoDataFrame(
+        {
+            "fw_index": best_route,
+            "poi_count": poi_counts,
+            "poi_score_sum": poi_scores,
+            "top_categories": poi_cats,
+            "radius_m": 1000,
+        },
+        geometry=buffers,
+        crs="EPSG:3857",
+    ).to_crs("EPSG:4326")
 
+    buffers_gdf.to_file(f"{output_dir}/aco_jps_station_buffers.geojson", driver="GeoJSON")
+    print(f"✅ Saved 1 km station buffers → {output_dir}/aco_jps_station_buffers.geojson")
+
+
+    # --- Export CSV (all nodes)
     all_nodes = points_gdf.to_crs("EPSG:4326").copy()
     all_nodes["fw_index"] = np.arange(len(all_nodes))
     all_nodes["is_station"] = all_nodes["fw_index"].isin(best_route).astype(int)
-    all_nodes["poi_count"] = all_nodes["fw_index"].map(
-        lambda i: node_stats.get(str(i), {}).get("count", 0)
-    )
-    all_nodes["poi_score"] = all_nodes["fw_index"].map(
-        lambda i: node_stats.get(str(i), {}).get("score", 0)
-    )
-    all_nodes["poi_norm"] = all_nodes["fw_index"].map(
-        lambda i: node_stats.get(str(i), {}).get("score_norm", 0)
-    )
-    all_nodes["top_pois"] = all_nodes["fw_index"].map(
-        lambda i: ", ".join(node_stats.get(str(i), {}).get("top_pois", [])[:5])
-    )
-    all_nodes["order"] = all_nodes["fw_index"].map(
-        lambda i: best_route.index(i) + 1 if i in best_route else 0
-    )
-
-    # Extract lon/lat for clarity
-    all_nodes["lon"] = all_nodes.geometry.x
-    all_nodes["lat"] = all_nodes.geometry.y
-
-    csv_path = Path(output_dir) / "aco_jps_all_nodes.csv"
-    all_nodes.drop(columns="geometry").to_csv(csv_path, index=False)
-    print(f"✅ Saved full node comparison → {csv_path}")
+    all_nodes["poi_count"] = all_nodes["fw_index"].map(lambda i: node_stats.get(str(i), {}).get("count", 0))
+    all_nodes["poi_score"] = all_nodes["fw_index"].map(lambda i: node_stats.get(str(i), {}).get("score", 0))
+    all_nodes["poi_norm"] = all_nodes["fw_index"].map(lambda i: node_stats.get(str(i), {}).get("score_norm", 0))
+    all_nodes["lon"], all_nodes["lat"] = all_nodes.geometry.x, all_nodes.geometry.y
+    all_nodes.drop(columns="geometry").to_csv(Path(output_dir) / "aco_jps_all_nodes.csv", index=False)
+    print("🧾 Exported aco_jps_all_nodes.csv (chosen + unchosen)")
 
 
 # ======================================================
