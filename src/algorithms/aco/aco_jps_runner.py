@@ -10,6 +10,7 @@ ACO + JPS Integrated Runner
 6. Enforces path order along the JPS route
 7. Exports full node comparison CSV (chosen + unchosen)
 8. Exports 1 km buffers for chosen stations (for visual verification)
+9. Tracks ACO convergence (cost vs. iteration)
 """
 
 import os
@@ -20,12 +21,15 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 import warnings
+import matplotlib.pyplot as plt
 from shapely.geometry import LineString
+
 from src.algorithms.aco.aco_effort_matrix import compute_effort_matrix, EffortParams
 from src.algorithms.aco.aco_station_selector import select_optimal_stations
 from src.algorithms.aco.poi_scores import load_pois_and_weights
 
 warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
+
 # ======================================================
 # Helper functions
 # ======================================================
@@ -142,32 +146,58 @@ def run_aco_jps(
         "seed": 42,
     }
 
+    # --- Run ACO selection
     best_route, summary = select_optimal_stations(
         E=E, node_stats=node_stats, points_gdf=points_gdf,
         corridor_gdf=route_gdf, start_idx=start_idx, end_idx=end_idx, params=aco_params,
     )
 
+    # --- Save convergence data
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    history = summary.get("history", {})
+    best_costs = history.get("best_cost", [])
+    mean_costs = history.get("mean_cost", [])
+
+    if best_costs:
+        df = pd.DataFrame({"iteration": range(1, len(best_costs) + 1),
+                           "best_cost": best_costs,
+                           "mean_cost": mean_costs})
+        df.to_csv(output_dir / "aco_convergence.csv", index=False)
+        print("📈 Saved ACO convergence log → aco_convergence.csv")
+
+        plt.figure()
+        plt.plot(df["iteration"], df["best_cost"], label="Best Cost")
+        plt.plot(df["iteration"], df["mean_cost"], "--", label="Mean Cost")
+        plt.xlabel("Iteration")
+        plt.ylabel("Cost")
+        plt.title("ACO Convergence Over Iterations")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(output_dir / "aco_convergence.png", dpi=200)
+        plt.close()
+        print("📉 Saved ACO convergence plot → aco_convergence.png")
+
+    # --- Sort route and export
     line = _route_line_from_geojson(route_gdf.to_crs("EPSG:3857"))
     all_candidates = list(dict.fromkeys(best_route + [start_idx, end_idx]))
     ordered = _sort_indices_along_line(points_gdf, line, all_candidates)
     best_route = _enforce_exact_k(ordered, n_stations, start_idx, end_idx)
 
-    os.makedirs(output_dir, exist_ok=True)
-
-    # --- Export chosen stations
     chosen = points_gdf.iloc[best_route].copy()
     chosen["fw_index"] = best_route
-    chosen.to_crs("EPSG:4326").to_file(f"{output_dir}/aco_jps_stations.geojson", driver="GeoJSON")
+    chosen.to_crs("EPSG:4326").to_file(output_dir / "aco_jps_stations.geojson", driver="GeoJSON")
 
-    # --- Export route
     coords = [points_gdf.iloc[i].geometry for i in best_route if not points_gdf.iloc[i].geometry.is_empty]
     if len(coords) > 1:
         line = LineString(coords)
         gpd.GeoDataFrame({"role": ["path"], "geometry": [line]}, crs="EPSG:3857").to_crs("EPSG:4326").to_file(
-            f"{output_dir}/aco_jps_path.geojson", driver="GeoJSON")
+            output_dir / "aco_jps_path.geojson", driver="GeoJSON")
     print(f"✅ Saved final route and stations in {output_dir}")
 
-    # --- Export station buffers
+    # --- Station buffers
     print("🟢 Generating 1 km buffers for station verification...")
     pois_m = pois_gdf.to_crs("EPSG:3857")
     stations_m = chosen.to_crs("EPSG:3857")
@@ -186,20 +216,13 @@ def run_aco_jps(
         poi_cats.append(str(cats))
 
     buffers_gdf = gpd.GeoDataFrame(
-        {
-            "fw_index": best_route,
-            "poi_count": poi_counts,
-            "poi_score_sum": poi_scores,
-            "top_categories": poi_cats,
-            "radius_m": 1000,
-        },
-        geometry=buffers,
-        crs="EPSG:3857",
+        {"fw_index": best_route, "poi_count": poi_counts, "poi_score_sum": poi_scores,
+         "top_categories": poi_cats, "radius_m": 1000},
+        geometry=buffers, crs="EPSG:3857"
     ).to_crs("EPSG:4326")
 
-    buffers_gdf.to_file(f"{output_dir}/aco_jps_station_buffers.geojson", driver="GeoJSON")
-    print(f"✅ Saved 1 km station buffers → {output_dir}/aco_jps_station_buffers.geojson")
-
+    buffers_gdf.to_file(output_dir / "aco_jps_station_buffers.geojson", driver="GeoJSON")
+    print("✅ Saved 1 km station buffers → aco_jps_station_buffers.geojson")
 
     # --- Export CSV (all nodes)
     all_nodes = points_gdf.to_crs("EPSG:4326").copy()
@@ -209,7 +232,7 @@ def run_aco_jps(
     all_nodes["poi_score"] = all_nodes["fw_index"].map(lambda i: node_stats.get(str(i), {}).get("score", 0))
     all_nodes["poi_norm"] = all_nodes["fw_index"].map(lambda i: node_stats.get(str(i), {}).get("score_norm", 0))
     all_nodes["lon"], all_nodes["lat"] = all_nodes.geometry.x, all_nodes.geometry.y
-    all_nodes.drop(columns="geometry").to_csv(Path(output_dir) / "aco_jps_all_nodes.csv", index=False)
+    all_nodes.drop(columns="geometry").to_csv(output_dir / "aco_jps_all_nodes.csv", index=False)
     print("🧾 Exported aco_jps_all_nodes.csv (chosen + unchosen)")
 
 

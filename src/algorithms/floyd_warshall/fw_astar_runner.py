@@ -280,34 +280,59 @@ def run_fw_astar_vector(
     if len(merged) == 0:
         print("❌ No points generated."); return
 
-    # ===================== NEW: endpoint guard =====================
-    # Always keep the *exact* start & end, remove others within 100 m
+    # ===================== NEW: endpoint guard (with labeling + lat/lon) =====================
     clearance_m = 100.0
     start_pt = Point(route.coords[0])
-    end_pt   = Point(route.coords[-1])
+    end_pt = Point(route.coords[-1])
 
-    # Remove all points within clearance of start/end
+    # Distances to start/end
     d_start = merged.geometry.distance(start_pt)
-    d_end   = merged.geometry.distance(end_pt)
+    d_end = merged.geometry.distance(end_pt)
+
+    # Remove redundant points near start/end
     remove_mask = (d_start < clearance_m) | (d_end < clearance_m)
     pruned = merged.loc[~remove_mask].copy()
 
-    # Force-insert exact start/end, then tiny dedup to avoid duplicates
-    endpoints_gdf = gpd.GeoDataFrame(geometry=[start_pt, end_pt], crs=METRIC)
-    filtered = gpd.GeoDataFrame(pd.concat([pruned, endpoints_gdf], ignore_index=True), crs=METRIC)
+    # Add start & end points
+    endpoints_gdf = gpd.GeoDataFrame(
+        {"geometry": [start_pt, end_pt], "role": ["start", "end"]},
+        crs=METRIC
+    )
+
+    # Merge and assign roles
+    filtered = gpd.GeoDataFrame(
+        pd.concat([pruned, endpoints_gdf], ignore_index=True),
+        geometry="geometry",
+        crs=METRIC
+    )
+    filtered["role"] = filtered.get("role", "intermediate").fillna("intermediate")
+
+    # Deduplicate close points
     filtered = dedup_tiny(filtered, tol_m=1.0)
 
-    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
-    # ===============================================================
+    # --- Add lat/lon columns (WGS84 order: lat, lon) ---
+    filtered_wgs = filtered.to_crs(WGS84).copy()
+    filtered_wgs["lat"] = filtered_wgs.geometry.y.round(6)
+    filtered_wgs["lon"] = filtered_wgs.geometry.x.round(6)
 
-    # 6) Save *spatial* outputs first
+    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
+    print(f"   Start/end points tagged and lat/lon added for export.")
+    # =====================================================================
+
+    # ===============================================================
+    # Save all outputs
+    # ===============================================================
     out = Path(output_dir); out.mkdir(parents=True, exist_ok=True)
     buffer_gdf.to_crs(WGS84).to_file(out / "fw_astar_buffer.geojson", driver="GeoJSON")
     roads_plus.to_crs(WGS84).to_file(out / "fw_astar_roads.geojson", driver="GeoJSON")
-    filtered.to_crs(WGS84).to_file(out / "fw_astar_points.geojson", driver="GeoJSON")
-    print("💾 Saved buffer/roads/points GeoJSON.")
 
-    # 7) Build A*-based distance matrix over raster grid
+    # Save enriched points with roles + lat/lon
+    filtered_wgs.to_file(out / "fw_astar_points.geojson", driver="GeoJSON")
+    print("💾 Saved buffer/roads/points GeoJSON (with lat/lon + role).")
+
+    # ===============================================================
+    # Build A*-based distance matrix over raster grid
+    # ===============================================================
     print(f"🗺️ Loading raster grid: {tif_path}")
     grid = GridAdapter(tif_path)
 
@@ -324,7 +349,7 @@ def run_fw_astar_vector(
     t_pairs = time.perf_counter()
     last_print = t_pairs
     for k, (i, j) in enumerate(idx_pairs, 1):
-        si = coords_xy_m[i]; sj = coords_xy_m[j]
+        si, sj = coords_xy_m[i], coords_xy_m[j]
         d_m = astar_distance_meters(grid, (si[0], si[1]), (sj[0], sj[1]))
         D[i, j] = D[j, i] = d_m
 
@@ -336,23 +361,26 @@ def run_fw_astar_vector(
 
     print(f"✅ A* distances done for {len(idx_pairs)} pairs in {(time.perf_counter()-t_pairs):.2f}s")
 
-    # 8) (Optional) FW on top of A* distances
+    # 8️⃣ (Optional) FW on top of A* distances
     if run_fw:
         print("♻️ Running Floyd–Warshall over A* distances (usually unnecessary)…")
         FW = floyd_warshall_numpy(D)
     else:
         FW = D.copy()
 
-    # 9) Save matrices
+    # 9️⃣ Save matrices
     np.save(out / "fw_astar_D.npy", D)
     np.save(out / "fw_astar_FW.npy", FW)
 
-    # 10) Summary
+    # 🔟 Summary
     elapsed_ms = (time.perf_counter() - t0) * 1000
     print("\n✅ Summary (A* + Vector, grid distances)")
     print(f"🟨 A* pts: {len(astar_pts)} | 🛣️ Road pts: {len(road_pts)} | 🧹 Unique (pre-filter): {len(merged)} | ✅ After endpoint rule: {len(filtered)}")
+    print(f"📍 Start: ({filtered_wgs.loc[filtered_wgs['role']=='start', 'lat'].iloc[0]}, {filtered_wgs.loc[filtered_wgs['role']=='start', 'lon'].iloc[0]})")
+    print(f"📍 End:   ({filtered_wgs.loc[filtered_wgs['role']=='end', 'lat'].iloc[0]}, {filtered_wgs.loc[filtered_wgs['role']=='end', 'lon'].iloc[0]})")
     print(f"📐 Matrix {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
     print("===================================")
+
 
 # ---------------------------------------------------
 # Entry

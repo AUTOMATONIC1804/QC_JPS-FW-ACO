@@ -231,44 +231,51 @@ def run_fw_dijkstra(
     edges_clip = gpd.overlay(edges_gdf.to_crs(METRIC), buffer_gdf, how="intersection").to_crs(WGS84)
     print(f"🛣️ Clipped roads: {len(edges_clip)}")
 
-    # ===================== NEW: endpoint guard (CRS-safe) =====================
-    clearance_m = 300.0  # adjust if you want
-    # Build endpoints in WGS84 (route_line is WGS84), then project to METRIC
+    # ===================== NEW: endpoint guard (with labeling + lat/lon) =====================
+    clearance_m = 100.0  # distance threshold to remove nearby nodes
+    # Build endpoints (route_line is WGS84), then project to METRIC
     endpoints_wgs = gpd.GeoDataFrame(
-        geometry=[Point(route_line.coords[0]), Point(route_line.coords[-1])],
+        {"role": ["start", "end"],
+         "geometry": [Point(route_line.coords[0]), Point(route_line.coords[-1])]},
         crs=WGS84
     )
     endpoints_m = endpoints_wgs.to_crs(METRIC)
     start_m, end_m = endpoints_m.geometry.iloc[0], endpoints_m.geometry.iloc[1]
 
-    # Work in METRIC for distances and merging
+    # Work in METRIC for filtering
     nodes_m = nodes_filtered.to_crs(METRIC).copy()
-
-    # Remove any node within clearance of start/end
     d_start = nodes_m.geometry.distance(start_m)
     d_end   = nodes_m.geometry.distance(end_m)
     remove_mask = (d_start < clearance_m) | (d_end < clearance_m)
     pruned = nodes_m.loc[~remove_mask].copy()
 
-    # Force insert start & end (in METRIC), then (light) duplicate drop
-    filtered_m = gpd.GeoDataFrame(
+    # Combine pruned nodes with start/end, assign roles
+    combined = gpd.GeoDataFrame(
         pd.concat([pruned, endpoints_m], ignore_index=True),
         geometry="geometry",
         crs=METRIC
-    ).drop_duplicates(subset=["geometry"]).reset_index(drop=True)
+    )
+    combined["role"] = combined.get("role", "intermediate").fillna("intermediate")
 
-    print(f"🎯 Endpoint rule: from {len(nodes_m)} → {len(filtered_m)} (kept exact start & end)")
+    # Deduplicate and convert to WGS84 for output
+    filtered_m = combined.drop_duplicates(subset=["geometry"]).reset_index(drop=True)
+    filtered_wgs = filtered_m.to_crs(WGS84).copy()
 
-    # Back to WGS84 for exports / downstream
-    nodes_filtered = filtered_m.to_crs(WGS84)
-    # ========================================================================
+    # Add lat/lon columns (WGS84 order)
+    filtered_wgs["lat"] = filtered_wgs.geometry.y.round(6)
+    filtered_wgs["lon"] = filtered_wgs.geometry.x.round(6)
+
+    print(f"🎯 Endpoint rule: from {len(nodes_m)} → {len(filtered_wgs)} (kept exact start & end)")
+    print(f"   Start/end points tagged and lat/lon added for export.")
+    # =====================================================================
 
     # 6️⃣ Export preliminary outputs
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     buffer_gdf.to_crs(WGS84).to_file(out / "fw_dijkstra_buffer.geojson", driver="GeoJSON")
     edges_clip.to_file(out / "fw_dijkstra_roads.geojson", driver="GeoJSON")
-    nodes_filtered.to_file(out / "fw_dijkstra_nodes.geojson", driver="GeoJSON")
+    filtered_wgs.to_file(out / "fw_dijkstra_nodes.geojson", driver="GeoJSON")
+    print("💾 Saved buffer/roads/nodes GeoJSON (with lat/lon + role).")
 
     # 7️⃣ Compute Dijkstra + FW
     roads_path = out / "fw_dijkstra_roads.geojson"
@@ -282,8 +289,13 @@ def run_fw_dijkstra(
 
     # 9️⃣ Summary
     elapsed_ms = (time.perf_counter() - t0) * 1000
+    start_lat, start_lon = filtered_wgs.loc[filtered_wgs["role"] == "start", ["lat", "lon"]].iloc[0]
+    end_lat, end_lon = filtered_wgs.loc[filtered_wgs["role"] == "end", ["lat", "lon"]].iloc[0]
+
     print("\n✅ Summary (Local Dijkstra + FW Integration)")
-    print(f"🧩 Nodes: {len(nodes_filtered)} | 🛣️ Edges: {len(edges_clip)}")
+    print(f"🧩 Nodes: {len(filtered_wgs)} | 🛣️ Edges: {len(edges_clip)}")
+    print(f"📍 Start: ({start_lat}, {start_lon})")
+    print(f"📍 End:   ({end_lat}, {end_lon})")
     print(f"📐 Matrix: {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
     print(f"♾️ Non-finite: {np.count_nonzero(~np.isfinite(D))} / {D.size}")
     print(f"⚖️ Symmetric? {np.allclose(D, D.T, equal_nan=True)}")

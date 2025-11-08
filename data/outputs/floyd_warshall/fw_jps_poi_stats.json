@@ -1,17 +1,5 @@
 {
   "0": {
-    "count": 24.0,
-    "score": 24.0,
-    "score_norm": 0.2696629213483146,
-    "top_pois": [
-      "Unnamed",
-      "La Mesa Eco Park",
-      "Children's House Of Learning And Development",
-      "Easylane Supermarket",
-      "Gateways Institute of Science & Technology"
-    ]
-  },
-  "1": {
     "count": 21.0,
     "score": 21.0,
     "score_norm": 0.23595505617977527,
@@ -23,7 +11,7 @@
       "Children's House Of Learning And Development"
     ]
   },
-  "2": {
+  "1": {
     "count": 24.0,
     "score": 24.0,
     "score_norm": 0.2696629213483146,
@@ -35,7 +23,7 @@
       "Cordis Mariae School"
     ]
   },
-  "3": {
+  "2": {
     "count": 27.0,
     "score": 27.0,
     "score_norm": 0.30337078651685395,
@@ -47,7 +35,7 @@
       "Puregold"
     ]
   },
-  "4": {
+  "3": {
     "count": 39.0,
     "score": 39.0,
     "score_norm": 0.43820224719101125,
@@ -59,7 +47,7 @@
       "Commonwealth Adventist Elementary School"
     ]
   },
-  "5": {
+  "4": {
     "count": 44.0,
     "score": 44.0,
     "score_norm": 0.4943820224719101,
@@ -71,7 +59,7 @@
       "Department of Social Welfare and Development"
     ]
   },
-  "6": {
+  "5": {
     "count": 38.0,
     "score": 38.0,
     "score_norm": 0.42696629213483145,
@@ -83,7 +71,7 @@
       "Riverside Terminal"
     ]
   },
-  "7": {
+  "6": {
     "count": 33.0,
     "score": 33.0,
     "score_norm": 0.3707865168539326,
@@ -95,7 +83,7 @@
       "Riverside Terminal"
     ]
   },
-  "8": {
+  "7": {
     "count": 39.0,
     "score": 39.0,
     "score_norm": 0.43820224719101125,
@@ -107,7 +95,7 @@
       "Royal Place"
     ]
   },
-  "9": {
+  "8": {
     "count": 29.0,
     "score": 29.0,
     "score_norm": 0.3258426966292135,
@@ -119,7 +107,7 @@
       "MAK English Academy"
     ]
   },
-  "10": {
+  "9": {
     "count": 29.0,
     "score": 29.0,
     "score_norm": 0.3258426966292135,
@@ -131,7 +119,7 @@
       "IELTS Toefls"
     ]
   },
-  "11": {
+  "10": {
     "count": 23.0,
     "score": 23.0,
     "score_norm": 0.25842696629213485,
@@ -143,7 +131,7 @@
       "National Commission on Muslim Filipinos"
     ]
   },
-  "12": {
+  "11": {
     "count": 26.0,
     "score": 26.0,
     "score_norm": 0.29213483146067415,
@@ -155,7 +143,7 @@
       "IELTS Toefls"
     ]
   },
-  "13": {
+  "12": {
     "count": 30.0,
     "score": 30.0,
     "score_norm": 0.33707865168539325,
@@ -167,7 +155,7 @@
       "Old Balara Christian Community School"
     ]
   },
-  "14": {
+  "13": {
     "count": 26.0,
     "score": 26.0,
     "score_norm": 0.29213483146067415,
@@ -179,7 +167,7 @@
       "Commision on Human Rights Central Office"
     ]
   },
-  "15": {
+  "14": {
     "count": 25.0,
     "score": 25.0,
     "score_norm": 0.2808988764044944,
@@ -191,7 +179,7 @@
       "UP Diliman Varsity Training Center"
     ]
   },
-  "16": {
+  "15": {
     "count": 36.0,
     "score": 36.0,
     "score_norm": 0.4044943820224719,
@@ -203,7 +191,7 @@
       "Bureau of Agricultural Extension"
     ]
   },
-  "17": {
+  "16": {
     "count": 42.0,
     "score": 42.0,
     "score_norm": 0.47191011235955055,
@@ -215,7 +203,7 @@
       "Department of Environment and Natural Resources"
     ]
   },
-  "18": {
+  "17": {
     "count": 74.0,
     "score": 74.0,
     "score_norm": 0.8314606741573034,
@@ -227,7 +215,7 @@
       "Metro Manila Commission"
     ]
   },
-  "19": {
+  "18": {
     "count": 89.0,
     "score": 89.0,
     "score_norm": 1.0,
@@ -239,7 +227,7 @@
       "Metro Manila Commission"
     ]
   },
-  "20": {
+  "19": {
     "count": 86.0,
     "score": 86.0,
     "score_norm": 0.9662921348314607,
@@ -251,19 +239,19 @@
       "Bantayog ng mga Bayani Museum"
     ]
   },
-  "21": {
-    "count": 67.0,
-    "score": 67.0,
-    "score_norm": 0.7528089887640449,
+  "20": {
+    "count": 52.0,
+    "score": 52.0,
+    "score_norm": 0.5842696629213483,
     "top_pois": [
-      "Unnamed",
-      "WalterMart",
-      "Isuzu",
-      "Vertis North",
-      "Bantayog ng mga Bayani Museum"
+      "Creative Explorers",
+      "U.P. - Ayala Land Technohub",
+      "Sugar Regulatory Administration",
+      "Department of Environment and Natural Resources",
+      "Bureau of Agricultural Extension"
     ]
   },
-  "22": {
+  "21": {
     "count": 14.0,
     "score": 14.0,
     "score_norm": 0.15730337078651685,
@@ -275,7 +263,7 @@
       "AMA Computer College-Fairview"
     ]
   },
-  "23": {
+  "22": {
     "count": 11.0,
     "score": 11.0,
     "score_norm": 0.12359550561797752,
@@ -287,7 +275,7 @@
       "AMA Computer College-Fairview"
     ]
   },
-  "24": {
+  "23": {
     "count": 16.0,
     "score": 16.0,
     "score_norm": 0.1797752808988764,
@@ -299,7 +287,7 @@
       "AMA Computer College-Fairview"
     ]
   },
-  "25": {
+  "24": {
     "count": 21.0,
     "score": 21.0,
     "score_norm": 0.23595505617977527,
@@ -311,7 +299,7 @@
       "Timothy Christian Academy"
     ]
   },
-  "26": {
+  "25": {
     "count": 16.0,
     "score": 16.0,
     "score_norm": 0.1797752808988764,
@@ -323,7 +311,7 @@
       "ClE New Life Christian School"
     ]
   },
-  "27": {
+  "26": {
     "count": 6.0,
     "score": 6.0,
     "score_norm": 0.06741573033707865,
@@ -335,7 +323,7 @@
       "Siloam Christian Academy"
     ]
   },
-  "28": {
+  "27": {
     "count": 7.0,
     "score": 7.0,
     "score_norm": 0.07865168539325842,
@@ -347,7 +335,7 @@
       "Blessed Exodus Christian Academy"
     ]
   },
-  "29": {
+  "28": {
     "count": 10.0,
     "score": 10.0,
     "score_norm": 0.11235955056179775,
@@ -359,7 +347,7 @@
       "Justice Cecilia Mu\u00f1oz Palma Senior High School"
     ]
   },
-  "30": {
+  "29": {
     "count": 34.0,
     "score": 34.0,
     "score_norm": 0.38202247191011235,
@@ -371,7 +359,7 @@
       "Payatas Academy"
     ]
   },
-  "31": {
+  "30": {
     "count": 22.0,
     "score": 22.0,
     "score_norm": 0.24719101123595505,
@@ -383,7 +371,7 @@
       "Publication Department"
     ]
   },
-  "32": {
+  "31": {
     "count": 18.0,
     "score": 18.0,
     "score_norm": 0.20224719101123595,
@@ -395,7 +383,7 @@
       "Publication Department"
     ]
   },
-  "33": {
+  "32": {
     "count": 12.0,
     "score": 12.0,
     "score_norm": 0.1348314606741573,
@@ -407,7 +395,7 @@
       "Batasan Hills National High School"
     ]
   },
-  "34": {
+  "33": {
     "count": 25.0,
     "score": 25.0,
     "score_norm": 0.2808988764044944,
@@ -419,7 +407,7 @@
       "Batasan Hills National High School"
     ]
   },
-  "35": {
+  "34": {
     "count": 37.0,
     "score": 37.0,
     "score_norm": 0.4157303370786517,
@@ -431,10 +419,22 @@
       "Old Balara Christian Community School"
     ]
   },
-  "36": {
+  "35": {
     "count": 34.0,
     "score": 34.0,
     "score_norm": 0.38202247191011235,
+    "top_pois": [
+      "Cesar E.A. Virata School of Business",
+      "IE/ME Swell Room",
+      "UP Town Center Mall (second home)",
+      "Advanced Science and Technology Institute",
+      "U.P. Town Center"
+    ]
+  },
+  "36": {
+    "count": 39.0,
+    "score": 39.0,
+    "score_norm": 0.43820224719101125,
     "top_pois": [
       "Cesar E.A. Virata School of Business",
       "IE/ME Swell Room",
@@ -448,18 +448,6 @@
     "score": 39.0,
     "score_norm": 0.43820224719101125,
     "top_pois": [
-      "Cesar E.A. Virata School of Business",
-      "IE/ME Swell Room",
-      "UP Town Center Mall (second home)",
-      "Advanced Science and Technology Institute",
-      "U.P. Town Center"
-    ]
-  },
-  "38": {
-    "count": 39.0,
-    "score": 39.0,
-    "score_norm": 0.43820224719101125,
-    "top_pois": [
       "Quezon City Central Depository & Archival Center",
       "Oxy Flow Water Station",
       "Aqua Health",
@@ -467,7 +455,7 @@
       "GL Supermarket"
     ]
   },
-  "39": {
+  "38": {
     "count": 46.0,
     "score": 46.0,
     "score_norm": 0.5168539325842697,
@@ -479,7 +467,7 @@
       "St. Mark's Learning Center"
     ]
   },
-  "40": {
+  "39": {
     "count": 38.0,
     "score": 38.0,
     "score_norm": 0.42696629213483145,
@@ -491,7 +479,7 @@
       "Aqua Health"
     ]
   },
-  "41": {
+  "40": {
     "count": 49.0,
     "score": 49.0,
     "score_norm": 0.550561797752809,
@@ -503,7 +491,7 @@
       "Aqua Health"
     ]
   },
-  "42": {
+  "41": {
     "count": 40.0,
     "score": 40.0,
     "score_norm": 0.449438202247191,
@@ -515,7 +503,7 @@
       "Aqua Health"
     ]
   },
-  "43": {
+  "42": {
     "count": 57.0,
     "score": 57.0,
     "score_norm": 0.6404494382022472,
@@ -527,7 +515,7 @@
       "Eco Mu\u00f1oz Enterprises Corp."
     ]
   },
-  "44": {
+  "43": {
     "count": 39.0,
     "score": 39.0,
     "score_norm": 0.43820224719101125,
@@ -539,7 +527,7 @@
       "Isuzu"
     ]
   },
-  "45": {
+  "44": {
     "count": 40.0,
     "score": 40.0,
     "score_norm": 0.449438202247191,
@@ -551,7 +539,7 @@
       "Montessori West School"
     ]
   },
-  "46": {
+  "45": {
     "count": 45.0,
     "score": 45.0,
     "score_norm": 0.5056179775280899,
@@ -563,7 +551,7 @@
       "Montessori West School"
     ]
   },
-  "47": {
+  "46": {
     "count": 35.0,
     "score": 35.0,
     "score_norm": 0.39325842696629215,
@@ -575,7 +563,7 @@
       "Puregold Mindanao Avenue - BJMP"
     ]
   },
-  "48": {
+  "47": {
     "count": 26.0,
     "score": 26.0,
     "score_norm": 0.29213483146067415,
@@ -587,7 +575,7 @@
       "Saint paul educational ctr"
     ]
   },
-  "49": {
+  "48": {
     "count": 21.0,
     "score": 21.0,
     "score_norm": 0.23595505617977527,
@@ -599,7 +587,7 @@
       "Puregold Mindanao Avenue - BJMP"
     ]
   },
-  "50": {
+  "49": {
     "count": 17.0,
     "score": 17.0,
     "score_norm": 0.19101123595505617,
@@ -611,7 +599,7 @@
       "Puregold Mindanao Avenue - BJMP"
     ]
   },
-  "51": {
+  "50": {
     "count": 38.0,
     "score": 38.0,
     "score_norm": 0.42696629213483145,
@@ -623,7 +611,7 @@
       "Mightee Mart"
     ]
   },
-  "52": {
+  "51": {
     "count": 47.0,
     "score": 47.0,
     "score_norm": 0.5280898876404494,
@@ -635,7 +623,7 @@
       "WalterMart"
     ]
   },
-  "53": {
+  "52": {
     "count": 48.0,
     "score": 48.0,
     "score_norm": 0.5393258426966292,
@@ -647,7 +635,7 @@
       "City Center"
     ]
   },
-  "54": {
+  "53": {
     "count": 43.0,
     "score": 43.0,
     "score_norm": 0.48314606741573035,
@@ -659,7 +647,7 @@
       "City Center"
     ]
   },
-  "55": {
+  "54": {
     "count": 31.0,
     "score": 31.0,
     "score_norm": 0.34831460674157305,
@@ -671,7 +659,7 @@
       "Puregold Mindanao Avenue - BJMP"
     ]
   },
-  "56": {
+  "55": {
     "count": 40.0,
     "score": 40.0,
     "score_norm": 0.449438202247191,
@@ -683,7 +671,7 @@
       "WalterMart"
     ]
   },
-  "57": {
+  "56": {
     "count": 51.0,
     "score": 51.0,
     "score_norm": 0.5730337078651685,
@@ -695,7 +683,7 @@
       "City Center"
     ]
   },
-  "58": {
+  "57": {
     "count": 49.0,
     "score": 49.0,
     "score_norm": 0.550561797752809,
@@ -707,7 +695,7 @@
       "Bantayog ng mga Bayani Museum"
     ]
   },
-  "59": {
+  "58": {
     "count": 17.0,
     "score": 17.0,
     "score_norm": 0.19101123595505617,
@@ -719,7 +707,7 @@
       "Saint Mark's Child Development Center"
     ]
   },
-  "60": {
+  "59": {
     "count": 21.0,
     "score": 21.0,
     "score_norm": 0.23595505617977527,
@@ -731,7 +719,7 @@
       "Coronado's School of Quezon City"
     ]
   },
-  "61": {
+  "60": {
     "count": 23.0,
     "score": 23.0,
     "score_norm": 0.25842696629213485,
@@ -743,7 +731,7 @@
       "Coronado's School of Quezon City (annex)"
     ]
   },
-  "62": {
+  "61": {
     "count": 21.0,
     "score": 21.0,
     "score_norm": 0.23595505617977527,
@@ -751,6 +739,18 @@
       "New Era University",
       "Coronado's School of Quezon City",
       "Saint Mark's Child Development Center",
+      "Unnamed",
+      "Unnamed"
+    ]
+  },
+  "62": {
+    "count": 14.0,
+    "score": 14.0,
+    "score_norm": 0.15730337078651685,
+    "top_pois": [
+      "New Era University",
+      "Diliman Christian Academy",
+      "New Era High School",
       "Unnamed",
       "Unnamed"
     ]
@@ -764,22 +764,10 @@
       "Diliman Christian Academy",
       "New Era High School",
       "Unnamed",
-      "Unnamed"
-    ]
-  },
-  "64": {
-    "count": 14.0,
-    "score": 14.0,
-    "score_norm": 0.15730337078651685,
-    "top_pois": [
-      "New Era University",
-      "Diliman Christian Academy",
-      "New Era High School",
-      "Unnamed",
       "Shining Hope Academy"
     ]
   },
-  "65": {
+  "64": {
     "count": 16.0,
     "score": 16.0,
     "score_norm": 0.1797752808988764,
@@ -791,7 +779,7 @@
       "Old Balara Elementary School"
     ]
   },
-  "66": {
+  "65": {
     "count": 18.0,
     "score": 18.0,
     "score_norm": 0.20224719101123595,
@@ -803,7 +791,7 @@
       "AMA Computer College-Fairview"
     ]
   },
-  "67": {
+  "66": {
     "count": 14.0,
     "score": 14.0,
     "score_norm": 0.15730337078651685,
@@ -815,7 +803,7 @@
       "AMA Computer College-Fairview"
     ]
   },
-  "68": {
+  "67": {
     "count": 75.0,
     "score": 75.0,
     "score_norm": 0.8426966292134831,
@@ -827,7 +815,7 @@
       "CIIT"
     ]
   },
-  "69": {
+  "68": {
     "count": 71.0,
     "score": 71.0,
     "score_norm": 0.797752808988764,
@@ -839,7 +827,7 @@
       "CIIT"
     ]
   },
-  "70": {
+  "69": {
     "count": 80.0,
     "score": 80.0,
     "score_norm": 0.898876404494382,
@@ -851,7 +839,7 @@
       "National Economic Development Administration"
     ]
   },
-  "71": {
+  "70": {
     "count": 23.0,
     "score": 23.0,
     "score_norm": 0.25842696629213485,
@@ -863,7 +851,7 @@
       "Coronado's School of Quezon City"
     ]
   },
-  "72": {
+  "71": {
     "count": 32.0,
     "score": 32.0,
     "score_norm": 0.3595505617977528,
@@ -875,7 +863,7 @@
       "Wilcon City Center"
     ]
   },
-  "73": {
+  "72": {
     "count": 24.0,
     "score": 24.0,
     "score_norm": 0.2696629213483146,
@@ -887,7 +875,7 @@
       "San Agustin Center of Studies"
     ]
   },
-  "74": {
+  "73": {
     "count": 24.0,
     "score": 24.0,
     "score_norm": 0.2696629213483146,
@@ -899,7 +887,7 @@
       "Diliman Christian Academy"
     ]
   },
-  "75": {
+  "74": {
     "count": 19.0,
     "score": 19.0,
     "score_norm": 0.21348314606741572,
@@ -911,7 +899,7 @@
       "New Era High School"
     ]
   },
-  "76": {
+  "75": {
     "count": 17.0,
     "score": 17.0,
     "score_norm": 0.19101123595505617,
@@ -923,7 +911,7 @@
       "Unnamed"
     ]
   },
-  "77": {
+  "76": {
     "count": 70.0,
     "score": 70.0,
     "score_norm": 0.7865168539325843,
@@ -935,7 +923,7 @@
       "Robinsons Easymart"
     ]
   },
-  "78": {
+  "77": {
     "count": 48.0,
     "score": 48.0,
     "score_norm": 0.5393258426966292,
@@ -947,7 +935,7 @@
       "St. Mark's Learning Center"
     ]
   },
-  "79": {
+  "78": {
     "count": 67.0,
     "score": 67.0,
     "score_norm": 0.7528089887640449,
@@ -959,7 +947,7 @@
       "Victory Liner Cubao Terminal"
     ]
   },
-  "80": {
+  "79": {
     "count": 68.0,
     "score": 68.0,
     "score_norm": 0.7640449438202247,
@@ -971,7 +959,7 @@
       "Sugar Regulatory Administration"
     ]
   },
-  "81": {
+  "80": {
     "count": 81.0,
     "score": 81.0,
     "score_norm": 0.9101123595505618,
@@ -983,7 +971,7 @@
       "Metro Manila Commission"
     ]
   },
-  "82": {
+  "81": {
     "count": 47.0,
     "score": 47.0,
     "score_norm": 0.5280898876404494,
@@ -995,7 +983,7 @@
       "National Economic Development Administration"
     ]
   },
-  "83": {
+  "82": {
     "count": 59.0,
     "score": 59.0,
     "score_norm": 0.6629213483146067,
@@ -1007,7 +995,7 @@
       "Gerald Barbershop & Salon"
     ]
   },
-  "84": {
+  "83": {
     "count": 37.0,
     "score": 37.0,
     "score_norm": 0.4157303370786517,
@@ -1019,7 +1007,7 @@
       "Victoria School Foundation"
     ]
   },
-  "85": {
+  "84": {
     "count": 74.0,
     "score": 74.0,
     "score_norm": 0.8314606741573034,
@@ -1031,7 +1019,7 @@
       "Bureau of Forest Development Region IV"
     ]
   },
-  "86": {
+  "85": {
     "count": 55.0,
     "score": 55.0,
     "score_norm": 0.6179775280898876,
@@ -1043,7 +1031,7 @@
       "Quezon City Hall"
     ]
   },
-  "87": {
+  "86": {
     "count": 65.0,
     "score": 65.0,
     "score_norm": 0.7303370786516854,
@@ -1055,7 +1043,7 @@
       "Bureau of Agricultural Extension"
     ]
   },
-  "88": {
+  "87": {
     "count": 29.0,
     "score": 29.0,
     "score_norm": 0.3258426966292135,
@@ -1067,7 +1055,7 @@
       "UP Diliman Varsity Training Center"
     ]
   },
-  "89": {
+  "88": {
     "count": 51.0,
     "score": 51.0,
     "score_norm": 0.5730337078651685,
@@ -1079,7 +1067,7 @@
       "Children's Park"
     ]
   },
-  "90": {
+  "89": {
     "count": 37.0,
     "score": 37.0,
     "score_norm": 0.4157303370786517,
@@ -1091,7 +1079,7 @@
       "Holy Family School of Quezon City"
     ]
   },
-  "91": {
+  "90": {
     "count": 35.0,
     "score": 35.0,
     "score_norm": 0.39325842696629215,
@@ -1103,7 +1091,7 @@
       "Unnamed"
     ]
   },
-  "92": {
+  "91": {
     "count": 43.0,
     "score": 43.0,
     "score_norm": 0.48314606741573035,
@@ -1113,6 +1101,30 @@
       "UP Town Center Mall (second home)",
       "Advanced Science and Technology Institute",
       "U.P. Town Center"
+    ]
+  },
+  "92": {
+    "count": 24.0,
+    "score": 24.0,
+    "score_norm": 0.2696629213483146,
+    "top_pois": [
+      "Unnamed",
+      "La Mesa Eco Park",
+      "Children's House Of Learning And Development",
+      "Easylane Supermarket",
+      "Gateways Institute of Science & Technology"
+    ]
+  },
+  "93": {
+    "count": 69.0,
+    "score": 69.0,
+    "score_norm": 0.7752808988764045,
+    "top_pois": [
+      "Unnamed",
+      "National Book Store",
+      "Robinsons Easymart",
+      "WalterMart",
+      "Isuzu"
     ]
   }
 }

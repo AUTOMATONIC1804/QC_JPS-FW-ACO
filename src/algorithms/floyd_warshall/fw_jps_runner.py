@@ -236,29 +236,64 @@ def run_fw_vector(
     if len(merged) == 0:
         print("❌ No points generated."); return
 
-    # ===================== NEW: endpoint guard =====================
+    # ===================== NEW: endpoint guard (with labeling + lat/lon) =====================
     clearance_m = 100.0
     start_pt = Point(route.coords[0])
     end_pt = Point(route.coords[-1])
+
+    # Distances to start/end
     d_start = merged.geometry.distance(start_pt)
     d_end = merged.geometry.distance(end_pt)
+
+    # Remove redundant points near start/end
     remove_mask = (d_start < clearance_m) | (d_end < clearance_m)
     pruned = merged.loc[~remove_mask].copy()
 
-    endpoints_gdf = gpd.GeoDataFrame(geometry=[start_pt, end_pt], crs=METRIC)
-    filtered = gpd.GeoDataFrame(pd.concat([pruned, endpoints_gdf], ignore_index=True), crs=METRIC)
-    filtered = dedup_tiny(filtered, tol_m=1.0)
-    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
-    # ===============================================================
+    # Add start & end points
+    endpoints_gdf = gpd.GeoDataFrame(
+        {"geometry": [start_pt, end_pt], "role": ["start", "end"]},
+        crs=METRIC
+    )
 
-    out = Path(output_dir); out.mkdir(parents=True, exist_ok=True)
+    # Merge and assign roles
+    filtered = gpd.GeoDataFrame(
+        pd.concat([pruned, endpoints_gdf], ignore_index=True),
+        geometry="geometry",
+        crs=METRIC
+    )
+    filtered["role"] = filtered.get("role", "intermediate").fillna("intermediate")
+
+    # Deduplicate
+    filtered = dedup_tiny(filtered, tol_m=1.0)
+
+    # --- Add lat/lon columns (WGS84 order: lat, lon) ---
+    filtered_wgs = filtered.to_crs(WGS84).copy()
+    filtered_wgs["lat"] = filtered_wgs.geometry.y.round(6)
+    filtered_wgs["lon"] = filtered_wgs.geometry.x.round(6)
+
+    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
+    print(f"   Start/end points tagged and lat/lon added for export.")
+    # =====================================================================
+
+    # ===============================================================
+    # Save all outputs
+    # ===============================================================
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
     buffer_gdf.to_crs(WGS84).to_file(out / "fw_jps_buffer.geojson", driver="GeoJSON")
     roads_gdf.to_crs(WGS84).to_file(out / "fw_jps_roads.geojson", driver="GeoJSON")
-    filtered.to_crs(WGS84).to_file(out / "fw_jps_points.geojson", driver="GeoJSON")
-    print("💾 Saved buffer/roads/points GeoJSON.")
 
+    # Save enriched points with roles + lat/lon
+    filtered_wgs.to_file(out / "fw_jps_points.geojson", driver="GeoJSON")
+    print("💾 Saved buffer/roads/points GeoJSON (with lat/lon + role).")
+
+    # ===============================================================
+    # Build JPS-based distance matrix
+    # ===============================================================
     print(f"🗺️ Loading raster grid: {tif_path}")
     grid = GridAdapter(tif_path)
+
     coords_xy_m = np.column_stack([filtered.geometry.x.values, filtered.geometry.y.values])
     n = coords_xy_m.shape[0]
     D = np.full((n, n), np.inf, dtype=float)
@@ -275,6 +310,7 @@ def run_fw_vector(
         si, sj = coords_xy_m[i], coords_xy_m[j]
         d_m = jps_distance_meters(grid, (si[0], si[1]), (sj[0], sj[1]))
         D[i, j] = D[j, i] = d_m
+
         now = time.perf_counter()
         if now - last_print > 2.5:
             print(f"  ⏳ JPS pairs {k}/{len(idx_pairs)} ({100*k/len(idx_pairs):.1f}%)")
@@ -290,6 +326,7 @@ def run_fw_vector(
     print(f"🟨 Total: {len(merged)} | After endpoint rule: {len(filtered)} (kept start+end)")
     print(f"📐 Matrix {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
     print("===================================")
+
 
 # ===================================================
 # Entry

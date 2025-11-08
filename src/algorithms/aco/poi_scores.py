@@ -121,13 +121,6 @@ def government_poi(fields):
     score = match_keywords(fields, mapping)
     return "Government / Institutional", score if score > 0 else 0
 
-def residential_poi(fields):
-    mapping = {
-        "residential": 2, "apartments": 2, "condo": 2,
-        "housing": 2, "dormitory": 1, "subdivision": 2, "village": 2
-    }
-    score = match_keywords(fields, mapping)
-    return "Residential / Housing", score if score > 0 else 0
 
 
 # Category Scores
@@ -135,10 +128,9 @@ CATEGORY_WEIGHTS = {
     "Transport Facilities": 30,
     "Commercial / Offices": 20,
     "Health Facilities": 15,
-    "Education Facilities": 10,
+    "Education Facilities": 15,
     "Recreational Facilities": 10,
-    "Residential / Housing": 10,
-    "Government / Institutional": 5
+    "Government / Institutional": 10
 }
 
 category_funcs = [
@@ -148,7 +140,6 @@ category_funcs = [
     education_poi,
     recreation_poi,
     government_poi,
-    residential_poi,
 ]
 
 # Classification and Scoring
