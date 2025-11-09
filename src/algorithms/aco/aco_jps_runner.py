@@ -292,9 +292,29 @@ def run_aco_jps(
     line = _route_line_from_geojson(route_gdf.to_crs("EPSG:3857"))
     if line is None:
         raise RuntimeError("Could not extract LineString from jps_path.geojson.")
+
     all_candidates = list(dict.fromkeys(best_route + [start_idx, end_idx]))
     ordered = _sort_indices_along_line(points_feas, line, all_candidates)
+
+    # 🧩 FIX: If ACO only returned start/end, fill with evenly spaced nodes
+    if len(ordered) < n_stations:
+        print(f"⚠️ ACO returned only {len(ordered)} nodes; filling up to {n_stations}...")
+        remaining_needed = n_stations - len(ordered)
+        feasible_idxs = list(range(len(points_feas)))
+
+        # Pick evenly spaced filler indices (excluding those already in route)
+        filler_idxs = np.linspace(
+            0, len(feasible_idxs) - 1,
+            num=remaining_needed + 2,
+            dtype=int
+        )[1:-1]
+        filler_idxs = [i for i in filler_idxs if i not in ordered]
+
+        ordered += filler_idxs
+        ordered = sorted(set(ordered), key=lambda i: line.project(points_feas.to_crs("EPSG:3857").geometry.iloc[i]))
+
     best_route = _enforce_exact_k(ordered, n_stations, start_idx, end_idx)
+
 
     # 12) Export chosen stations
     chosen = points_feas.iloc[best_route].copy()
