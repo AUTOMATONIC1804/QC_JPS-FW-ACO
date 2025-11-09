@@ -5,19 +5,20 @@ ACO Station Selector
 Integrates all ACO components for station optimization.
 
 Workflow:
-  1. Load effort matrix + POI node stats.
-  2. Apply detour feasibility adjustment (POI score boost/penalty).
-  3. Run Ant Colony Optimization with spacing, coverage, POI, and corridor alignment constraints.
-  4. Return selected station indices and diagnostics.
+  1) Accept pre-sliced effort matrix E and node_stats (feasible-only if runner filtered).
+  2) (Optional) Enforce detour feasibility again if `detour_label` is present on points_gdf.
+  3) Run ACO with spacing + coverage + POI + alignment penalties.
+  4) Return selected station indices and diagnostic stats.
 """
 
 from __future__ import annotations
 
 import math
-import numpy as np
-import geopandas as gpd
-from shapely.geometry import LineString
 from typing import Dict, List, Tuple
+
+import geopandas as gpd
+import numpy as np
+from shapely.geometry import LineString
 
 from src.algorithms.aco.aco_core import AntColony, ACOConfig
 from src.algorithms.aco.aco_coverage_utils import (
@@ -25,32 +26,6 @@ from src.algorithms.aco.aco_coverage_utils import (
     coverage_penalty,
     spacing_penalty,
 )
-
-# ---------------------------------------------------------------------
-# DETOUR-AWARE ADJUSTMENT
-# ---------------------------------------------------------------------
-def _compute_detour_features(points_gdf, corridor_gdf, detour_limit=300, rejoin_limit=500):
-    """Compute off-corridor detour feasibility using JPS corridor geometry."""
-    line = corridor_gdf.to_crs("EPSG:3857").geometry.iloc[0]
-    pts = points_gdf.to_crs("EPSG:3857").copy()
-
-    pts["d_path"] = pts.geometry.distance(line)
-    pts["s_proj"] = pts.geometry.apply(lambda p: line.project(p))
-    total_len = line.length
-
-    feasible = []
-    for _, row in pts.iterrows():
-        if row["d_path"] <= detour_limit:
-            feasible.append(True)
-            continue
-
-        # Try rejoining downstream within rejoin_limit
-        p_proj = line.interpolate(min(row["s_proj"] + rejoin_limit, total_len))
-        rejoin_dist = row.geometry.distance(p_proj)
-        feasible.append(rejoin_dist <= rejoin_limit)
-
-    pts["detour_feasible"] = feasible
-    return pts
 
 
 # ---------------------------------------------------------------------
@@ -68,8 +43,7 @@ def select_optimal_stations(
     """Run ACO to select optimal stations along a corridor."""
     print("\n[ACO] Starting station selection optimization...")
 
-    # -----------------------------------------------------------------
-    # CONFIG
+    # -------------------- config --------------------
     cfg = ACOConfig(
         n_ants=params.get("n_ants", 40),
         n_iterations=params.get("n_iterations", 100),
@@ -92,117 +66,114 @@ def select_optimal_stations(
     w_coverage = params.get("weights", {}).get("coverage", 0.3)
     w_poi = params.get("weights", {}).get("poi", 0.3)
 
-    # -----------------------------------------------------------------
-    # DETOUR FEASIBILITY + SCORE ADJUSTMENT
-    # -----------------------------------------------------------------
-    print("🧭 Evaluating off-corridor detour feasibility...")
-    points_with_detours = _compute_detour_features(points_gdf, corridor_gdf)
+    # Alignment penalty weights (meters → cost addend via multipliers)
+    # Mild by default; tune as needed.
+    align_cfg = params.get("align", {})
+    lambda_back = float(align_cfg.get("lambda_back", 0.001))      # cost per meter of backtracking
+    lambda_over = float(align_cfg.get("lambda_over", 0.002))      # cost per meter of overshoot
+    proj_tol_m = float(align_cfg.get("proj_tol_m", 10.0))         # tolerance for overshoot
 
-    detour_ok_count = 0
-    detour_no_count = 0
+    # -------------------- feasibility guard (detour_label) --------------------
+    # If the runner already filtered to feasible-only nodes, this is a no-op.
+    # We keep it here as a hard guardrail.
+    feasible_mask = np.ones(len(points_gdf), dtype=bool)
+    if "detour_label" in points_gdf.columns:
+        lab = (
+            points_gdf["detour_label"]
+            .astype(str)
+            .str.lower()
+            .isin(["feasible", "true", "1"])
+            .values
+        )
+        feasible_mask &= lab
 
-    for i, row in points_with_detours.iterrows():
-        idx = str(i)
-        if idx not in node_stats:
-            continue
+    # Always force start/end to be feasible
+    feasible_mask[start_idx] = True
+    feasible_mask[end_idx] = True
 
-        detour_ok = bool(row.get("detour_feasible", False))
-        d_path = float(row.get("d_path", 0))
-        score_norm = node_stats[idx].get("score_norm", 0.0)
-
-        if detour_ok:
-            detour_ok_count += 1
-            adj_factor = 1 + 0.25 * (1 - min(d_path, 300) / 300)
-            node_stats[idx]["score_norm"] = score_norm * adj_factor
-        else:
-            detour_no_count += 1
-            node_stats[idx]["score_norm"] = score_norm * 0.1
-
-    print(f"✅ Detour-feasible nodes: {detour_ok_count} | ❌ Non-feasible: {detour_no_count}")
-
-    # -----------------------------------------------------------------
-    # BUILD COST FUNCTION
-    # -----------------------------------------------------------------
+    # -------------------- precompute geometry/projections --------------------
     points_m = points_gdf.to_crs("EPSG:3857")
     corridor_m = corridor_gdf.to_crs("EPSG:3857")
+    if len(corridor_m) == 0:
+        raise RuntimeError("corridor_gdf is empty.")
+    line: LineString = corridor_m.geometry.iloc[0]  # the JPS path LineString
 
+    # Projection of each candidate onto the corridor (meters along-line)
+    s_proj = np.array([line.project(geom) for geom in points_m.geometry], dtype=float)
+    s_start = float(s_proj[start_idx])
+    s_end = float(s_proj[end_idx])
+    s_min, s_max = (min(s_start, s_end), max(s_start, s_end))
+
+    # -------------------- cost function --------------------
     def route_cost_fn(route: List[int]) -> Tuple[float, bool]:
-        """Composite cost for an ant’s route."""
+        """Composite cost for an ant route."""
+        if not route:
+            return math.inf, False
+
+        # Hard feasibility: any non-feasible node kills the route
+        for r in route:
+            if not feasible_mask[r]:
+                return math.inf, False
+
+        # Base effort on E (sum of edges; invalid edges penalized)
         total_effort = 0.0
         invalid_edges = 0
-
         for u, v in zip(route[:-1], route[1:]):
             c = E[u, v]
             if not np.isfinite(c):
-                total_effort += 1e6
+                total_effort += 1e6  # heavy penalty for invalid links
                 invalid_edges += 1
             else:
-                total_effort += c
+                total_effort += float(c)
 
         if invalid_edges > len(route) * 0.4:
             return math.inf, False
 
-        # ---------------------- SPACING ----------------------
+        # Spacing penalty (pairwise)
         spacing_vals = []
         for u, v in zip(route[:-1], route[1:]):
-            pu = points_m.iloc[u].geometry
-            pv = points_m.iloc[v].geometry
-            dist = pu.distance(pv)
-            spacing_vals.append(spacing_penalty(dist, ideal_min, ideal_max, w=1.0))
-        spacing_penalty_avg = np.mean(spacing_vals) if spacing_vals else 1.0
+            duv = points_m.geometry.iloc[u].distance(points_m.geometry.iloc[v])
+            spacing_vals.append(spacing_penalty(duv, ideal_min, ideal_max, w=1.0))
+        spacing_penalty_avg = float(np.mean(spacing_vals)) if spacing_vals else 1.0
 
-        # ---------------------- COVERAGE ----------------------
+        # Coverage penalty (buffers along the corridor)
         selected_points = points_gdf.iloc[route]
-        coverage_ratio = compute_coverage_ratio(selected_points, corridor_m, buffer_radius)
-        coverage_pen = coverage_penalty(coverage_ratio, target_cov, w=1.0)
+        coverage_ratio = float(compute_coverage_ratio(selected_points, corridor_m, buffer_radius))
+        cov_pen = coverage_penalty(coverage_ratio, target_cov, w=1.0)
 
-        # ---------------------- POI REWARD ----------------------
+        # POI reward (higher poi_norm reduces cost)
         poi_vals = [node_stats.get(str(i), {}).get("score_norm", 0.0) for i in route]
-        avg_poi = np.mean(poi_vals) if poi_vals else 0.0
+        avg_poi = float(np.mean(poi_vals)) if poi_vals else 0.0
 
-        # ---------------------- CORRIDOR ALIGNMENT ----------------------
-        try:
-            line = corridor_m.geometry.iloc[0]
-            projections = [line.project(points_m.iloc[i].geometry) for i in route]
-            diffs = np.diff(projections)
-            line_len = line.length
+        # Alignment penalty: discourage big backtracks and overshooting the goal
+        s_route = s_proj[route]
+        diffs = np.diff(s_route)
 
-            # measure backward and overshoot
-            backward_excess = np.sum(np.abs(diffs[diffs < -50]))  # meters reversed
-            overshoot_excess = max(0, projections[-1] - line_len)
+        # Backtracking = negative diffs (in meters)
+        back_m = float(np.sum(np.abs(diffs[diffs < 0]))) if diffs.size else 0.0
 
-            backward_ratio = backward_excess / max(line_len, 1)
-            overshoot_ratio = overshoot_excess / max(line_len, 1)
+        # Overshoot = how far past the goal projection we end (measured against the “end” side)
+        # Identify the corridor direction by comparing start/end projections.
+        end_target = s_max  # we want to end within [s_min, s_max]
+        last_proj = float(s_route[-1])
+        overshoot_m = max(0.0, last_proj - end_target - proj_tol_m)
 
-            # strong penalty
-            alignment_penalty = 1 + (1000 * backward_ratio) + (500 * overshoot_ratio)
-            alignment_penalty = min(alignment_penalty, 1e6)
+        align_add = lambda_back * back_m + lambda_over * overshoot_m
 
-            # Debug (optional)
-            if alignment_penalty > 5:
-                print(f"[⚠️ Alignment] penalty={alignment_penalty:.2f}, backward={backward_excess:.1f}m, overshoot={overshoot_excess:.1f}m")
-
-        except Exception:
-            alignment_penalty = 1.0
-
-        # ---------------------- COMBINE ----------------------
+        # Combine multiplicatively for spacing/coverage/poi, add alignment
         total_cost = total_effort
         total_cost *= (1 + w_spacing * (spacing_penalty_avg - 1))
-        total_cost *= (1 + w_coverage * (coverage_pen - 1))
+        total_cost *= (1 + w_coverage * (cov_pen - 1))
         total_cost *= (1 - w_poi * avg_poi)
-        total_cost *= alignment_penalty  # enforce corridor direction
+        total_cost += align_add
 
         return float(total_cost), True
 
-    # -----------------------------------------------------------------
-    # RUN ACO
-    # -----------------------------------------------------------------
+    # -------------------- run ACO --------------------
     colony = AntColony(E, cfg)
     best_route, best_cost, history = colony.run(route_cost_fn=route_cost_fn)
 
-    # -----------------------------------------------------------------
-    # REPORT
-    # -----------------------------------------------------------------
+    # -------------------- report --------------------
     if not best_route:
         print("[ACO] No valid route found.")
         return [], {"best_cost": np.inf, "history": history}
@@ -222,13 +193,13 @@ def select_optimal_stations(
 
     summary = {
         "best_cost": float(best_cost),
-        "num_stations": len(best_route),
+        "num_stations": int(len(best_route)),
         "coverage_ratio": float(coverage_ratio),
         "spacing_mean_m": spacing_stats["mean"],
         "spacing_min_m": spacing_stats["min"],
         "spacing_max_m": spacing_stats["max"],
         "avg_poi_norm": float(np.mean(valid_poi_scores) if valid_poi_scores else 0.0),
-        "history": history,
+        "history": history,  # <-- for convergence CSV/plot
     }
 
     return best_route, summary
@@ -238,19 +209,19 @@ def select_optimal_stations(
 # HELPERS
 # ---------------------------------------------------------------------
 def _route_spacing_stats(points_gdf: gpd.GeoDataFrame) -> dict:
-    """Compute inter-station spacing along a route."""
+    """Compute inter-station spacing along a route (meters)."""
     if points_gdf.crs is None:
         points_gdf = points_gdf.set_crs("EPSG:4326")
     points_m = points_gdf.to_crs("EPSG:3857")
 
     dists = []
     for i in range(len(points_m) - 1):
-        a = points_m.iloc[i].geometry
-        b = points_m.iloc[i + 1].geometry
+        a = points_m.geometry.iloc[i]
+        b = points_m.geometry.iloc[i + 1]
         dists.append(a.distance(b))
 
     if not dists:
-        return {"mean": 0, "min": 0, "max": 0}
+        return {"mean": 0.0, "min": 0.0, "max": 0.0}
 
     return {
         "mean": float(np.mean(dists)),
