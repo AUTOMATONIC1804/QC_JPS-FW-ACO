@@ -1,7 +1,7 @@
 # merge_pois_qc.py
 # ------------------------------------------------------
 # Merging of Separate GeoJSON POI Files (Overpass Exports)
-# + Validation, Integrity Checks, and Safe Centroid Conversion
+# + Strict Attribute Schema Preservation (with left/right duplication)
 # ------------------------------------------------------
 
 import geopandas as gpd
@@ -10,19 +10,29 @@ import os
 
 # === Paths ===
 raw_dir = r"D:\Quezon_City\data\raw"
-out_merged = os.path.join(raw_dir, "qc_pois_clean_merged.geojson")
+out_merged = os.path.join(raw_dir, "qc_pois_transportation_clean.geojson")
 
 # === Your Overpass-exported POI files ===
 files = [
-    ("qc_pois_all.geojson", "mixed"),
-    #("qc_pois_health.geojson", "health"), 
-    #("qc_pois_education.geojson", "education"),
-    #("qc_pois_transport.geojson", "transport"),
-    #("qc_pois_commercial.geojson", "commercial"),
-    #("qc_pois_government.geojson", "government"),
-    #("qc_pois_residential.geojson", "residential"), 
-    #("qc_pois_recreation.geojson", "recreation"),
+    ("qc_pois_transportation.geojson", "transportation"),
 ]
+
+# === Strict schema (as per screenshots) ===
+allowed_columns = [
+    "name_left", "amenity_left", "building_left", "landuse_left", "shop_left",
+    "id", "@id",
+    "amenity_right", "building_right", "bus",
+    "construction:building", "construction:public_transport", "construction:railway",
+    "construction:station", "governance_type", "government", "healthcare",
+    "historic", "historic:building", "jeepney", "landuse_right", "leisure",
+    "light_rail", "marketplace", "museum", "name_right", "office",
+    "proposed:building", "proposed:light_rail", "proposed:railway",
+    "proposed:station", "public_transport", "railway", "school", "shop_right",
+    "@relations", "station", "subway", "tourism", "train", "wholesale", "category"
+]
+
+# === Columns that should be mirrored left/right from single originals ===
+mirrored_fields = ["name", "amenity", "building", "landuse", "shop"]
 
 gdfs = []
 meta_summary = []
@@ -40,14 +50,26 @@ for fname, cat in files:
         continue
 
     n_before = len(g)
-
-    # Ensure 'name' column exists
-    if "name" not in g.columns:
-        g["name"] = None
-
     g["category"] = cat
 
-    # Basic geometry validation
+    # === Create left/right fields from originals ===
+    for base in mirrored_fields:
+        if base in g.columns:
+            g[f"{base}_left"] = g[base]
+            g[f"{base}_right"] = g[base]
+        else:
+            # Ensure columns exist even if missing
+            g[f"{base}_left"] = None
+            g[f"{base}_right"] = None
+
+    # === Guarantee all strict fields exist ===
+    for col in allowed_columns:
+        if col not in g.columns:
+            g[col] = None
+
+    # === Subset strictly to allowed schema + geometry ===
+    g = g[[c for c in allowed_columns if c in g.columns] + ["geometry"]]
+
     geom_types = g.geometry.geom_type.value_counts().to_dict()
     meta_summary.append({
         "file": fname,
@@ -73,17 +95,12 @@ print("🧱 Columns preserved:", list(pois.columns))
 print("\n🧭 Generating centroids safely using EPSG:32651...")
 pois_points = pois.copy()
 
-# Step 1: Project to UTM Zone 51N (meters)
 pois_utm = pois_points.to_crs(epsg=32651)
-
-# Step 2: Compute centroids in metric space
 pois_utm["geometry"] = pois_utm.geometry.centroid
-
-# Step 3: Reproject back to WGS84 (EPSG:4326)
 pois_points = pois_utm.to_crs(epsg=4326)
 
 # === Deduplicate by name + coordinates ===
-pois_points["dup_key"] = pois_points["name"].fillna("") \
+pois_points["dup_key"] = pois_points["name_left"].fillna("") \
     + "_" + pois_points.geometry.x.round(6).astype(str) \
     + "_" + pois_points.geometry.y.round(6).astype(str)
 
@@ -95,7 +112,7 @@ print(f"\n🔍 Duplicate Summary:")
 print(f"Before deduplication: {dup_count_before}")
 print(f"After deduplication:  {dup_count_after}")
 
-# === Merge original polygons + centroid points into one unified file ===
+# === Combine original + centroids ===
 print("\n🔗 Combining original geometries and centroids into one dataset...")
 pois["geom_type"] = pois.geometry.geom_type.str.lower()
 pois_points["geom_type"] = "centroid"
@@ -122,7 +139,7 @@ print("\n📋 Per-file Summary:")
 meta_df = pd.DataFrame(meta_summary)
 print(meta_df.to_string(index=False))
 
-# === Optional QC boundary sanity check ===
+# === QC boundary sanity check ===
 try:
     qc_boundary_path = os.path.join(raw_dir, "qc_boundary.geojson")
     if os.path.exists(qc_boundary_path):
@@ -135,4 +152,4 @@ try:
 except Exception as e:
     print(f"\n⚠ Boundary check skipped due to error: {e}")
 
-print("\n🎯 POI merge + validation complete!")
+print("\n🎯 POI merge + validation complete (STRICT + LEFT/RIGHT DUPLICATION MODE)!")

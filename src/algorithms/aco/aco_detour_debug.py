@@ -1,14 +1,16 @@
 # src/algorithms/aco/aco_detour_debug.py
 # -*- coding: utf-8 -*-
 """
-Detour feasibility debugger (uses your existing JPS path)
+Detour feasibility debugger (LOCAL chainage corridor)
+----------------------------------------------------
 - Reads fw_<method>_points.geojson
-- Reads data/outputs/jps_path.geojson and extracts the LineString with role=='path'
-- Computes per-node:
-    d_path (distance to path, meters)
-    s_proj (projected chainage along path, meters)
-    detour_feasible (within detour_limit OR can rejoin within rejoin_limit)
-- Writes GeoJSON for quick QGIS inspection
+- Reads data/outputs/jps_path.geojson (role=='path')
+- Per node:
+    * d_path (m), s_proj (m along path)
+    * Build a LOCAL subline around s_proj (± window_m)
+    * detour_feasible if inside detour buffer of that subline,
+      or can rejoin inside rejoin buffer of that subline
+This eliminates false positives from nearby-but-far-in-chainage path segments.
 """
 
 import argparse
@@ -16,49 +18,133 @@ from pathlib import Path
 import geopandas as gpd
 import numpy as np
 from shapely.geometry import LineString
+from shapely.ops import split as shp_split
+
+# ----------------------------- helpers -----------------------------
 
 def _load_path_line(jps_path_file: str) -> LineString:
     gdf = gpd.read_file(jps_path_file)
     if "role" in gdf.columns:
         rows = gdf[gdf["role"] == "path"]
-        if not rows.empty:
-            geom = rows.geometry.iloc[0]
-            if isinstance(geom, LineString):
-                return geom
-            # If it's MultiLineString, merge to a LineString-ish
-            return geom if isinstance(geom, LineString) else geom.union
-    # Fallback: first LineString in file
+        if not rows.empty and isinstance(rows.geometry.iloc[0], LineString):
+            return rows.geometry.iloc[0]
     for geom in gdf.geometry:
         if isinstance(geom, LineString):
             return geom
     raise RuntimeError("No LineString path found in jps_path.geojson")
 
-def _compute_detour_features(points_gdf, path_line, detour_limit=300, rejoin_limit=500):
-    # project to metric
+def _cut_line_at_distance(line: LineString, dist: float):
+    """Return line cut at distance 'dist' (0<=dist<=length)."""
+    if dist <= 0.0:
+        return [LineString([]), LineString(line)]
+    L = line.length
+    if dist >= L:
+        return [LineString(line), LineString([])]
+    # cut by creating a point and splitting
+    pt = line.interpolate(dist)
+    # small buffer to ensure split hits a vertex
+    res = shp_split(line, pt.buffer(1e-7))
+    # order pieces by start chainage
+    parts = sorted(list(res.geoms), key=lambda ls: ls.project(line.coords[0] if False else line.interpolate(0)))
+    # heuristic: pick the piece that ends closest to 'dist' as left
+    # simpler: accumulate lengths to decide
+    acc = 0.0
+    left = []
+    for seg in parts:
+        segL = seg.length
+        if acc + segL <= dist + 1e-6:
+            left.append(seg)
+            acc += segL
+        else:
+            # split this seg internally to match exact dist
+            rem = dist - acc
+            if rem > 1e-9:
+                pt2 = seg.interpolate(rem)
+                split2 = shp_split(seg, pt2.buffer(1e-7))
+                seg_left = max(split2.geoms, key=lambda x: x.length)  # the longer piece ≈ left
+                seg_right = min(split2.geoms, key=lambda x: x.length)
+                left.append(seg_left)
+                right_first = seg_right
+            else:
+                right_first = seg
+            right = [right_first] + [s for s in parts[parts.index(seg)+1:]]
+            return [LineString([c for ls in left for c in ls.coords]) if left else LineString([]),
+                    LineString([c for ls in right for c in ls.coords]) if right else LineString([])]
+    # fallback
+    return [LineString(line), LineString([])]
+
+def _subline(line: LineString, start_m: float, end_m: float) -> LineString:
+    """Extract subline between chainages [start_m, end_m]."""
+    L = line.length
+    a = max(0.0, min(start_m, L))
+    b = max(0.0, min(end_m, L))
+    if b <= a:
+        return LineString([])
+    left, right = _cut_line_at_distance(line, a)
+    sub, _ = _cut_line_at_distance(right, b - a)
+    return sub
+
+# ------------------------- core computation ------------------------
+
+def _compute_detour_features(points_gdf,
+                             path_line,
+                             detour_limit=300,
+                             rejoin_limit=500,
+                             window_m=600):
+    """
+    Feasibility is tested against a LOCAL corridor:
+    buffer(subline(s_proj±window_m), detour/rejoin).
+    """
+    # Project to metric
     pts_m = points_gdf.to_crs("EPSG:3857").copy()
-    line_m = gpd.GeoSeries([path_line], crs="EPSG:4326").to_crs("EPSG:3857").iloc[0]
+    path_m = gpd.GeoSeries([path_line], crs="EPSG:4326").to_crs("EPSG:3857").iloc[0]
+    L = float(path_m.length)
 
-    # distance to path and chainage
-    pts_m["d_path"] = pts_m.geometry.distance(line_m)
-    pts_m["s_proj"] = pts_m.geometry.apply(lambda p: float(line_m.project(p)))
-    total_len = float(line_m.length)
+    # Basic metrics
+    pts_m["d_path"] = pts_m.geometry.distance(path_m)
+    pts_m["s_proj"] = pts_m.geometry.apply(lambda p: float(path_m.project(p)))
 
-    # simple feasibility: close to path OR can rejoin downstream within rejoin_limit
-    feasible = []
+    feasible, reasons = [], []
+
     for _, row in pts_m.iterrows():
-        dpath = float(row["d_path"])
-        if dpath <= detour_limit:
-            feasible.append(True)
+        geom = row.geometry
+        s = float(row["s_proj"])
+
+        # Local subline
+        sub = _subline(path_m, s - window_m, s + window_m)
+        if sub.is_empty or sub.length == 0:
+            feasible.append(False)
+            reasons.append("no_local_subline")
             continue
-        s_proj = float(row["s_proj"])
-        s_down = min(s_proj + rejoin_limit, total_len)
-        rejoin_pt = line_m.interpolate(s_down)
-        feasible.append(row.geometry.distance(rejoin_pt) <= rejoin_limit)
+
+        detour_buf = sub.buffer(detour_limit)
+        rejoin_buf = sub.buffer(rejoin_limit)
+
+        # Case 1: inside local detour corridor
+        if geom.within(detour_buf):
+            feasible.append(True)
+            reasons.append("in_local_detour")
+            continue
+
+        # Case 2: can rejoin inside local window
+        # sample along the local subline only (prevents remote segment snaps)
+        ts = np.linspace(0.0, sub.length, 12)
+        near_pts = [sub.interpolate(t) for t in ts]
+        if min(geom.distance(p) for p in near_pts) <= rejoin_limit * 0.8 and geom.within(rejoin_buf):
+            feasible.append(True)
+            reasons.append("in_local_rejoin")
+            continue
+
+        feasible.append(False)
+        reasons.append("outside_local_corridor")
 
     pts_m["detour_feasible"] = feasible
+    pts_m["feasibility_reason"] = reasons
     return pts_m.to_crs("EPSG:4326")
 
-def main(method: str, out_dir: str, detour_limit: float, rejoin_limit: float):
+# ------------------------------ CLI -------------------------------
+
+def main(method: str, out_dir: str, detour_limit: float, rejoin_limit: float, window_m: float):
     base_fw = Path("data/outputs/floyd_warshall")
     points_fp = base_fw / f"fw_{method}_points.geojson"
     jps_path_fp = Path("data/outputs/jps_path.geojson")
@@ -70,23 +156,32 @@ def main(method: str, out_dir: str, detour_limit: float, rejoin_limit: float):
     if not jps_path_fp.exists():
         raise FileNotFoundError(jps_path_fp)
 
+    print(f"🔍 Nodes: {points_fp}")
+    print(f"🛣️ Path:  {jps_path_fp}")
+
     points = gpd.read_file(points_fp)
     path_line = _load_path_line(str(jps_path_fp))
 
+    print(f"🧮 detour_limit={detour_limit} | rejoin_limit={rejoin_limit} | window_m={window_m}")
     detour_gdf = _compute_detour_features(
         points_gdf=points,
         path_line=path_line,
         detour_limit=detour_limit,
         rejoin_limit=rejoin_limit,
+        window_m=window_m
     )
+
     detour_gdf["fw_index"] = np.arange(len(detour_gdf))
     detour_gdf["detour_label"] = detour_gdf["detour_feasible"].map(lambda x: "feasible" if x else "not_feasible")
 
     out_fp = out_dir / "debug_detour_nodes.geojson"
     detour_gdf.to_file(out_fp, driver="GeoJSON")
+
+    n_total = len(detour_gdf)
+    n_feas = int(detour_gdf["detour_feasible"].sum())
     print(f"✅ Saved: {out_fp}")
-    print(f"🟢 feasible: {int(detour_gdf['detour_feasible'].sum())} / {len(detour_gdf)} "
-          f"🔴 not_feasible: {int((~detour_gdf['detour_feasible']).sum())}")
+    print(f"🟢 feasible: {n_feas} / {n_total}  🔴 not_feasible: {n_total - n_feas}")
+    print(detour_gdf["feasibility_reason"].value_counts().to_string())
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
@@ -94,5 +189,7 @@ if __name__ == "__main__":
     ap.add_argument("--out_dir", type=str, default="data/outputs/aco")
     ap.add_argument("--detour_limit", type=float, default=300.0)
     ap.add_argument("--rejoin_limit", type=float, default=500.0)
+    ap.add_argument("--window_m", type=float, default=600.0,
+                    help="Half-window around s_proj to define local corridor")
     args = ap.parse_args()
     main(**vars(args))

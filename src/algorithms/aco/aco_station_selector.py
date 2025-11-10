@@ -152,7 +152,7 @@ def select_optimal_stations(
         # Backtracking = negative diffs (in meters)
         back_m = float(np.sum(np.abs(diffs[diffs < 0]))) if diffs.size else 0.0
 
-        # Overshoot = how far past the goal projection we end (measured against the “end” side)
+        # Overshoot = how far past the goal projection we end (measured against the "end" side)
         # Identify the corridor direction by comparing start/end projections.
         end_target = s_max  # we want to end within [s_min, s_max]
         last_proj = float(s_route[-1])

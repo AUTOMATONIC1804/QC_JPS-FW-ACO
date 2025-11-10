@@ -6,12 +6,12 @@
     "Buffer_m":2000,
     "Spacing_m":600,
     "MergeRadius_m":450,
-    "n_points":93,
+    "n_points":98,
     "MatrixShape":[
-      93,
-      93
+      98,
+      98
     ],
-    "Time_ms":1094.16
+    "Time_ms":776661.83
   },
   {
     "Algorithm":"A*",
@@ -20,12 +20,12 @@
     "Buffer_m":2000,
     "Spacing_m":600,
     "MergeRadius_m":450,
-    "n_points":84,
+    "n_points":82,
     "MatrixShape":[
-      84,
-      84
+      82,
+      82
     ],
-    "Time_ms":1013.09
+    "Time_ms":64127.25
   },
   {
     "Algorithm":"Dijkstra",
@@ -34,11 +34,11 @@
     "Buffer_m":2000,
     "Spacing_m":600,
     "MergeRadius_m":"-",
-    "n_points":67,
+    "n_points":66,
     "MatrixShape":[
-      67,
-      67
+      66,
+      66
     ],
-    "Time_ms":1439.6
+    "Time_ms":3279.01
   }
 ]

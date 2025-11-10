@@ -1,16 +1,12 @@
-# src/algorithms/aco/aco_jps_runner.py
+# src/algorithms/aco/aco_station_runner.py
 """
-ACO + JPS Integrated Runner
+ACO Station Runner (helper module)
 ----------------------------
-1) Load original FW nodes (full set, in canonical order)
-2) Filter to detour-feasible subset (from debug_detour_nodes.geojson)
-3) Build/slice effort matrix and node stats to feasible subset only
-4) Run ACO on the sliced problem
-5) Lock start/end, order along JPS path, enforce K
-6) Export stations, buffers, all-nodes CSV, convergence logs
+Provides run_aco_jps(...) as an importable helper. This module is not intended
+to be executed as a script; remove the CLI entry if you previously ran it with
+python -m ...
 """
 
-import argparse
 from pathlib import Path
 import warnings
 
@@ -26,6 +22,7 @@ from src.algorithms.aco.poi_scores import load_pois_and_weights
 
 warnings.filterwarnings("ignore", category=pd.errors.SettingWithCopyWarning)
 
+__all__ = ["run_aco_jps"]
 
 # ------------------------ small helpers ------------------------
 
@@ -66,7 +63,7 @@ def _enforce_exact_k(sorted_indices, k, start_idx, end_idx):
     return final[:k]
 
 
-# ------------------------ main ------------------------
+# ------------------------ main helper ------------------------
 
 def run_aco_jps(
     n_stations: int = 9,
@@ -74,6 +71,10 @@ def run_aco_jps(
     buffer_radius_m: float = 1000.0,
     output_dir: str = "data/outputs/aco",
 ):
+    """
+    Run ACO + JPS integrated optimization and write outputs to output_dir.
+    This function is intended to be imported and called from other code.
+    """
     print("=== 🧠 Running ACO + JPS Integrated Optimization ===")
 
     base_fw_dir = Path("data/outputs/floyd_warshall")
@@ -324,9 +325,6 @@ def run_aco_jps(
     chosen.to_crs("EPSG:4326").to_file(outdir / "aco_jps_stations.geojson", driver="GeoJSON")
     print("✅ Saved chosen stations → aco_jps_stations.geojson")
 
-    # 13) (Removed exporting of aco_jps_path.geojson)
-
-
     # 14) Export 1 km buffers for verification
     print("🟢 Generating 1 km buffers for station verification…")
     pois_m = pois_gdf.to_crs("EPSG:3857")
@@ -373,14 +371,21 @@ def run_aco_jps(
     all_nodes.drop(columns="geometry").to_csv(outdir / "aco_jps_all_nodes.csv", index=False)
     print("🧾 Exported aco_jps_all_nodes.csv (feasible universe: chosen + unchosen)")
 
+    # Return core results for callers
+    return {
+        "chosen_stations_gdf": chosen,
+        "buffers_gdf": buffers_gdf,
+        "all_nodes_df": all_nodes,
+        "best_route": best_route,
+        "summary": summary,
+    }
 
-# ------------------------ entry ------------------------
 
+# ===================================================
+# Prevent direct execution
+# ===================================================
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--n_stations", type=int, default=9)
-    ap.add_argument("--method", type=str, default="jps")
-    ap.add_argument("--buffer_radius_m", type=float, default=1000.0)
-    ap.add_argument("--output_dir", type=str, default="data/outputs/aco")
-    args = ap.parse_args()
-    run_aco_jps(**vars(args))
+    raise RuntimeError(
+        "This module is a helper and should not be executed directly. "
+        "Use 'aco_jps_runner.py' instead, which calls run_aco_jps() internally."
+    )

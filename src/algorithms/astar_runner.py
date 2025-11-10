@@ -12,7 +12,7 @@ from shapely.geometry import Point, LineString, mapping
 
 from src.algorithms.jps.jps_grid import Grid
 from src.algorithms.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
-from src.algorithms.metrics_utils import measure_runtime, compute_path_length
+from src.algorithms.metrics_utils import compute_path_length
 from src.algorithms.astar.astar_main import astar_search
 from src.algorithms.astar.astar_heuristics import octile_distance  
 from src.algorithms.astar.astar_utils import snap_to_nearest_road
@@ -20,8 +20,8 @@ from src.algorithms.astar.astar_utils import snap_to_nearest_road
 
 def run_astar_benchmark(
     tif_path="data/processed/qc_grid_clean.tif",
-    start_coords=(14.7065345,121.0680065),  
-    goal_coords=(14.6442107,121.0375645),    
+    start_coords=(14.7327857,121.0611778),  
+    goal_coords=(14.656511,121.031089),    
     output_dir="data/outputs"
 ):
     """Run A* on QC grid and return performance metrics (lat, lon input version)."""
@@ -54,7 +54,9 @@ def run_astar_benchmark(
         print(f"   Start cell: {start}, Goal cell: {goal}")
 
         print("[3] Running A* algorithm...")
-        path, runtime_ms = measure_runtime(astar_search, grid, start, goal)
+        t0 = time.time()
+        path = astar_search(grid, start, goal)
+        runtime_ms = (time.time() - t0) * 1000
         if not path:
             print("❌ No path found by A*.")
             total_runtime_ms = (time.time() - total_start) * 1000

@@ -69,9 +69,10 @@ def match_keywords(fields, mapping):
 
 def transport_poi(fields):
     mapping = {
-        "train": 3, "railway": 3, "station": 3, "mrt": 3, "lrt": 3,
+        "train": 3, "light_rail": 3, "railway": 3, "train_station": 3, "mrt": 3, "lrt": 3,
         "bus": 2, "bus_station": 2, "terminal": 2, "subway": 3, "jeepney": 2,
-        "tricycle": 1, "public_transport": 2, "transport": 2, "stop_position": 2
+        "tricycle": 1, "public_transport": 2, "transport": 2, "stop_position": 2, "transportation": 2
+        
     }
     score = match_keywords(fields, mapping)
     return "Transport Facilities", score if score > 0 else 0

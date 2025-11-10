@@ -16,7 +16,7 @@ from src.algorithms.jps.jps_grid import Grid
 from src.algorithms.jps.jps_main import jump_point_search
 from src.algorithms.jps.jps_heuristics import octile_distance  # ✅ unified heuristic
 from src.algorithms.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
-from src.algorithms.metrics_utils import measure_runtime, compute_path_length
+from src.algorithms.metrics_utils import compute_path_length
 
 
 def snap_to_nearest_road(grid, start_cell, max_radius=50):
@@ -46,8 +46,8 @@ def snap_to_nearest_road(grid, start_cell, max_radius=50):
 
 def run_jps_benchmark(
     tif_path="data/processed/qc_grid_clean.tif",
-    start_coords=(14.7065345,121.0680065),  
-    goal_coords=(14.6442107,121.0375645),    
+    start_coords=(14.7327857,121.0611778),  
+    goal_coords=(14.656511,121.031089),    
     output_dir="data/outputs"
 ):
     """Run JPS on QC grid and return metrics for comparison (lat, lon input version)."""
@@ -82,7 +82,9 @@ def run_jps_benchmark(
 
         # -------------------------------------------------------
         print("[3] Running Jump Point Search algorithm...")
-        (path, runtime_ms) = measure_runtime(jump_point_search, grid, start, goal)
+        t0 = time.time()
+        path = jump_point_search(grid, start, goal)
+        runtime_ms = (time.time() - t0) * 1000
         if not path:
             print("❌ No path found by JPS.")
             total_runtime_ms = (time.time() - total_start) * 1000

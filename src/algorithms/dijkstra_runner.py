@@ -44,8 +44,8 @@ def build_curved_route(G, path_nodes):
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(14.7065345,121.0680065),  
-    goal_coords=(14.6442107,121.0375645),    
+    start_coords=(14.7327857,121.0611778),  
+    goal_coords=(14.656511,121.031089),    
     output_dir="data/outputs"
 ):
     """

@@ -115,14 +115,10 @@ def run_aco_jps_route(
     # 🚉 Stage 0: Generate stations
     # -------------------------------
     print("=== 🚉 Stage 1: Running ACO Station Optimization ===")
-    try:
-        n_stations = int(input("Enter number of stations (including start/end) [default=9]: ") or 9)
-    except ValueError:
-        n_stations = 9
-
+    
     # 🔹 Automatically run the ACO + JPS station optimizer
-    print(f"🧠 Running ACO Station Runner with {n_stations} stations...")
-    run_aco_jps(n_stations=n_stations, method="jps")
+    # (run_aco_jps handles user input for n_stations internally)
+    run_aco_jps(n_stations=9, method="jps")
     print("\n✅ Stations generated successfully — proceeding to JPS route generation...\n")
 
     # -------------------------------
@@ -192,9 +188,9 @@ def run_aco_jps_route(
 
         print(f"▶️ Segment {i+1}/{len(stations)-1}: {start_cell} → {goal_cell}")
 
-        t0 = time.perf_counter()
+        t0 = time.time()
         path = jump_point_search(grid, start_cell, goal_cell)
-        t_ms = (time.perf_counter() - t0) * 1000
+        t_ms = (time.time() - t0) * 1000
         total_time_ms += t_ms
 
         if not path:

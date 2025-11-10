@@ -15,8 +15,8 @@ from pathlib import Path
 
 # === Paths ===
 base_dir = Path(r"D:\Quezon_City\data\processed")
-input_path = base_dir / "qc_pois_all_matched.geojson"
-output_path = base_dir / "qc_pois_all_matched_clean.geojson"
+input_path = base_dir / "qc_pois_transportation_clean.geojson" #qc_pois_all_matched.geojson
+output_path = base_dir / "qc_pois_transportation_clean.geojson" #qc_pois_all_matched_clean.geojson
 
 # === Load ===
 print("📂 Loading file...")
