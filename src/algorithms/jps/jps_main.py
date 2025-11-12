@@ -54,7 +54,10 @@ def get_successors(grid, node, goal):
         jp = jump(grid, node.row, node.col, dr, dc, goal)
         if jp:
             r, c = jp
-            g_cost = node.g + ((dr * dc) and 1.414 or 1.0)
+            # Calculate actual distance from current node to jump point
+            # Use octile distance to properly account for diagonal vs cardinal movement
+            distance = octile_distance((node.row, node.col), (r, c))
+            g_cost = node.g + distance
             h_cost = octile_distance((r, c), goal)  # ✅ unified heuristic
             successors.append(Node(r, c, g_cost, h_cost, node))
     return successors

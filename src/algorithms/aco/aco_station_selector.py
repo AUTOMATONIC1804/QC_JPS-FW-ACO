@@ -178,9 +178,6 @@ def select_optimal_stations(
         print("[ACO] No valid route found.")
         return [], {"best_cost": np.inf, "history": history}
 
-    print(f"[ACO] Best route cost: {best_cost:.4f}")
-    print(f"[ACO] Best route length: {len(best_route)} stations")
-
     best_points = points_gdf.iloc[best_route]
     coverage_ratio = compute_coverage_ratio(best_points, corridor_gdf, buffer_radius)
     spacing_stats = _route_spacing_stats(best_points)

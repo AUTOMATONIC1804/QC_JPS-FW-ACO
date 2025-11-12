@@ -9,6 +9,7 @@ python -m ...
 
 from pathlib import Path
 import warnings
+import time
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -27,7 +28,7 @@ __all__ = ["run_aco_jps"]
 # ------------------------ small helpers ------------------------
 
 def _route_line_from_geojson(route_gdf: gpd.GeoDataFrame):
-    """Extract the main LineString path from jps_path.geojson."""
+    """Extract the main LineString path from a route GeoJSON file."""
     if "role" in route_gdf.columns:
         line_rows = route_gdf[route_gdf["role"] == "path"]
         if not line_rows.empty:
@@ -72,16 +73,21 @@ def run_aco_jps(
     output_dir: str = "data/outputs/aco",
 ):
     """
-    Run ACO + JPS integrated optimization and write outputs to output_dir.
+    Run ACO station optimization for the specified algorithm method.
+    Supports: "jps", "dijkstra", "astar"
     This function is intended to be imported and called from other code.
     """
-    print("=== 🧠 Running ACO + JPS Integrated Optimization ===")
+    method_upper = method.upper() if method == "astar" else method.capitalize()
+    print(f"=== 🧠 RUNNING ACO + {method_upper.upper()} INTEGRATED OPTIMIZATION ===")
+    aco_total_start = time.perf_counter()
+
+    interactive_wait_s = 0.0
 
     base_fw_dir = Path("data/outputs/floyd_warshall")
     points_path_full = base_fw_dir / f"fw_{method}_points.geojson"
     D_path = base_fw_dir / f"fw_{method}_D.npy"
     FW_path = base_fw_dir / f"fw_{method}_FW.npy"
-    route_path = Path("data/outputs/jps_path.geojson")
+    route_path = Path(f"data/outputs/{method}_path.geojson")
     detour_path = Path("data/outputs/aco/debug_detour_nodes.geojson")
 
     # 1) Load full FW nodes in canonical order (these define row/col order for D/FW/E_full)
@@ -196,7 +202,6 @@ def run_aco_jps(
     E = np.where(np.isfinite(E), E, FW_slice * 1.2)
     E[~np.isfinite(E)] = 1e9
     print(f"📊 Effort matrix (feasible-only) shape: {E.shape}")
-    print(f"🔍 Connectivity repaired. Finite ratio: {(np.isfinite(E).sum() / E.size):.2%}")
 
     # 6) Determine start/end on the feasible subset
     def _find_se_idx_from_roles(gdf):
@@ -220,22 +225,29 @@ def run_aco_jps(
     print(f"🔒 Start/end confirmed → start_idx={start_idx}, end_idx={end_idx}")
 
     # 7) Ask for station count
+    wait_start = time.perf_counter()
     try:
         user_input = input(
             f"Enter number of stations (including start/end) [default={n_stations}]: "
         ).strip()
+    except Exception:
+        interactive_wait_s += time.perf_counter() - wait_start
+        print(f"⚠️ Invalid input, using default station count ({n_stations}).")
+    else:
+        interactive_wait_s += time.perf_counter() - wait_start
         if user_input:
-            n_stations = int(user_input)
-            print(f"✅ Station count manually set to {n_stations}.")
+            try:
+                n_stations = int(user_input)
+                print(f"✅ Station count manually set to {n_stations}.")
+            except Exception:
+                print(f"⚠️ Invalid input, using default station count ({n_stations}).")
         else:
             print(f"ℹ️ Using default station count: {n_stations}")
-    except Exception:
-        print(f"⚠️ Invalid input, using default station count ({n_stations}).")
 
     # 8) ACO params
     aco_params = {
-        "n_ants": 40,
-        "n_iterations": 80,
+        "n_ants": 50,
+        "n_iterations": 100,
         "alpha": 1.0,
         "beta": 3.0,
         "rho": 0.5,
@@ -272,8 +284,8 @@ def run_aco_jps(
             "best_cost": best_costs,
             "mean_cost": mean_costs if len(mean_costs) == len(best_costs) else [np.nan]*len(best_costs)
         })
-        df_hist.to_csv(outdir / "aco_convergence.csv", index=False)
-        print("📈 Saved ACO convergence log → aco_convergence.csv")
+        df_hist.to_csv(outdir / f"aco_{method}_convergence.csv", index=False)
+        print(f"📈 Saved ACO convergence log → aco_{method}_convergence.csv")
 
         plt.figure()
         plt.plot(df_hist["iteration"], df_hist["best_cost"], label="Best Cost")
@@ -281,25 +293,24 @@ def run_aco_jps(
             plt.plot(df_hist["iteration"], df_hist["mean_cost"], "--", label="Mean Cost")
         plt.xlabel("Iteration")
         plt.ylabel("Cost")
-        plt.title("ACO Convergence Over Iterations")
+        plt.title(f"ACO Convergence Over Iterations ({method_upper})")
         plt.legend()
         plt.grid(True)
         plt.tight_layout()
-        plt.savefig(outdir / "aco_convergence.png", dpi=200)
+        plt.savefig(outdir / f"aco_{method}_convergence.png", dpi=200)
         plt.close()
-        print("📉 Saved ACO convergence plot → aco_convergence.png")
+        print(f"📉 Saved ACO convergence plot → aco_{method}_convergence.png")
 
     # 11) Order along corridor and enforce exact K
     line = _route_line_from_geojson(route_gdf.to_crs("EPSG:3857"))
     if line is None:
-        raise RuntimeError("Could not extract LineString from jps_path.geojson.")
+        raise RuntimeError(f"Could not extract LineString from {method}_path.geojson.")
 
     all_candidates = list(dict.fromkeys(best_route + [start_idx, end_idx]))
     ordered = _sort_indices_along_line(points_feas, line, all_candidates)
 
     # 🧩 FIX: If ACO only returned start/end, fill with evenly spaced nodes
     if len(ordered) < n_stations:
-        print(f"⚠️ ACO returned only {len(ordered)} nodes; filling up to {n_stations}...")
         remaining_needed = n_stations - len(ordered)
         feasible_idxs = list(range(len(points_feas)))
 
@@ -322,8 +333,12 @@ def run_aco_jps(
     chosen.loc[:, "sub_index"] = best_route  # index within feasible subproblem
     # Also carry back original FW index for traceability
     chosen.loc[:, "fw_index"] = [feas_orig_idx[i] for i in best_route]
-    chosen.to_crs("EPSG:4326").to_file(outdir / "aco_jps_stations.geojson", driver="GeoJSON")
-    print("✅ Saved chosen stations → aco_jps_stations.geojson")
+    # Add top POIs as a property (will show up when clicking points in GeoJSON viewers)
+    chosen.loc[:, "top_pois"] = [
+        "; ".join(node_stats.get(str(i), {}).get("top_pois", [])) for i in best_route
+    ]
+    chosen.to_crs("EPSG:4326").to_file(outdir / f"aco_{method}_stations.geojson", driver="GeoJSON")
+    print(f"✅ Saved chosen stations → aco_{method}_stations.geojson")
 
     # 14) Export 1 km buffers for verification
     print("🟢 Generating 1 km buffers for station verification…")
@@ -348,8 +363,8 @@ def run_aco_jps(
          "radius_m": 1000},
         geometry=buffers, crs="EPSG:3857"
     ).to_crs("EPSG:4326")
-    buffers_gdf.to_file(outdir / "aco_jps_station_buffers.geojson", driver="GeoJSON")
-    print("✅ Saved 1 km station buffers → aco_jps_station_buffers.geojson")
+    buffers_gdf.to_file(outdir / f"aco_{method}_station_buffers.geojson", driver="GeoJSON")
+    print(f"✅ Saved 1 km station buffers → aco_{method}_station_buffers.geojson")
 
     # 15) Export all-nodes CSV (feasible-only universe = what ACO evaluated)
     all_nodes = points_feas.to_crs("EPSG:4326").copy()
@@ -366,10 +381,22 @@ def run_aco_jps(
     all_nodes.loc[:, "poi_norm"] = all_nodes["sub_index"].map(
         lambda i: node_stats.get(str(i), {}).get("score_norm", 0)
     )
+    all_nodes.loc[:, "top_pois"] = all_nodes["sub_index"].map(
+        lambda i: "; ".join(node_stats.get(str(i), {}).get("top_pois", []))
+    )
     all_nodes.loc[:, "lon"] = all_nodes.geometry.x
     all_nodes.loc[:, "lat"] = all_nodes.geometry.y
-    all_nodes.drop(columns="geometry").to_csv(outdir / "aco_jps_all_nodes.csv", index=False)
-    print("🧾 Exported aco_jps_all_nodes.csv (feasible universe: chosen + unchosen)")
+    all_nodes.drop(columns="geometry").to_csv(outdir / f"aco_{method}_candidate_stations.csv", index=False)
+    print(f"🧾 Exported aco_{method}_candidate_stations.csv (Feasible Nodes)")
+
+    # 16) Export chosen stations CSV (only the final selected stations)
+    chosen_stations_df = all_nodes[all_nodes["sub_index"].isin(best_route)].copy()
+    chosen_stations_df.drop(columns="geometry").to_csv(outdir / f"aco_{method}_stations_list.csv", index=False)
+    print(f"🧾 Exported aco_{method}_stations_list.csv (Final Stations List)")
+
+    aco_total_elapsed = max(0.0, time.perf_counter() - aco_total_start - interactive_wait_s)
+    aco_total_ms = aco_total_elapsed * 1000.0
+    print(f"[OK] ACO total runtime: {aco_total_ms:.2f} ms ({aco_total_elapsed:.2f} s)")
 
     # Return core results for callers
     return {
@@ -378,6 +405,8 @@ def run_aco_jps(
         "all_nodes_df": all_nodes,
         "best_route": best_route,
         "summary": summary,
+        "interactive_wait_s": interactive_wait_s,
+        "compute_time_s": aco_total_elapsed,
     }
 
 

@@ -106,29 +106,52 @@ def snap_to_nearest_road(grid, start_cell, max_radius=50):
 # Main Runner
 # ===================================================
 def run_aco_jps_route(
-    stations_fp="data/outputs/aco/aco_jps_stations.geojson",
-    roads_fp="data/outputs/floyd_warshall/fw_jps_roads.geojson",
+    method: str = "jps",
+    stations_fp: str = None,
+    roads_fp: str = None,
     tif_path="data/processed/qc_grid_clean.tif",
     output_dir="data/outputs/aco"
 ):
+    """
+    Run ACO station optimization + route generation for the specified method.
+    Supports: "jps", "dijkstra", "astar"
+    """
+    # Auto-construct paths if not provided
+    if stations_fp is None:
+        stations_fp = f"data/outputs/aco/aco_{method}_stations.geojson"
+    if roads_fp is None:
+        roads_fp = f"data/outputs/floyd_warshall/fw_{method}_roads.geojson"
+    
+    method_upper = method.upper() if method == "astar" else method.capitalize()
+    
+    runner_total_start = time.perf_counter()
+    
     # -------------------------------
     # 🚉 Stage 0: Generate stations
     # -------------------------------
-    print("=== 🚉 Stage 1: Running ACO Station Optimization ===")
+    print(f"=== 🚉 STAGE 1: RUNNING ACO {method_upper.upper()} STATION OPTIMIZATION ===")
     
-    # 🔹 Automatically run the ACO + JPS station optimizer
+    # 🔹 Automatically run the ACO station optimizer
     # (run_aco_jps handles user input for n_stations internally)
-    run_aco_jps(n_stations=9, method="jps")
-    print("\n✅ Stations generated successfully — proceeding to JPS route generation...\n")
+    stage1_start = time.perf_counter()
+    stage1_result = run_aco_jps(n_stations=9, method=method)
+    stage1_raw = time.perf_counter() - stage1_start
+    stage1_compute_s = float(stage1_result.get("compute_time_s", stage1_raw)) if stage1_result else stage1_raw
+    stage1_wait_s = float(stage1_result.get("interactive_wait_s", 0.0)) if stage1_result else 0.0
+    if stage1_compute_s < 0:
+        stage1_compute_s = max(0.0, stage1_raw - stage1_wait_s)
+    print(f"[OK] Stage 1 runtime: {stage1_compute_s * 1000:.2f} ms ({stage1_compute_s:.2f} s)")
+    print(f"\n✅ Stations generated successfully — proceeding to {method_upper} route generation...\n")
 
     # -------------------------------
     # 🚆 Stage 1: Route generation
     # -------------------------------
-    print("=== 🚆 Stage 2: Running ACO JPS Route Generation ===")
+    print(f"=== 🚆 Stage 2: Running ACO {method_upper} Route Generation ===")
+    stage2_start = time.perf_counter()
 
     # --- Setup paths ---
     stations_fp, roads_fp, tif_path = Path(stations_fp), Path(roads_fp), Path(tif_path)
-    outdir = Path(output_dir) / "aco_jps_segments"
+    outdir = Path(output_dir) / f"aco_{method}_segments"
     outdir.mkdir(parents=True, exist_ok=True)
 
     # --- 1. Load station points ---
@@ -144,8 +167,8 @@ def run_aco_jps_route(
     grid_arr, transform, crs = load_clean_grid(tif_path=str(tif_path))
     adapter = GridAdapter(str(tif_path))
 
-    # --- 3. Load and rasterize fw_jps_roads.geojson ---
-    print("🛣️ Rasterizing FW JPS roads to binary mask...")
+    # --- 3. Load and rasterize FW roads ---
+    print(f"🛣️ Rasterizing FW {method_upper} roads to binary mask...")
     if not roads_fp.exists():
         raise FileNotFoundError(f"Missing {roads_fp}")
 
@@ -230,8 +253,8 @@ def run_aco_jps_route(
         full_route = gpd.GeoDataFrame(
             {"role": ["path"], "length_m": [merged.length]}, geometry=[merged], crs="EPSG:3857"
         ).to_crs(WGS84)
-        full_route.to_file(Path(output_dir) / "aco_jps_full_route.geojson", driver="GeoJSON")
-        print(f"✅ Saved merged route → aco_jps_full_route.geojson")
+        full_route.to_file(Path(output_dir) / f"aco_{method}_full_route.geojson", driver="GeoJSON")
+        print(f"✅ Saved merged route → aco_{method}_full_route.geojson")
     else:
         print("⚠️ No valid segments to merge — route incomplete.")
 
@@ -245,12 +268,18 @@ def run_aco_jps_route(
             "runtime_ms": round(total_time_ms, 2),
             "status": "complete"
         }
-        df.to_csv(Path(output_dir) / "aco_jps_route_report.csv", index=False)
-        print(f"🧾 Saved route report → aco_jps_route_report.csv")
+        df.to_csv(Path(output_dir) / f"aco_{method}_route_report.csv", index=False)
+        print(f"🧾 Saved route report → aco_{method}_route_report.csv")
 
-    print("\n=== ✅ ACO JPS Route Generation Complete ===")
+    now = time.perf_counter()
+    stage2_elapsed = now - stage2_start
+    total_compute_s = stage1_compute_s + stage2_elapsed
+
+    print(f"\n=== ✅ ACO {method_upper} Route Generation Complete ===")
     print(f"📏 Total distance: {total_len:.2f} m")
-    print(f"⏱️ Total compute time: {total_time_ms:.2f} ms")
+    print(f"[OK] Stage 1 runtime: {stage1_compute_s * 1000:.2f} ms ({stage1_compute_s:.2f} s)")
+    print(f"[OK] Stage 2 runtime: {stage2_elapsed * 1000:.2f} ms ({stage2_elapsed:.2f} s)")
+    print(f"[OK] ACO total runtime (Stage 1 + Stage 2): {total_compute_s * 1000:.2f} ms ({total_compute_s:.2f} s)")
     print("=============================================")
 
 

@@ -44,8 +44,8 @@ def build_curved_route(G, path_nodes):
 
 def run_dijkstra_benchmark(
     graph_path="data/processed/qc_roads_major.graphml",
-    start_coords=(14.7327857,121.0611778),  
-    goal_coords=(14.656511,121.031089),    
+    start_coords=None,
+    goal_coords=None,
     output_dir="data/outputs"
 ):
     """
@@ -54,7 +54,42 @@ def run_dijkstra_benchmark(
     Includes total runtime measurement for consistency with JPS and A*.
     """
     print(f"\n=== 🚆 Running Dijkstra Benchmark ===")
-    total_start = time.time()  # ⏱️ start total runtime
+    
+    # Get user input for coordinates if not provided
+    interactive_wait_s = 0.0
+    if start_coords is None or goal_coords is None:
+        wait_start = time.perf_counter()
+        print("\n📍 Enter coordinates (lat, lon format):")
+        try:
+            start_input = input("Start coordinates (lat, lon) [default: 14.7327857, 121.0611778]: ").strip()
+            if not start_input:
+                start_coords = (14.7327857, 121.0611778)
+            else:
+                start_parts = [x.strip() for x in start_input.split(",")]
+                if len(start_parts) != 2:
+                    raise ValueError("Start coordinates must be in format: lat, lon")
+                start_coords = (float(start_parts[0]), float(start_parts[1]))
+            
+            goal_input = input("Goal coordinates (lat, lon) [default: 14.656511, 121.031089]: ").strip()
+            if not goal_input:
+                goal_coords = (14.656511, 121.031089)
+            else:
+                goal_parts = [x.strip() for x in goal_input.split(",")]
+                if len(goal_parts) != 2:
+                    raise ValueError("Goal coordinates must be in format: lat, lon")
+                goal_coords = (float(goal_parts[0]), float(goal_parts[1]))
+            
+            interactive_wait_s += time.perf_counter() - wait_start
+            print(f"✅ Using coordinates: Start ({start_coords[0]}, {start_coords[1]}), Goal ({goal_coords[0]}, {goal_coords[1]})\n")
+        except (ValueError, KeyboardInterrupt) as e:
+            interactive_wait_s += time.perf_counter() - wait_start
+            if isinstance(e, KeyboardInterrupt):
+                raise
+            print("⚠️ Invalid input, using default coordinates.")
+            start_coords = (14.7327857, 121.0611778)
+            goal_coords = (14.656511, 121.031089)
+    
+    total_start = time.perf_counter()  # ⏱️ start total runtime
 
     try:
         # --- Load and preprocess graph ---
@@ -75,7 +110,7 @@ def run_dijkstra_benchmark(
 
         if not nx.has_path(G, start_node, goal_node):
             print("❌ No path found between nodes.")
-            total_runtime_ms = (time.time() - total_start) * 1000
+            total_runtime_ms = (time.perf_counter() - total_start - interactive_wait_s) * 1000
             return {
                 "algorithm": "Dijkstra",
                 "runtime_ms": None,
@@ -86,10 +121,10 @@ def run_dijkstra_benchmark(
 
         # --- Run Dijkstra ---
         print("[3] Running Dijkstra shortest path search...")
-        t0 = time.time()
+        t0 = time.perf_counter()
         path = nx.shortest_path(G, source=start_node, target=goal_node, weight="length")
         length_m = nx.shortest_path_length(G, source=start_node, target=goal_node, weight="length")
-        runtime_ms = (time.time() - t0) * 1000
+        runtime_ms = (time.perf_counter() - t0) * 1000
         adjusted_length = max(0, length_m - (dist_start + dist_goal))
         print(f"[OK] Path found — Runtime: {runtime_ms:.2f} ms, Length: {adjusted_length:.2f} m, Steps: {len(path)}")
 
@@ -157,7 +192,7 @@ def run_dijkstra_benchmark(
         print(f"✅ Saved GeoJSON → {out_geojson}")
 
         # --- Final total runtime ---
-        total_runtime_ms = (time.time() - total_start) * 1000
+        total_runtime_ms = (time.perf_counter() - total_start - interactive_wait_s) * 1000
         print(f"[OK] Total runtime (load → export): {total_runtime_ms:.2f} ms")
 
         # --- Return metrics ---
@@ -171,7 +206,7 @@ def run_dijkstra_benchmark(
 
     except Exception as e:
         print("\n❌ Dijkstra failed with error:", e)
-        total_runtime_ms = (time.time() - total_start) * 1000
+        total_runtime_ms = (time.perf_counter() - total_start - interactive_wait_s) * 1000
         return {
             "algorithm": "Dijkstra",
             "runtime_ms": None,

@@ -17,7 +17,6 @@ from shapely.geometry import Point, LineString, mapping
 
 from src.algorithms.jps.jps_grid import Grid
 from src.algorithms.jps.jps_main import jump_point_search
-from src.algorithms.jps.jps_heuristics import octile
 from src.algorithms.jps.grid_utils import load_clean_grid, cell_to_coords, coords_to_cell
 
 
@@ -107,7 +106,7 @@ def run_demo(use_qc=True, manual=False, start_coords=None, goal_coords=None):
         transform, crs = None, None
 
     # Run JPS
-    path = jump_point_search(grid, start, goal, heuristic=octile)
+    path = jump_point_search(grid, start, goal)
 
     # --- Visualization ---
     plt.figure(figsize=(8, 10))

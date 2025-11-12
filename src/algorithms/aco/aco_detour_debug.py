@@ -4,13 +4,16 @@
 Detour feasibility debugger (LOCAL chainage corridor)
 ----------------------------------------------------
 - Reads fw_<method>_points.geojson
-- Reads data/outputs/jps_path.geojson (role=='path')
+- Reads data/outputs/<method>_path.geojson (role=='path')
 - Per node:
     * d_path (m), s_proj (m along path)
     * Build a LOCAL subline around s_proj (± window_m)
     * detour_feasible if inside detour buffer of that subline,
       or can rejoin inside rejoin buffer of that subline
 This eliminates false positives from nearby-but-far-in-chainage path segments.
+
+Supports: jps, dijkstra, astar
+Usage: python -m src.algorithms.aco.aco_detour_debug --method jps
 """
 
 import argparse
@@ -22,8 +25,9 @@ from shapely.ops import split as shp_split
 
 # ----------------------------- helpers -----------------------------
 
-def _load_path_line(jps_path_file: str) -> LineString:
-    gdf = gpd.read_file(jps_path_file)
+def _load_path_line(path_file: str) -> LineString:
+    """Load the main path LineString from a route GeoJSON file."""
+    gdf = gpd.read_file(path_file)
     if "role" in gdf.columns:
         rows = gdf[gdf["role"] == "path"]
         if not rows.empty and isinstance(rows.geometry.iloc[0], LineString):
@@ -31,7 +35,7 @@ def _load_path_line(jps_path_file: str) -> LineString:
     for geom in gdf.geometry:
         if isinstance(geom, LineString):
             return geom
-    raise RuntimeError("No LineString path found in jps_path.geojson")
+    raise RuntimeError(f"No LineString path found in {path_file}")
 
 def _cut_line_at_distance(line: LineString, dist: float):
     """Return line cut at distance 'dist' (0<=dist<=length)."""
@@ -145,22 +149,39 @@ def _compute_detour_features(points_gdf,
 # ------------------------------ CLI -------------------------------
 
 def main(method: str, out_dir: str, detour_limit: float, rejoin_limit: float, window_m: float):
+    """
+    Main function to compute detour feasibility for nodes.
+    
+    Args:
+        method: Algorithm method ("jps", "dijkstra", or "astar")
+        out_dir: Output directory for results
+        detour_limit: Maximum detour distance in meters
+        rejoin_limit: Maximum rejoin distance in meters
+        window_m: Half-window size for local corridor in meters
+    """
+    method_upper = method.upper() if method == "astar" else method.capitalize()
+    
+    print(f"\n{'='*60}")
+    print(f"🔍 Detour Feasibility Debugger - Running with {method_upper}")
+    print(f"{'='*60}\n")
+    
     base_fw = Path("data/outputs/floyd_warshall")
     points_fp = base_fw / f"fw_{method}_points.geojson"
-    jps_path_fp = Path("data/outputs/jps_path.geojson")
+    path_fp = Path(f"data/outputs/{method}_path.geojson")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if not points_fp.exists():
-        raise FileNotFoundError(points_fp)
-    if not jps_path_fp.exists():
-        raise FileNotFoundError(jps_path_fp)
+        raise FileNotFoundError(f"Missing points file: {points_fp}")
+    if not path_fp.exists():
+        raise FileNotFoundError(f"Missing path file: {path_fp}")
 
+    print(f"📍 Algorithm: {method_upper}")
     print(f"🔍 Nodes: {points_fp}")
-    print(f"🛣️ Path:  {jps_path_fp}")
+    print(f"🛣️ Path:  {path_fp}")
 
     points = gpd.read_file(points_fp)
-    path_line = _load_path_line(str(jps_path_fp))
+    path_line = _load_path_line(str(path_fp))
 
     print(f"🧮 detour_limit={detour_limit} | rejoin_limit={rejoin_limit} | window_m={window_m}")
     detour_gdf = _compute_detour_features(
@@ -179,9 +200,13 @@ def main(method: str, out_dir: str, detour_limit: float, rejoin_limit: float, wi
 
     n_total = len(detour_gdf)
     n_feas = int(detour_gdf["detour_feasible"].sum())
-    print(f"✅ Saved: {out_fp}")
+    print(f"\n✅ Saved: {out_fp}")
     print(f"🟢 feasible: {n_feas} / {n_total}  🔴 not_feasible: {n_total - n_feas}")
+    print(f"\n📊 Feasibility reasons:")
     print(detour_gdf["feasibility_reason"].value_counts().to_string())
+    print(f"\n{'='*60}")
+    print(f"✅ Detour debug complete for {method_upper}")
+    print(f"{'='*60}\n")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()

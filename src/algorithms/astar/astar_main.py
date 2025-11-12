@@ -17,6 +17,7 @@ def astar_search(grid, start, goal):
     came_from = {}
     g_score = {start: 0}
     f_score = {start: octile_distance(start, goal)}  # ✅ unified heuristic
+    closed_set = set()  # Track processed nodes
 
     directions = [
         (-1, 0), (1, 0), (0, -1), (0, 1),
@@ -25,6 +26,11 @@ def astar_search(grid, start, goal):
 
     while open_set:
         _, current = heapq.heappop(open_set)
+        
+        # Skip if already processed (duplicate entry in heap)
+        if current in closed_set:
+            continue
+            
         if current == goal:
             # Reconstruct path
             path = []
@@ -35,11 +41,17 @@ def astar_search(grid, start, goal):
             path.reverse()
             return path
 
+        closed_set.add(current)
+
         for dr, dc in directions:
             neighbor = (current[0] + dr, current[1] + dc)
             if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
                 if grid.matrix[neighbor[0], neighbor[1]] == 0:
                     continue  # obstacle
+                
+                # Skip if already processed
+                if neighbor in closed_set:
+                    continue
 
                 step_cost = sqrt(2) if dr != 0 and dc != 0 else 1
                 tentative_g = g_score[current] + step_cost

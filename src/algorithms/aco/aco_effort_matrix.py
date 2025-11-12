@@ -73,8 +73,12 @@ def compute_effort_matrix(
     if L is None:
         raise RuntimeError("No distance matrix found (D or FW).")
 
-    L_c = np.nanmax(L)
-    L_norm = np.divide(L, L_c, out=np.zeros_like(L, dtype=float), where=(L_c > 0))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        L_c = np.nanmax(L)
+    if not np.isfinite(L_c) or L_c <= 0:
+        L_norm = np.zeros_like(L, dtype=float)
+    else:
+        L_norm = np.divide(L, L_c, out=np.zeros_like(L, dtype=float))
     V_ratio = _speed_ratio_matrix(L, FW, params.expected_speed_kmh)
     E = L_norm * V_ratio * A
 
