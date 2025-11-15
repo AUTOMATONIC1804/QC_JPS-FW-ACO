@@ -6,7 +6,7 @@ Master runner for Floyd–Warshall (FW) pipeline across:
     - Dijkstra
 """
 
-import time, json
+import time, json, inspect
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -41,16 +41,24 @@ def get_matrix_info(output_dir: Path, prefix: str):
     return info
 
 
+def _get_default_param(func, param_name, fallback=None):
+    try:
+        sig = inspect.signature(func)
+        param = sig.parameters.get(param_name)
+        if param and param.default is not inspect._empty:
+            return param.default
+    except (ValueError, TypeError):
+        pass
+    return fallback
+
+
 def run_fw_pipelines(
     base_output_dir="data/outputs/floyd_warshall",
     jps_path="data/outputs/jps_path.geojson",
     astar_path="data/outputs/astar_path.geojson",
     dijkstra_path="data/outputs/dijkstra_path.geojson",
     roads_vector="data/processed/qc_roads_major_edges.geojson",
-    graphml_path=r"D:\Quezon_City\data\processed\qc_roads_major.graphml",
-    buffer_m=2000,
-    spacing_m=600,
-    merge_radius_m=450
+    graphml_path=r"D:\Quezon_City\data\processed\qc_roads_major.graphml"
 ):
     """
     Runs all three Floyd–Warshall pipelines (JPS, A*, Dijkstra)
@@ -62,72 +70,17 @@ def run_fw_pipelines(
     results = []
     t0_all = time.perf_counter()
 
-    # JPS Metrics
-    print("\n==============================")
-    print("Jump Point Search + FW")
-    print("==============================")
-    t0 = time.perf_counter()
-    run_jps(
-        route_geojson=jps_path,
-        roads_vector=roads_vector,
-        buffer_m=buffer_m,
-        spacing_m=spacing_m,
-        merge_radius_m=merge_radius_m,
-        output_dir=base_output_dir
-    )
-    t1 = (time.perf_counter() - t0) * 1000
-    info_jps = get_matrix_info(out_dir, "fw_jps")
-    results.append({
-        "Algorithm": "JPS",
-        "RouteFile": jps_path,
-        "RoadSource": "Vector (GeoJSON)",
-        "Buffer_m": buffer_m,
-        "Spacing_m": spacing_m,
-        "MergeRadius_m": merge_radius_m,
-        "n_points": info_jps.get("n_points"),
-        "MatrixShape": info_jps.get("matrix_shape"),
-        "Time_ms": round(t1, 2)
-    })
-    print(f"JPS runtime: {t1:.2f} ms")
-
-    # A* Metrics
-    print("\n==============================")
-    print("A* + FW")
-    print("==============================")
-    t0 = time.perf_counter()
-    run_astar(
-        route_geojson=astar_path,
-        roads_vector=roads_vector,
-        buffer_m=buffer_m,
-        spacing_m=spacing_m,
-        merge_radius_m=merge_radius_m,
-        output_dir=base_output_dir
-    )
-    t1 = (time.perf_counter() - t0) * 1000
-    info_astar = get_matrix_info(out_dir, "fw_astar")
-    results.append({
-        "Algorithm": "A*",
-        "RouteFile": astar_path,
-        "RoadSource": "Vector (GeoJSON)",
-        "Buffer_m": buffer_m,
-        "Spacing_m": spacing_m,
-        "MergeRadius_m": merge_radius_m,
-        "n_points": info_astar.get("n_points"),
-        "MatrixShape": info_astar.get("matrix_shape"),
-        "Time_ms": round(t1, 2)
-    })
-    print(f"A* runtime: {t1:.2f} ms")
-
     # Dijkstra Metrics
     print("\n==============================")
     print("Dijkstra + FW")
     print("==============================")
     t0 = time.perf_counter()
+    dijkstra_buffer = _get_default_param(run_dijkstra, "buffer_m", "default")
+    dijkstra_spacing = _get_default_param(run_dijkstra, "spacing_m", "default")
+
     run_dijkstra(
         route_geojson=dijkstra_path,
         graphml_path=graphml_path,
-        buffer_m=buffer_m,
-        spacing_m=spacing_m,
         output_dir=base_output_dir
     )
     t1 = (time.perf_counter() - t0) * 1000
@@ -136,14 +89,72 @@ def run_fw_pipelines(
         "Algorithm": "Dijkstra",
         "RouteFile": dijkstra_path,
         "RoadSource": "GraphML (OSMnx)",
-        "Buffer_m": buffer_m,
-        "Spacing_m": spacing_m,
+        "Buffer_m": dijkstra_buffer,
+        "Spacing_m": dijkstra_spacing,
         "MergeRadius_m": "-",
         "n_points": info_dijkstra.get("n_points"),
         "MatrixShape": info_dijkstra.get("matrix_shape"),
         "Time_ms": round(t1, 2)
     })
     print(f"Dijkstra runtime: {t1:.2f} ms")
+
+    # A* Metrics
+    print("\n==============================")
+    print("A* + FW")
+    print("==============================")
+    t0 = time.perf_counter()
+    astar_buffer = _get_default_param(run_astar, "buffer_m", "default")
+    astar_spacing = _get_default_param(run_astar, "spacing_m", "default")
+    astar_merge = _get_default_param(run_astar, "merge_radius_m", "default")
+
+    run_astar(
+        route_geojson=astar_path,
+        roads_vector=roads_vector,
+        output_dir=base_output_dir
+    )
+    t1 = (time.perf_counter() - t0) * 1000
+    info_astar = get_matrix_info(out_dir, "fw_astar")
+    results.append({
+        "Algorithm": "A*",
+        "RouteFile": astar_path,
+        "RoadSource": "Vector (GeoJSON)",
+        "Buffer_m": astar_buffer,
+        "Spacing_m": astar_spacing,
+        "MergeRadius_m": astar_merge,
+        "n_points": info_astar.get("n_points"),
+        "MatrixShape": info_astar.get("matrix_shape"),
+        "Time_ms": round(t1, 2)
+    })
+    print(f"A* runtime: {t1:.2f} ms")
+
+    # JPS Metrics
+    print("\n==============================")
+    print("Jump Point Search + FW")
+    print("==============================")
+    t0 = time.perf_counter()
+    jps_buffer = _get_default_param(run_jps, "buffer_m", "default")
+    jps_spacing = _get_default_param(run_jps, "spacing_m", "default")
+    jps_merge = _get_default_param(run_jps, "merge_radius_m", "default")
+
+    run_jps(
+        route_geojson=jps_path,
+        roads_vector=roads_vector,
+        output_dir=base_output_dir
+    )
+    t1 = (time.perf_counter() - t0) * 1000
+    info_jps = get_matrix_info(out_dir, "fw_jps")
+    results.append({
+        "Algorithm": "JPS",
+        "RouteFile": jps_path,
+        "RoadSource": "Vector (GeoJSON)",
+        "Buffer_m": jps_buffer,
+        "Spacing_m": jps_spacing,
+        "MergeRadius_m": jps_merge,
+        "n_points": info_jps.get("n_points"),
+        "MatrixShape": info_jps.get("matrix_shape"),
+        "Time_ms": round(t1, 2)
+    })
+    print(f"JPS runtime: {t1:.2f} ms")
 
     # Summary of all three algorithms
 
@@ -152,15 +163,13 @@ def run_fw_pipelines(
     print("Summary")
     print("\n")
     print("Runtimes")
-    print("JPS:      {:.2f} ms".format(results[0]["Time_ms"]))
-    print("A*:       {:.2f} ms".format(results[1]["Time_ms"]))
-    print("Dijkstra: {:.2f} ms".format(results[2]["Time_ms"]))
+    for res in results:
+        print("{:<9}: {:>8.2f} ms".format(res["Algorithm"], res["Time_ms"]))
     print(f"Total runtime: {total_time:.2f} ms")
     print("\n")
     print("Matrix Shape")
-    print(f"JPS:      {results[0]['MatrixShape']}")
-    print(f"A*:       {results[1]['MatrixShape']}")
-    print(f"Dijkstra: {results[2]['MatrixShape']}")
+    for res in results:
+        print(f"{res['Algorithm']:<9}: {res['MatrixShape']}")
     print("\n")
 
     df = pd.DataFrame(results)

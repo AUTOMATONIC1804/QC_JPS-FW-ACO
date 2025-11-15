@@ -10,7 +10,7 @@ import os
 
 # === Paths ===
 raw_dir = r"D:\Quezon_City\data\raw"
-out_merged = os.path.join(raw_dir, "qc_pois_transportation_clean.geojson")
+out_merged = os.path.join(raw_dir, "qc_pois_final_scored_transpo.geojson")
 
 # === Your Overpass-exported POI files ===
 files = [

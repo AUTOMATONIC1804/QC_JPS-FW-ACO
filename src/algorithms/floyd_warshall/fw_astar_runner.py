@@ -237,8 +237,8 @@ def run_fw_astar_vector(
     route_geojson="data/outputs/astar_path.geojson",
     roads_vector="data/processed/qc_roads_major_edges.geojson",
     buffer_m=2000,
-    spacing_m=600,
-    merge_radius_m=450,
+    spacing_m=500,
+    merge_radius_m=495,
     output_dir="data/outputs/floyd_warshall",
     tif_path="data/processed/qc_grid_clean.tif",
     run_fw=False,
@@ -390,8 +390,8 @@ if __name__ == "__main__":
     ap.add_argument("--route_geojson", default="data/outputs/astar_path.geojson")
     ap.add_argument("--roads_vector", default="data/processed/qc_roads_major_edges.geojson")
     ap.add_argument("--buffer_m", type=float, default=2000)
-    ap.add_argument("--spacing_m", type=float, default=600)
-    ap.add_argument("--merge_radius_m", type=float, default=450)
+    ap.add_argument("--spacing_m", type=float, default=500)
+    ap.add_argument("--merge_radius_m", type=float, default=500)
     ap.add_argument("--output_dir", default="data/outputs/floyd_warshall")
     ap.add_argument("--tif_path", default="data/processed/qc_grid_clean.tif")
     ap.add_argument("--run_fw", action="store_true", help="Optionally run Floyd–Warshall over A* distances")

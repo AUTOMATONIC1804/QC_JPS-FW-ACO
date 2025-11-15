@@ -201,7 +201,6 @@ def run_fw_dijkstra(
             G_clip = truncate_graph_polygon(G_full, poly)
         print(f"✅ Clipped graph: {len(G_clip.nodes)} nodes, {len(G_clip.edges)} edges")
     except Exception as e:
-        print("⚠️ Clip failed; using full graph. Error:", e)
         G_clip = G_full
 
     # 4️⃣ Convert to GeoDataFrames
@@ -274,12 +273,12 @@ def run_fw_dijkstra(
     out.mkdir(parents=True, exist_ok=True)
     buffer_gdf.to_crs(WGS84).to_file(out / "fw_dijkstra_buffer.geojson", driver="GeoJSON")
     edges_clip.to_file(out / "fw_dijkstra_roads.geojson", driver="GeoJSON")
-    filtered_wgs.to_file(out / "fw_dijkstra_nodes.geojson", driver="GeoJSON")
+    filtered_wgs.to_file(out / "fw_dijkstra_points.geojson", driver="GeoJSON")
     print("💾 Saved buffer/roads/nodes GeoJSON (with lat/lon + role).")
 
     # 7️⃣ Compute Dijkstra + FW
     roads_path = out / "fw_dijkstra_roads.geojson"
-    nodes_path = out / "fw_dijkstra_nodes.geojson"
+    nodes_path = out / "fw_dijkstra_points.geojson"
     D = compute_local_dijkstra_matrix(roads_path, nodes_path)
     FW = floyd_warshall_numpy(D)
 

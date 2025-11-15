@@ -36,7 +36,6 @@ def _route_line_from_geojson(route_gdf: gpd.GeoDataFrame):
     lines = [g for g in route_gdf.geometry if isinstance(g, LineString)]
     return lines[0] if lines else None
 
-
 def _sort_indices_along_line(points_gdf: gpd.GeoDataFrame, line: LineString, indices):
     """Sort node indices along the direction of the JPS route line."""
     pts = points_gdf.to_crs("EPSG:3857")
@@ -45,6 +44,85 @@ def _sort_indices_along_line(points_gdf: gpd.GeoDataFrame, line: LineString, ind
     dists.sort(key=lambda x: x[1])
     return [i for i, _ in dists]
 
+def _enforce_minimum_spacing(points_gdf: gpd.GeoDataFrame, ordered_indices: list, 
+                             min_spacing_m: float, start_idx: int, end_idx: int, 
+                             target_count: int) -> list:
+    """
+    Enforce minimum spacing while maintaining target station count.
+    Priority: exact station count > spacing constraint.
+    """
+    if len(ordered_indices) <= 2:
+        return ordered_indices
+    
+    points_m = points_gdf.to_crs("EPSG:3857")
+    filtered = []
+    
+    # Separate start/end from regular stations
+    regular_stations = [idx for idx in ordered_indices if idx not in (start_idx, end_idx)]
+    
+    # Always include start first
+    if start_idx in ordered_indices:
+        filtered.append(start_idx)
+    
+    # Process regular stations with spacing constraint, but ensure we reach target
+    needed_regular = max(0, target_count - 2)  # -2 for start/end
+    
+    for i, current_idx in enumerate(regular_stations):
+        if len(filtered) >= target_count:
+            break  # Already have enough stations
+        
+        # Calculate how many stations we still need (including end)
+        remaining_needed = target_count - len(filtered) - (1 if end_idx not in filtered else 0)
+        remaining_candidates = len(regular_stations) - i - 1  # Stations after current
+        
+        # Check spacing to last added station
+        last_idx = filtered[-1] if filtered else None
+        if last_idx is not None:
+            dist = points_m.geometry.iloc[last_idx].distance(points_m.geometry.iloc[current_idx])
+        else:
+            dist = float('inf')  # No previous station, always add first one
+        
+        if dist >= min_spacing_m:
+            # Good spacing, add it
+            filtered.append(current_idx)
+        elif remaining_needed > remaining_candidates:
+            # We need this station to reach target count (not enough remaining candidates)
+            # Accept it even if spacing is violated
+            filtered.append(current_idx)
+        elif dist >= min_spacing_m * 0.6:
+            # Moderate spacing violation, but acceptable if we need stations
+            if remaining_needed > 0:
+                filtered.append(current_idx)
+        # else: skip (too close and we have alternatives)
+    
+    # Always include end
+    if end_idx in ordered_indices and end_idx not in filtered:
+        # Check spacing to last station
+        if filtered:
+            last_idx = filtered[-1]
+            dist_to_end = points_m.geometry.iloc[last_idx].distance(points_m.geometry.iloc[end_idx])
+            # Always add end, but warn if spacing is very tight
+            if dist_to_end < min_spacing_m * 0.5 and len(filtered) >= target_count:
+                # If we're at target and end is very close, consider removing last regular station
+                if len(filtered) > 1 and filtered[-1] not in (start_idx, end_idx):
+                    filtered.pop()
+        filtered.append(end_idx)
+    
+    # If we still don't have enough stations, fill from remaining candidates
+    if len(filtered) < target_count:
+        remaining = [idx for idx in ordered_indices if idx not in filtered]
+        needed = target_count - len(filtered)
+        # Add remaining stations in order (spacing may be violated, but count is priority)
+        for idx in remaining[:needed]:
+            filtered.append(idx)
+    
+    # Ensure both start and end are present
+    if start_idx not in filtered:
+        filtered.insert(0, start_idx)
+    if end_idx not in filtered:
+        filtered.append(end_idx)
+    
+    return filtered
 
 def _enforce_exact_k(sorted_indices, k, start_idx, end_idx):
     """Trim/subsample to ensure exactly k nodes while keeping start/end."""
@@ -62,7 +140,6 @@ def _enforce_exact_k(sorted_indices, k, start_idx, end_idx):
         if i not in final:
             final.append(i)
     return final[:k]
-
 
 # ------------------------ main helper ------------------------
 
@@ -88,7 +165,8 @@ def run_aco_jps(
     D_path = base_fw_dir / f"fw_{method}_D.npy"
     FW_path = base_fw_dir / f"fw_{method}_FW.npy"
     route_path = Path(f"data/outputs/{method}_path.geojson")
-    detour_path = Path("data/outputs/aco/debug_detour_nodes.geojson")
+    method_slug = method.lower()
+    detour_path = Path(f"data/outputs/aco/{method_slug}_detour_debug.geojson")
 
     # 1) Load full FW nodes in canonical order (these define row/col order for D/FW/E_full)
     if not points_path_full.exists():
@@ -102,10 +180,10 @@ def run_aco_jps(
 
     # 2) Detour filter → produce feasible ORIGINAL indices (in FW order)
     if detour_path.exists():
-        print("🧭 Using debug_detour_nodes.geojson as authoritative filter…")
+        print(f"🧭 Using {detour_path.name} as authoritative filter…")
         detour_ll = gpd.read_file(detour_path).to_crs("EPSG:4326")
         if "detour_label" not in detour_ll.columns:
-            raise RuntimeError("❌ debug_detour_nodes.geojson missing 'detour_label' column.")
+            raise RuntimeError(f"❌ {detour_path.name} missing 'detour_label' column.")
 
         detour_ll["__is_feasible__"] = detour_ll["detour_label"].astype(str).str.lower().isin(
             ["feasible", "true", "1"]
@@ -126,7 +204,7 @@ def run_aco_jps(
                 feas_orig_idx = sorted(set(feas_orig_idx + se_idx))
         else:
             # No fw_index → nearest snap to FW nodes in EPSG:3857 (metric)
-            print("ℹ️ detour file has no 'fw_index' → snapping detour to FW nodes (≤ 50 m)…")
+            print(f"ℹ️ {detour_path.name} has no 'fw_index' → snapping detour to FW nodes (≤ 50 m)…")
             detour_m = detour_ll.to_crs("EPSG:3857")
             points_full_m = points_full.to_crs("EPSG:3857")
             joined = gpd.sjoin_nearest(
@@ -147,7 +225,7 @@ def run_aco_jps(
             raise RuntimeError("❌ Detour filter resulted in 0 feasible nodes.")
         print(f"✅ Feasible detour nodes mapped to FW indices: {len(feas_orig_idx)}")
     else:
-        print("⚠️ debug_detour_nodes.geojson not found — using all FW nodes.")
+        print(f"⚠️ {detour_path.name} not found — using all FW nodes.")
         feas_orig_idx = list(range(len(points_full)))
 
     # Build feasible node frame in original order
@@ -245,6 +323,16 @@ def run_aco_jps(
             print(f"ℹ️ Using default station count: {n_stations}")
 
     # 8) ACO params
+    corridor_line_metric = _route_line_from_geojson(route_gdf.to_crs("EPSG:3857"))
+    corridor_len_m = corridor_line_metric.length if corridor_line_metric is not None else None
+    if corridor_len_m and n_stations > 1:
+        target_spacing = corridor_len_m / (n_stations - 1)
+        spacing_min = max(250.0, target_spacing * 0.85)
+        spacing_max = target_spacing * 1.15
+    else:
+        spacing_min = 500.0
+        spacing_max = 800.0
+
     aco_params = {
         "n_ants": 50,
         "n_iterations": 100,
@@ -252,8 +340,8 @@ def run_aco_jps(
         "beta": 3.0,
         "rho": 0.5,
         "Q": 1.0,
-        "ideal_spacing_min": 500,
-        "ideal_spacing_max": 800,
+        "ideal_spacing_min": spacing_min,
+        "ideal_spacing_max": spacing_max,
         "buffer_radius": 1000,
         "target_coverage": 0.9,
         "weights": {"spacing": 0.4, "coverage": 0.3, "poi": 0.3},
@@ -301,7 +389,7 @@ def run_aco_jps(
         plt.close()
         print(f"📉 Saved ACO convergence plot → aco_{method}_convergence.png")
 
-    # 11) Order along corridor and enforce exact K
+    # 11) Order along corridor and enforce minimum spacing
     line = _route_line_from_geojson(route_gdf.to_crs("EPSG:3857"))
     if line is None:
         raise RuntimeError(f"Could not extract LineString from {method}_path.geojson.")
@@ -325,6 +413,11 @@ def run_aco_jps(
         ordered += filler_idxs
         ordered = sorted(set(ordered), key=lambda i: line.project(points_feas.to_crs("EPSG:3857").geometry.iloc[i]))
 
+    # Enforce minimum spacing while maintaining exact station count
+    min_spacing = aco_params.get("ideal_spacing_min", 250.0)
+    ordered = _enforce_minimum_spacing(points_feas, ordered, min_spacing, start_idx, end_idx, n_stations)
+    print(f"📏 After minimum spacing enforcement ({min_spacing:.0f} m, target={n_stations}): {len(ordered)} stations")
+
     best_route = _enforce_exact_k(ordered, n_stations, start_idx, end_idx)
 
 
@@ -333,10 +426,6 @@ def run_aco_jps(
     chosen.loc[:, "sub_index"] = best_route  # index within feasible subproblem
     # Also carry back original FW index for traceability
     chosen.loc[:, "fw_index"] = [feas_orig_idx[i] for i in best_route]
-    # Add top POIs as a property (will show up when clicking points in GeoJSON viewers)
-    chosen.loc[:, "top_pois"] = [
-        "; ".join(node_stats.get(str(i), {}).get("top_pois", [])) for i in best_route
-    ]
     chosen.to_crs("EPSG:4326").to_file(outdir / f"aco_{method}_stations.geojson", driver="GeoJSON")
     print(f"✅ Saved chosen stations → aco_{method}_stations.geojson")
 
@@ -345,14 +434,68 @@ def run_aco_jps(
     pois_m = pois_gdf.to_crs("EPSG:3857")
     stations_m = chosen.to_crs("EPSG:3857")
     buffers, poi_counts, poi_scores, poi_cats = [], [], [], []
-    for geom in stations_m.geometry:
+    station_top_poi_pairs = []
+    for sub_idx, geom in zip(best_route, stations_m.geometry):
         buf = geom.buffer(1000)
         near = pois_m[pois_m.intersects(buf)]
         buffers.append(buf)
         poi_counts.append(int(len(near)))
         poi_scores.append(float(near["score"].sum()) if "score" in near.columns and len(near) else 0.0)
-        cats = near["category"].value_counts().head(5).to_dict() if "category" in near.columns and len(near) else {}
+        cats = near["category"].value_counts().head(10).to_dict() if "category" in near.columns and len(near) else {}
         poi_cats.append(str(cats))
+
+        if len(near) and "NormalizedScore" in near.columns:
+            near = near.copy()
+            near["__norm_score__"] = pd.to_numeric(near["NormalizedScore"], errors="coerce").fillna(0.0)
+
+            id_field = "@id" if "@id" in near.columns else ("id" if "id" in near.columns else None)
+            if id_field:
+                near["_geom_priority"] = near.geometry.geom_type.isin(["Polygon", "MultiPolygon"])
+                near = (
+                    near.sort_values(
+                        by=[id_field, "_geom_priority", "__norm_score__"],
+                        ascending=[True, False, False],
+                    )
+                    .drop_duplicates(subset=[id_field], keep="first")
+                    .drop(columns="_geom_priority")
+                    .reset_index(drop=True)
+                )
+
+            top_rows = near.sort_values("__norm_score__", ascending=False).head(10)
+            if not top_rows.empty:
+                name_series = None
+                for col in ["name", "name_left", "name_right"]:
+                    if col in top_rows.columns:
+                        name_series = top_rows[col] if name_series is None else name_series.fillna(top_rows[col])
+
+                if name_series is None:
+                    # No name columns found -> no labels
+                    formatted = ""
+                else:
+                    # Normalize and strip strings
+                    labels = name_series.fillna("").astype(str).str.strip()
+
+                    # Skip blanks and "Unnamed*" entries in favor of real names
+                    filtered_pairs = []
+                    for label, score in zip(labels, top_rows["__norm_score__"]):
+                        if not label:
+                            continue
+                        # skip common autogenerated "Unnamed" labels (case-insensitive)
+                        if label.lower().startswith("unnamed"):
+                            continue
+                        filtered_pairs.append((label, score))
+
+                    # If no valid named entries after filtering, fall back to any non-blank labels
+                    if not filtered_pairs:
+                        for label, score in zip(labels, top_rows["__norm_score__"]):
+                            if label:
+                                filtered_pairs.append((label, score))
+                    formatted = "; ".join(f"{lbl} ({sc:.3f})" for lbl, sc in filtered_pairs)
+            else:
+                formatted = ""
+        else:
+            formatted = "; ".join(node_stats.get(str(sub_idx), {}).get("top_pois", []))
+        station_top_poi_pairs.append((sub_idx, formatted))
 
     buffers_gdf = gpd.GeoDataFrame(
         {"sub_index": best_route,
@@ -366,12 +509,15 @@ def run_aco_jps(
     buffers_gdf.to_file(outdir / f"aco_{method}_station_buffers.geojson", driver="GeoJSON")
     print(f"✅ Saved 1 km station buffers → aco_{method}_station_buffers.geojson")
 
+    # Update chosen stations with top POI scorers (NormalizedScore-based)
+    top_poi_map = {idx: label for idx, label in station_top_poi_pairs}
+    chosen.loc[:, "top_pois"] = [top_poi_map.get(idx, "") for idx in best_route]
+
     # 15) Export all-nodes CSV (feasible-only universe = what ACO evaluated)
     all_nodes = points_feas.to_crs("EPSG:4326").copy()
     all_nodes.loc[:, "sub_index"] = np.arange(len(all_nodes))
     all_nodes.loc[:, "fw_index"] = feas_orig_idx
     chosen_set = set(best_route)
-    all_nodes.loc[:, "is_station"] = all_nodes["sub_index"].apply(lambda i: int(i in chosen_set))
     all_nodes.loc[:, "poi_count"] = all_nodes["sub_index"].map(
         lambda i: node_stats.get(str(i), {}).get("count", 0)
     )
@@ -384,6 +530,9 @@ def run_aco_jps(
     all_nodes.loc[:, "top_pois"] = all_nodes["sub_index"].map(
         lambda i: "; ".join(node_stats.get(str(i), {}).get("top_pois", []))
     )
+    if top_poi_map:
+        mask = all_nodes["sub_index"].isin(top_poi_map.keys())
+        all_nodes.loc[mask, "top_pois"] = all_nodes.loc[mask, "sub_index"].map(top_poi_map)
     all_nodes.loc[:, "lon"] = all_nodes.geometry.x
     all_nodes.loc[:, "lat"] = all_nodes.geometry.y
     all_nodes.drop(columns="geometry").to_csv(outdir / f"aco_{method}_candidate_stations.csv", index=False)
@@ -391,6 +540,15 @@ def run_aco_jps(
 
     # 16) Export chosen stations CSV (only the final selected stations)
     chosen_stations_df = all_nodes[all_nodes["sub_index"].isin(best_route)].copy()
+
+    # -------------------------------------------------------------
+    # >>> NEW FEATURE: Average poi_norm score (over 1, rounded 2dp)
+    # -------------------------------------------------------------
+    avg_norm = float(chosen_stations_df["poi_norm"].mean())
+    formatted_score = f"{avg_norm:.2f}/1"
+    chosen_stations_df.loc[:, "avg_poi_norm_score"] = formatted_score
+    # -------------------------------------------------------------
+
     chosen_stations_df.drop(columns="geometry").to_csv(outdir / f"aco_{method}_stations_list.csv", index=False)
     print(f"🧾 Exported aco_{method}_stations_list.csv (Final Stations List)")
 
@@ -417,4 +575,4 @@ if __name__ == "__main__":
     raise RuntimeError(
         "This module is a helper and should not be executed directly. "
         "Use 'aco_jps_runner.py' instead, which calls run_aco_jps() internally."
-    )
+    ) 

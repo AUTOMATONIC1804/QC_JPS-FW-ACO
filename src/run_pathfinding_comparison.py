@@ -13,9 +13,9 @@ def main():
     print("=== 🚆 PATHFINDING COMPARISON START ===")
     
     # Get coordinates once for all algorithms
-    print("\n📍 Enter coordinates (lat, lon format) - will be used for all algorithms:")
+    print("\nEnter coordinates (lat, lon format)")
     try:
-        start_input = input("Start coordinates (lat, lon) [default: 14.7327857, 121.0611778]: ").strip()
+        start_input = input("Start coordinates (lat, lon): ").strip()
         if not start_input:
             start_coords = (14.7327857, 121.0611778)
         else:
@@ -24,7 +24,7 @@ def main():
                 raise ValueError("Start coordinates must be in format: lat, lon")
             start_coords = (float(start_parts[0]), float(start_parts[1]))
         
-        goal_input = input("Goal coordinates (lat, lon) [default: 14.656511, 121.031089]: ").strip()
+        goal_input = input("Goal coordinates (lat, lon): ").strip()
         if not goal_input:
             goal_coords = (14.656511, 121.031089)
         else:
@@ -59,7 +59,7 @@ def main():
     results.append(astar_metrics)
 
     # --- Summary ---
-    print("\n=== ✅ COMPARISON COMPLETE ===")
+    print("\nCOMPARISON COMPLETE")
     for r in results:
         if r is None:
             print("❌ One algorithm failed to return results.")

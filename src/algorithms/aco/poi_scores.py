@@ -1,26 +1,118 @@
-"""
-poi_scores.py
------------------------------------------------------
-Enhanced POI scoring system for Quezon City.
-
-- Handles _left/_right attribute logic
-- Checks across all major columns
-- Prefers left, falls back to right, or picks higher scoring
-- Adds 'Classified' (Yes/No) flag
-- Includes "update mode" to reclassify unclassified rows only
-"""
-
+from pathlib import Path
 import geopandas as gpd
 import pandas as pd
-from pathlib import Path
 import numpy as np
 
-UPDATE_MODE = False  # Set to True to reclassify only unclassified rows
+# >>> ADDED
+import requests
+from shapely.geometry import Polygon, LineString
+import time
+# <<< END ADDED
 
+
+UPDATE_MODE = True  # Set to True to reclassify only unclassified rows
 
 base_dir = Path(r"D:\Quezon_City\data\processed")
 input_path = base_dir / "qc_pois_final_scored.geojson"
 output_path = base_dir / "qc_pois_final_scored.geojson"
+
+
+# ======================================================
+# >>> ROBUST Overpass downloader (fixed)
+# ======================================================
+def download_osm_way(way_id, max_retries=4, backoff=1.0, timeout=30):
+    """Download an OSM way and return TWO features:
+       1) the polygon/line geometry
+       2) its centroid as a POINT feature
+    """
+    query = f"""
+    [out:json];
+    way({way_id});
+    (._;>;);
+    out body;
+    """
+    url = "https://overpass-api.de/api/interpreter"
+    headers = {"User-Agent": "qc_poi_downloader/1.0"}
+
+    attempt = 0
+    while attempt <= max_retries:
+        try:
+            r = requests.post(url, data={"data": query}, headers=headers, timeout=timeout)
+        except requests.exceptions.RequestException:
+            attempt += 1
+            time.sleep(backoff * attempt)
+            continue
+
+        if r.status_code != 200:
+            attempt += 1
+            time.sleep(backoff * attempt)
+            continue
+
+        try:
+            data = r.json()
+        except ValueError:
+            attempt += 1
+            time.sleep(backoff * attempt)
+            continue
+
+        break
+    else:
+        print(f"❌ Failed to fetch OSM way {way_id}")
+        return None
+
+    # parse nodes
+    nodes = {}
+    way_tags = {}
+    way_nodes = []
+
+    for el in data.get("elements", []):
+        if el.get("type") == "node":
+            nodes[el["id"]] = (el["lon"], el["lat"])
+        elif el.get("type") == "way":
+            way_tags = el.get("tags", {})
+            way_nodes = el.get("nodes", [])
+
+    coords = [nodes[n] for n in way_nodes if n in nodes]
+    if not coords:
+        print(f"❗ No coords for {way_id}")
+        return None
+
+    # Create polygon or line
+    if len(coords) >= 4 and coords[0] == coords[-1]:
+        geom = Polygon(coords)
+    else:
+        geom = LineString(coords)
+
+    # Create centroid point
+    centroid_geom = geom.centroid
+
+    # Build the POLYGON row
+    gdf_polygon = gpd.GeoDataFrame(
+        [{
+            **way_tags,
+            "osm_id": way_id,
+            "type": "polygon"
+        }],
+        geometry=[geom],
+        crs="EPSG:4326"
+    )
+
+    # Build the CENTROID point row
+    gdf_centroid = gpd.GeoDataFrame(
+        [{
+            "osm_id": f"{way_id}_centroid",
+            "type": "centroid"
+        }],
+        geometry=[centroid_geom],
+        crs="EPSG:4326"
+    )
+
+    # Return both as a combined GeoDataFrame
+    return pd.concat([gdf_polygon, gdf_centroid], ignore_index=True)
+
+# ======================================================
+
+
 
 # Left and Right Merge
 def merge_lr(row, field_base):
@@ -33,17 +125,14 @@ def merge_lr(row, field_base):
         return left_val
     if right_val and not left_val:
         return right_val
-    return f"{left_val} {right_val}"  # both exist, combine for keyword detection
+    return f"{left_val} {right_val}"
 
 
 def get_all_text_fields(row):
     fields = []
-
-    # 1. Left/right pairs
     for base in ["amenity", "building", "landuse", "shop", "name"]:
         fields.append(merge_lr(row, base))
 
-    # 2. Singles
     singles = [
         "office", "school", "government", "governance_type", "healthcare",
         "public_transport", "bus", "train", "subway", "station", "jeepney",
@@ -51,6 +140,7 @@ def get_all_text_fields(row):
         "historic", "proposed:building", "proposed:station", "proposed:railway",
         "proposed:light_rail"
     ]
+
     for s in singles:
         if s in row:
             val = str(row.get(s, "")).lower()
@@ -60,22 +150,23 @@ def get_all_text_fields(row):
     return " ".join(fields)
 
 
-# Categories
 def match_keywords(fields, mapping):
     for k, v in mapping.items():
         if k in fields:
             return v
     return 0
 
+
 def transport_poi(fields):
     mapping = {
         "train": 3, "light_rail": 3, "railway": 3, "train_station": 3, "mrt": 3, "lrt": 3,
         "bus": 2, "bus_station": 2, "terminal": 2, "subway": 3, "jeepney": 2,
-        "tricycle": 1, "public_transport": 2, "transport": 2, "stop_position": 2, "transportation": 2
-        
+        "tricycle": 1, "public_transport": 2, "transport": 2, "stop_position": 2,
+        "transportation": 2
     }
     score = match_keywords(fields, mapping)
     return "Transport Facilities", score if score > 0 else 0
+
 
 def commercial_poi(fields):
     mapping = {
@@ -87,6 +178,7 @@ def commercial_poi(fields):
     score = match_keywords(fields, mapping)
     return "Commercial / Offices", score if score > 0 else 0
 
+
 def health_poi(fields):
     mapping = {
         "hospital": 3, "medical_center": 3, "clinic": 2,
@@ -94,6 +186,7 @@ def health_poi(fields):
     }
     score = match_keywords(fields, mapping)
     return "Health Facilities", score if score > 0 else 0
+
 
 def education_poi(fields):
     mapping = {
@@ -103,6 +196,7 @@ def education_poi(fields):
     score = match_keywords(fields, mapping)
     return "Education Facilities", score if score > 0 else 0
 
+
 def recreation_poi(fields):
     mapping = {
         "park": 3, "sports": 2, "sports_centre": 2, "playground": 2,
@@ -111,6 +205,7 @@ def recreation_poi(fields):
     }
     score = match_keywords(fields, mapping)
     return "Recreational Facilities", score if score > 0 else 0
+
 
 def government_poi(fields):
     mapping = {
@@ -123,11 +218,9 @@ def government_poi(fields):
     return "Government / Institutional", score if score > 0 else 0
 
 
-
-# Category Scores
 CATEGORY_WEIGHTS = {
-    "Transport Facilities": 30,
-    "Commercial / Offices": 20,
+    "Transport Facilities": 25,
+    "Commercial / Offices": 25,
     "Health Facilities": 15,
     "Education Facilities": 15,
     "Recreational Facilities": 10,
@@ -143,7 +236,7 @@ category_funcs = [
     government_poi,
 ]
 
-# Classification and Scoring
+
 def classify_and_score(row):
     fields = get_all_text_fields(row)
     best_cat, best_score, best_weighted = "Unclassified", 0, 0
@@ -160,10 +253,24 @@ def classify_and_score(row):
 
 
 
+# ======================================================
+# MAIN PROCESS
+# ======================================================
 if not UPDATE_MODE:
     print("📂 Loading merged POI file...")
     gdf = gpd.read_file(input_path)
     print(f"  → {len(gdf)} features loaded")
+
+    # Insert OSM Way
+    print("⬇ Downloading OSM Way 564479403...")
+    osm_extra = download_osm_way(402882917)
+
+    if osm_extra is not None:
+        print(f"  → Downloaded with {len(osm_extra.columns)} columns")
+        gdf = pd.concat([gdf, osm_extra], ignore_index=True)
+        print(f"  → New total: {len(gdf)} features")
+    else:
+        print("❗ Failed to download OSM way — continuing without it.")
 
     print("🧠 Running full classification...")
     gdf[["Category", "SubScore", "WeightedScore", "Classified"]] = gdf.apply(
@@ -172,17 +279,21 @@ if not UPDATE_MODE:
 
     gdf["NormalizedScore"] = gdf["WeightedScore"] / gdf["WeightedScore"].max()
 
+    # Ensure only one geometry column
+    for col in gdf.columns:
+        if isinstance(gdf[col], gpd.GeoSeries) and col != "geometry":
+            print(f"🧹 Removing extra geometry column: {col}")
+            gdf = gdf.drop(columns=[col])
+
     gdf.to_file(output_path, driver="GeoJSON")
-    print(f"✅ Saved updated POI scores to: {output_path}")
+    print(f"✅ Saved to: {output_path}")
 
 else:
-    print("\n🔄 Update mode enabled — refreshing unclassified rows...")
+    print("\n🔄 Update mode: refreshing unclassified rows...")
     gdf = gpd.read_file(output_path)
     unclassified_mask = gdf["Classified"] == "No"
-    num_unclassified = unclassified_mask.sum()
-    print(f"  → Found {num_unclassified} unclassified rows")
 
-    if num_unclassified > 0:
+    if unclassified_mask.any():
         gdf_to_update = gdf[unclassified_mask].copy()
         gdf_to_update[["Category", "SubScore", "WeightedScore", "Classified"]] = gdf_to_update.apply(
             lambda row: pd.Series(classify_and_score(row)), axis=1
@@ -190,9 +301,9 @@ else:
         gdf_to_update["NormalizedScore"] = gdf_to_update["WeightedScore"] / gdf_to_update["WeightedScore"].max()
         gdf.update(gdf_to_update)
         gdf.to_file(output_path, driver="GeoJSON")
-        print(f"✅ Updated {num_unclassified} previously unclassified features.")
+        print("✅ Updated unclassified rows.")
     else:
-        print("✅ No unclassified rows left to update.")
+        print("No unclassified rows.")
 
 
 summary = gdf["Category"].value_counts().to_frame("Count")
@@ -201,25 +312,20 @@ print("\n📊 Category Summary:")
 print(summary.sort_index())
 
 
-# ======================================================
-# ✅ Helper: Load POIs + Category Weights for ACO
-# ======================================================
 
+# ======================================================
+# Load POIs + Weights for ACO
+# ======================================================
 def load_pois_and_weights(pois_file=None):
-    """
-    Load POI GeoDataFrame and category weights for ACO integration.
-    If pois_file is None, defaults to the final classified POI file.
-    """
-    import geopandas as gpd
-    from pathlib import Path
-
     base_dir = Path(r"D:\Quezon_City\data\processed")
     pois_file = pois_file or base_dir / "qc_pois_final_scored.geojson"
 
     print(f"📦 Loading POIs from {pois_file}")
     gdf = gpd.read_file(pois_file)
+
     if gdf.crs is None:
         gdf = gdf.set_crs("EPSG:4326")
 
-    print(f"✅ Loaded {len(gdf)} POIs with scores.")
+    print(f"✅ Loaded {len(gdf)} POIs.")
     return gdf, CATEGORY_WEIGHTS
+

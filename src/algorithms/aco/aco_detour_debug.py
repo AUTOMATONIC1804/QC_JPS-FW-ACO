@@ -195,7 +195,7 @@ def main(method: str, out_dir: str, detour_limit: float, rejoin_limit: float, wi
     detour_gdf["fw_index"] = np.arange(len(detour_gdf))
     detour_gdf["detour_label"] = detour_gdf["detour_feasible"].map(lambda x: "feasible" if x else "not_feasible")
 
-    out_fp = out_dir / "debug_detour_nodes.geojson"
+    out_fp = out_dir / f"{method}_detour_debug.geojson"
     detour_gdf.to_file(out_fp, driver="GeoJSON")
 
     n_total = len(detour_gdf)
