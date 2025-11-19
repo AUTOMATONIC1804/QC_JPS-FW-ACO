@@ -1,31 +1,17 @@
 [
   {
-    "Algorithm":"Dijkstra",
-    "RouteFile":"data\/outputs\/dijkstra_path.geojson",
-    "RoadSource":"GraphML (OSMnx)",
-    "Buffer_m":2000,
-    "Spacing_m":500,
-    "MergeRadius_m":"-",
-    "n_points":71,
-    "MatrixShape":[
-      71,
-      71
-    ],
-    "Time_ms":3761.13
-  },
-  {
     "Algorithm":"A*",
     "RouteFile":"data\/outputs\/astar_path.geojson",
     "RoadSource":"Vector (GeoJSON)",
     "Buffer_m":2000,
     "Spacing_m":500,
     "MergeRadius_m":495,
-    "n_points":70,
+    "n_points":49,
     "MatrixShape":[
-      70,
-      70
+      49,
+      49
     ],
-    "Time_ms":40092.14
+    "Time_ms":18926.32
   },
   {
     "Algorithm":"JPS",
@@ -34,11 +20,11 @@
     "Buffer_m":2000,
     "Spacing_m":500,
     "MergeRadius_m":495,
-    "n_points":67,
+    "n_points":47,
     "MatrixShape":[
-      67,
-      67
+      47,
+      47
     ],
-    "Time_ms":538126.65
+    "Time_ms":926870.38
   }
 ]

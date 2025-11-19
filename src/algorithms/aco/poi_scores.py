@@ -57,7 +57,7 @@ def download_osm_way(way_id, max_retries=4, backoff=1.0, timeout=30):
 
         break
     else:
-        print(f"❌ Failed to fetch OSM way {way_id}")
+        print(f"Failed to fetch OSM way {way_id}")
         return None
 
     # parse nodes
@@ -74,7 +74,7 @@ def download_osm_way(way_id, max_retries=4, backoff=1.0, timeout=30):
 
     coords = [nodes[n] for n in way_nodes if n in nodes]
     if not coords:
-        print(f"❗ No coords for {way_id}")
+        print(f"No coords for {way_id}")
         return None
 
     # Create polygon or line
@@ -257,13 +257,13 @@ def classify_and_score(row):
 # MAIN PROCESS
 # ======================================================
 if not UPDATE_MODE:
-    print("📂 Loading merged POI file...")
+    print("Loading merged POI file...")
     gdf = gpd.read_file(input_path)
     print(f"  → {len(gdf)} features loaded")
 
     # Insert OSM Way
-    print("⬇ Downloading OSM Way 564479403...")
-    osm_extra = download_osm_way(402882917)
+    print("⬇ Downloading OSM Way...")
+    osm_extra = download_osm_way(670398505)
 
     if osm_extra is not None:
         print(f"  → Downloaded with {len(osm_extra.columns)} columns")
@@ -272,7 +272,7 @@ if not UPDATE_MODE:
     else:
         print("❗ Failed to download OSM way — continuing without it.")
 
-    print("🧠 Running full classification...")
+    print("Running full classification...")
     gdf[["Category", "SubScore", "WeightedScore", "Classified"]] = gdf.apply(
         lambda row: pd.Series(classify_and_score(row)), axis=1
     )
@@ -286,10 +286,10 @@ if not UPDATE_MODE:
             gdf = gdf.drop(columns=[col])
 
     gdf.to_file(output_path, driver="GeoJSON")
-    print(f"✅ Saved to: {output_path}")
+    print(f"Saved to: {output_path}")
 
 else:
-    print("\n🔄 Update mode: refreshing unclassified rows...")
+    print("\nUpdate mode: refreshing unclassified rows...")
     gdf = gpd.read_file(output_path)
     unclassified_mask = gdf["Classified"] == "No"
 
@@ -301,14 +301,14 @@ else:
         gdf_to_update["NormalizedScore"] = gdf_to_update["WeightedScore"] / gdf_to_update["WeightedScore"].max()
         gdf.update(gdf_to_update)
         gdf.to_file(output_path, driver="GeoJSON")
-        print("✅ Updated unclassified rows.")
+        print("Updated unclassified rows.")
     else:
         print("No unclassified rows.")
 
 
 summary = gdf["Category"].value_counts().to_frame("Count")
 summary["AvgWeighted"] = gdf.groupby("Category")["WeightedScore"].mean()
-print("\n📊 Category Summary:")
+print("\nCategory Summary:")
 print(summary.sort_index())
 
 
@@ -320,12 +320,12 @@ def load_pois_and_weights(pois_file=None):
     base_dir = Path(r"D:\Quezon_City\data\processed")
     pois_file = pois_file or base_dir / "qc_pois_final_scored.geojson"
 
-    print(f"📦 Loading POIs from {pois_file}")
+    print(f"Loading POIs from {pois_file}")
     gdf = gpd.read_file(pois_file)
 
     if gdf.crs is None:
         gdf = gdf.set_crs("EPSG:4326")
 
-    print(f"✅ Loaded {len(gdf)} POIs.")
+    print(f"Loaded {len(gdf)} POIs.")
     return gdf, CATEGORY_WEIGHTS
 

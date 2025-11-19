@@ -1,18 +1,18 @@
 """
 src/run_pathfinding_comparison.py
-Compare performance of JPS (grid), Dijkstra (road graph), and A* (grid).
+Compare performance of JPS (grid) and A* (grid).
+All Dijkstra and JPS-Pruned logic removed.
 """
 
 import json
 from src.algorithms.jps_runner import run_jps_benchmark
-from src.algorithms.dijkstra_runner import run_dijkstra_benchmark
 from src.algorithms.astar_runner import run_astar_benchmark
 
 
 def main():
     print("=== 🚆 PATHFINDING COMPARISON START ===")
     
-    # Get coordinates once for all algorithms
+    # Get coordinates once for both algorithms
     print("\nEnter coordinates (lat, lon format)")
     try:
         start_input = input("Start coordinates (lat, lon): ").strip()
@@ -33,7 +33,9 @@ def main():
                 raise ValueError("Goal coordinates must be in format: lat, lon")
             goal_coords = (float(goal_parts[0]), float(goal_parts[1]))
         
-        print(f"✅ Using coordinates: Start ({start_coords[0]}, {start_coords[1]}), Goal ({goal_coords[0]}, {goal_coords[1]})\n")
+        print(f"✅ Using coordinates: Start ({start_coords[0]}, {start_coords[1]}), "
+              f"Goal ({goal_coords[0]}, {goal_coords[1]})\n")
+
     except (ValueError, KeyboardInterrupt) as e:
         if isinstance(e, KeyboardInterrupt):
             raise
@@ -43,20 +45,15 @@ def main():
 
     results = []
 
-    # --- Run JPS ---
-    print("\n=== 🟨 Running Jump Point Search (Grid) ===")
-    jps_metrics = run_jps_benchmark(start_coords=start_coords, goal_coords=goal_coords)
-    results.append(jps_metrics)
-
-    # --- Run Dijkstra ---
-    print("\n=== 🔵 Running Dijkstra (Road Graph) ===")
-    dijkstra_metrics = run_dijkstra_benchmark(start_coords=start_coords, goal_coords=goal_coords)
-    results.append(dijkstra_metrics)
-
-    # --- Run A* ---
+    # --- Run A* FIRST (baseline) ---
     print("\n=== 🟩 Running A* (Grid) ===")
     astar_metrics = run_astar_benchmark(start_coords=start_coords, goal_coords=goal_coords)
     results.append(astar_metrics)
+
+    # --- Run JPS SECOND (improved) ---
+    print("\n=== 🟨 Running Jump Point Search (Grid) ===")
+    jps_metrics = run_jps_benchmark(start_coords=start_coords, goal_coords=goal_coords)
+    results.append(jps_metrics)
 
     # --- Summary ---
     print("\nCOMPARISON COMPLETE")
@@ -68,7 +65,7 @@ def main():
             print(f"{r.get('algorithm', 'Unknown')}: ❌ No path found.")
         else:
             print(f"{r['algorithm']}: {r['runtime_ms']:.2f} ms | "
-                f"{r['path_length_m']:.2f} m | {r['steps']} steps")
+                  f"{r['path_length_m']:.2f} m | {r['steps']} steps")
 
     # --- Save results ---
     with open("data/outputs/pathfinding_comparison.json", "w") as f:

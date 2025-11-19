@@ -59,7 +59,7 @@ def load_astar_route(route_geojson):
         coords = []
         for ls in geom.geoms: coords.extend(ls.coords)
         geom = LineString(coords)
-    print(f"✅ Loaded A* route (length ≈ {geom.length:.0f} m)")
+    print(f"Loaded A* route (length ≈ {geom.length:.0f} m)")
     return geom
 
 def buffer_around_line(line, buffer_m=1000):
@@ -78,16 +78,16 @@ def silence_gdal():
         sys.stderr = saved_stderr
 
 def extract_vector_roads(roads_vector, buffer_geom):
-    print(f"📂 Loading vector roads: {roads_vector}")
+    print(f"Loading vector roads: {roads_vector}")
     try:
         with silence_gdal():
             roads = gpd.read_file(roads_vector)
     except Exception as e:
-        print(f"❌ Could not load road file: {e}")
+        print(f"Could not load road file: {e}")
         return gpd.GeoDataFrame(columns=["geometry"], crs=METRIC)
 
     if "geometry" not in roads.columns:
-        print("❌ Invalid road data — no geometry column found.")
+        print("Invalid road data — no geometry column found.")
         return gpd.GeoDataFrame(columns=["geometry"], crs=METRIC)
     roads = roads[["geometry"]].copy()
 
@@ -100,7 +100,7 @@ def extract_vector_roads(roads_vector, buffer_geom):
     clipped = clipped.explode(index_parts=False).reset_index(drop=True)
     clipped = clipped[clipped.geometry.length > 10]
 
-    print(f"✅ Extracted {len(clipped)} road segments inside buffer.")
+    print(f"Extracted {len(clipped)} road segments inside buffer.")
     return clipped
 
 # ---------------------------------------------------
@@ -140,7 +140,7 @@ def merge_nearby(points_gdf, rad_m):
         if i in seen: continue
         seen.update(g); keep.append(i)
     cleaned = points_gdf.iloc[keep].copy()
-    print(f"🧹 Dedup {len(points_gdf)} → {len(cleaned)} pts (r={rad_m} m)")
+    print(f"Dedup {len(points_gdf)} → {len(cleaned)}")
     return cleaned.reset_index(drop=True)
 
 # Tiny dedup helper (used after forcing endpoints)
@@ -217,7 +217,7 @@ def astar_distance_pixels(grid: GridAdapter, start_rc, goal_rc) -> float:
             pix_len += (np.sqrt(2.0) if (dr == 1 and dc == 1) else 1.0)
         return pix_len
     except Exception as e:
-        print(f"⚠️ A* failed between {start_rc} → {goal_rc}: {e}")
+        print(f"A* failed between {start_rc} → {goal_rc}: {e}")
         return np.inf
 
 def astar_distance_meters(grid: GridAdapter, start_xy_m, goal_xy_m) -> float:
@@ -249,7 +249,7 @@ def run_fw_astar_vector(
     max_pairs: cap number of unique pairs (upper triangle) for quick tests.
     run_fw: if True, run FW over the A* distance matrix (usually unnecessary).
     """
-    print("🚆 FW (A*-on-Grid + Vector Roads) — Haversine removed")
+    print("FW (A*-on-Grid + Vector Roads)")
     print(f"Route:  {route_geojson}")
     print(f"Roads:  {roads_vector}")
     print(f"Buffer: ±{buffer_m} m | Spacing: {spacing_m} m | Merge r: {merge_radius_m} m")
@@ -267,18 +267,18 @@ def run_fw_astar_vector(
     astar_gdf = gpd.GeoDataFrame(geometry=[route], crs=METRIC)
     roads_plus = pd.concat([roads_gdf, astar_gdf], ignore_index=True)
     roads_plus = gpd.GeoDataFrame(roads_plus, geometry="geometry", crs=METRIC)
-    print(f"🛤️ Added A* route (total lines: {len(roads_plus)})")
+    print(f"Added A* route (total lines: {len(roads_plus)})")
 
     # 4) Sample points (A* line and roads)
     astar_pts = sample_points_along(route, spacing_m)
     road_pts = sample_points_on_lines(roads_plus, spacing_m)
-    print(f"🟨 A* pts: {len(astar_pts)} | 🛣️ Road pts: {len(road_pts)}")
+    print(f"A* pts: {len(astar_pts)} | Road pts: {len(road_pts)}")
 
     # 5) Merge & deduplicate (coarse)
     all_pts = gpd.GeoDataFrame(pd.concat([astar_pts, road_pts], ignore_index=True), crs=METRIC)
     merged = merge_nearby(all_pts, merge_radius_m)
     if len(merged) == 0:
-        print("❌ No points generated."); return
+        print("No points generated."); return
 
     # ===================== NEW: endpoint guard (with labeling + lat/lon) =====================
     clearance_m = 100.0
@@ -315,8 +315,8 @@ def run_fw_astar_vector(
     filtered_wgs["lat"] = filtered_wgs.geometry.y.round(6)
     filtered_wgs["lon"] = filtered_wgs.geometry.x.round(6)
 
-    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
-    print(f"   Start/end points tagged and lat/lon added for export.")
+    print(f"Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
+    print(f"Start/end points tagged and lat/lon added for export.")
     # =====================================================================
 
     # ===============================================================
@@ -328,12 +328,12 @@ def run_fw_astar_vector(
 
     # Save enriched points with roles + lat/lon
     filtered_wgs.to_file(out / "fw_astar_points.geojson", driver="GeoJSON")
-    print("💾 Saved buffer/roads/points GeoJSON (with lat/lon + role).")
+    print("Saved buffer/roads/points GeoJSON (with lat/lon + role).")
 
     # ===============================================================
     # Build A*-based distance matrix over raster grid
     # ===============================================================
-    print(f"🗺️ Loading raster grid: {tif_path}")
+    print(f"Loading raster grid: {tif_path}")
     grid = GridAdapter(tif_path)
 
     coords_xy_m = np.column_stack([filtered.geometry.x.values, filtered.geometry.y.values])
@@ -344,7 +344,7 @@ def run_fw_astar_vector(
     idx_pairs = list(combinations(range(n), 2))
     if max_pairs is not None:
         idx_pairs = idx_pairs[:max_pairs]
-        print(f"🔬 Capping pairs to {len(idx_pairs)} for test runs.")
+        print(f"Capping pairs to {len(idx_pairs)} for test runs.")
 
     t_pairs = time.perf_counter()
     last_print = t_pairs
@@ -356,29 +356,29 @@ def run_fw_astar_vector(
         now = time.perf_counter()
         if now - last_print > 2.5:
             pct = 100.0 * k / len(idx_pairs)
-            print(f"  ⏳ A* pairs {k}/{len(idx_pairs)} ({pct:.1f}%)")
+            print(f"A* pairs {k}/{len(idx_pairs)} ({pct:.1f}%)")
             last_print = now
 
-    print(f"✅ A* distances done for {len(idx_pairs)} pairs in {(time.perf_counter()-t_pairs):.2f}s")
+    print(f"A* distances done for {len(idx_pairs)} pairs in {(time.perf_counter()-t_pairs):.2f}s")
 
-    # 8️⃣ (Optional) FW on top of A* distances
+    #(Optional) FW on top of A* distances
     if run_fw:
-        print("♻️ Running Floyd–Warshall over A* distances (usually unnecessary)…")
+        print("Running Floyd–Warshall over A* distances (usually unnecessary)…")
         FW = floyd_warshall_numpy(D)
     else:
         FW = D.copy()
 
-    # 9️⃣ Save matrices
+    #Save matrices
     np.save(out / "fw_astar_D.npy", D)
     np.save(out / "fw_astar_FW.npy", FW)
 
-    # 🔟 Summary
+    #Summary
     elapsed_ms = (time.perf_counter() - t0) * 1000
-    print("\n✅ Summary (A* + Vector, grid distances)")
-    print(f"🟨 A* pts: {len(astar_pts)} | 🛣️ Road pts: {len(road_pts)} | 🧹 Unique (pre-filter): {len(merged)} | ✅ After endpoint rule: {len(filtered)}")
-    print(f"📍 Start: ({filtered_wgs.loc[filtered_wgs['role']=='start', 'lat'].iloc[0]}, {filtered_wgs.loc[filtered_wgs['role']=='start', 'lon'].iloc[0]})")
-    print(f"📍 End:   ({filtered_wgs.loc[filtered_wgs['role']=='end', 'lat'].iloc[0]}, {filtered_wgs.loc[filtered_wgs['role']=='end', 'lon'].iloc[0]})")
-    print(f"📐 Matrix {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
+    print("\nSummary (A* + Vector, grid distances)")
+    print(f"A* pts: {len(astar_pts)} | Road pts: {len(road_pts)} | Unique (pre-filter): {len(merged)} | After endpoint rule: {len(filtered)}")
+    print(f"Start: ({filtered_wgs.loc[filtered_wgs['role']=='start', 'lat'].iloc[0]}, {filtered_wgs.loc[filtered_wgs['role']=='start', 'lon'].iloc[0]})")
+    print(f"End:   ({filtered_wgs.loc[filtered_wgs['role']=='end', 'lat'].iloc[0]}, {filtered_wgs.loc[filtered_wgs['role']=='end', 'lon'].iloc[0]})")
+    print(f"Matrix {D.shape} | {elapsed_ms:.2f} ms | {out}")
     print("===================================")
 
 

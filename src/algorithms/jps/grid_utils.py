@@ -22,7 +22,7 @@ def load_clean_grid(tif_path="data/processed/qc_grid_clean.tif",
         transform = src.transform
         crs = src.crs
 
-    print(f"[OK] Loaded cleaned grid from {tif_path}")
+    print(f"Loaded cleaned grid from {tif_path}")
     print(f"Grid shape: {grid.shape}, CRS: {crs}")
 
     # --- PNG preview ---
@@ -33,7 +33,7 @@ def load_clean_grid(tif_path="data/processed/qc_grid_clean.tif",
     plt.tight_layout()
     plt.savefig(preview_png, dpi=300, bbox_inches="tight", pad_inches=0.1)
     plt.close()
-    print(f"[OK] Saved grid preview PNG → {preview_png}")
+    print(f"Saved grid preview PNG → {preview_png}")
 
     # --- GeoJSON preview (road cells only) ---
     features = []
@@ -56,7 +56,7 @@ def load_clean_grid(tif_path="data/processed/qc_grid_clean.tif",
     with open(preview_geojson, "w") as f:
         json.dump(geojson, f)
 
-    print(f"[OK] Saved grid preview GeoJSON → {preview_geojson}")
+    print(f"Saved grid preview GeoJSON → {preview_geojson}")
 
     return grid, transform, crs
 

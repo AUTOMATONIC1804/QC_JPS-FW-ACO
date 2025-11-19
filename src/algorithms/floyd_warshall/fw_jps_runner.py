@@ -52,7 +52,7 @@ def load_jps_route(route_geojson):
         for ls in geom.geoms:
             coords.extend(ls.coords)
         geom = LineString(coords)
-    print(f"✅ Loaded JPS route (length ≈ {geom.length:.0f} m)")
+    print(f"Loaded JPS route (length ≈ {geom.length:.0f} m)")
     return geom
 
 def buffer_around_line(line, buffer_m=1000):
@@ -71,15 +71,15 @@ def silence_gdal():
         sys.stderr = saved_stderr
 
 def extract_vector_roads(roads_vector, buffer_geom):
-    print(f"📂 Loading vector roads: {roads_vector}")
+    print(f"Loading vector roads: {roads_vector}")
     try:
         with silence_gdal():
             roads = gpd.read_file(roads_vector)
     except Exception as e:
-        print(f"❌ Could not load road file: {e}")
+        print(f"Could not load road file: {e}")
         return gpd.GeoDataFrame(columns=["geometry"], crs=METRIC)
     if "geometry" not in roads.columns:
-        print("❌ Invalid road data — no geometry column found.")
+        print("Invalid road data — no geometry column found.")
         return gpd.GeoDataFrame(columns=["geometry"], crs=METRIC)
 
     roads = roads[["geometry"]].copy()
@@ -91,7 +91,7 @@ def extract_vector_roads(roads_vector, buffer_geom):
     clipped = gpd.overlay(roads, buf, how="intersection")
     clipped = clipped.explode(index_parts=False).reset_index(drop=True)
     clipped = clipped[clipped.geometry.length > 10]
-    print(f"✅ Extracted {len(clipped)} road segments inside buffer.")
+    print(f"Extracted {len(clipped)} road segments inside buffer.")
     return clipped
 
 # ---------------------------------------------------
@@ -118,7 +118,7 @@ def merge_nearby(points, rad):
         seen.update(g)
         keep.append(i)
     cleaned = points.iloc[keep].copy()
-    print(f"🧹 Dedup {len(points)} → {len(cleaned)} pts (r={rad} m)")
+    print(f"Dedup {len(points)} → {len(cleaned)} pts (r={rad} m)")
     return cleaned.reset_index(drop=True)
 
 def dedup_tiny(points_gdf, tol_m=1.0):
@@ -186,7 +186,7 @@ def jps_distance_pixels(grid: GridAdapter, start_rc, goal_rc):
             pix_len += np.sqrt(2) * min(dr, dc) + abs(dr - dc)
         return pix_len
     except Exception as e:
-        print(f"⚠️ JPS failed between {start_rc} → {goal_rc}: {e}")
+        print(f"JPS failed between {start_rc} → {goal_rc}: {e}")
         return np.inf
 
 def jps_distance_meters(grid, start_xy_m, goal_xy_m):
@@ -213,7 +213,7 @@ def run_fw_vector(
     run_fw=False,
     max_pairs=None
 ):
-    print("🚆 FW (JPS-on-Grid + Vector Roads) — Haversine removed")
+    print("FW (JPS-on-Grid + Vector Roads)")
     t0 = time.perf_counter()
 
     route = load_jps_route(route_geojson)
@@ -234,7 +234,7 @@ def run_fw_vector(
     all_pts = gpd.GeoDataFrame(pd.concat([jps_combined, road_pts_gdf], ignore_index=True)).set_crs(METRIC)
     merged = merge_nearby(all_pts, merge_radius_m)
     if len(merged) == 0:
-        print("❌ No points generated."); return
+        print("No points generated."); return
 
     # ===================== NEW: endpoint guard (with labeling + lat/lon) =====================
     clearance_m = 100.0
@@ -271,8 +271,8 @@ def run_fw_vector(
     filtered_wgs["lat"] = filtered_wgs.geometry.y.round(6)
     filtered_wgs["lon"] = filtered_wgs.geometry.x.round(6)
 
-    print(f"🎯 Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
-    print(f"   Start/end points tagged and lat/lon added for export.")
+    print(f"Endpoint rule: from {len(merged)} → {len(filtered)} (kept exact start & end)")
+    print(f"Start/end points tagged and lat/lon added for export.")
     # =====================================================================
 
     # ===============================================================
@@ -286,12 +286,12 @@ def run_fw_vector(
 
     # Save enriched points with roles + lat/lon
     filtered_wgs.to_file(out / "fw_jps_points.geojson", driver="GeoJSON")
-    print("💾 Saved buffer/roads/points GeoJSON (with lat/lon + role).")
+    print("Saved buffer/roads/points GeoJSON (with lat/lon + role).")
 
     # ===============================================================
     # Build JPS-based distance matrix
     # ===============================================================
-    print(f"🗺️ Loading raster grid: {tif_path}")
+    print(f"Loading raster grid: {tif_path}")
     grid = GridAdapter(tif_path)
 
     coords_xy_m = np.column_stack([filtered.geometry.x.values, filtered.geometry.y.values])
@@ -302,7 +302,7 @@ def run_fw_vector(
     idx_pairs = list(combinations(range(n), 2))
     if max_pairs is not None:
         idx_pairs = idx_pairs[:max_pairs]
-        print(f"🔬 Capping pairs to {len(idx_pairs)} for test runs.")
+        print(f"Capping pairs to {len(idx_pairs)} for test runs.")
 
     t_pairs = time.perf_counter()
     last_print = t_pairs
@@ -313,18 +313,18 @@ def run_fw_vector(
 
         now = time.perf_counter()
         if now - last_print > 2.5:
-            print(f"  ⏳ JPS pairs {k}/{len(idx_pairs)} ({100*k/len(idx_pairs):.1f}%)")
+            print(f"JPS pairs {k}/{len(idx_pairs)} ({100*k/len(idx_pairs):.1f}%)")
             last_print = now
 
-    print(f"✅ JPS distances done for {len(idx_pairs)} pairs.")
+    print(f"JPS distances done for {len(idx_pairs)} pairs.")
     FW = floyd_warshall_numpy(D) if run_fw else D.copy()
     np.save(out / "fw_jps_D.npy", D)
     np.save(out / "fw_jps_FW.npy", FW)
 
     elapsed_ms = (time.perf_counter() - t0) * 1000
-    print("\n✅ Summary")
-    print(f"🟨 Total: {len(merged)} | After endpoint rule: {len(filtered)} (kept start+end)")
-    print(f"📐 Matrix {D.shape} | ⏱ {elapsed_ms:.2f} ms | 📂 {out}")
+    print("\nSummary")
+    print(f"Total: {len(merged)} | After endpoint rule: {len(filtered)} (kept start+end)")
+    print(f"Matrix {D.shape} | {elapsed_ms:.2f} ms | {out}")
     print("===================================")
 
 
