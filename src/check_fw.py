@@ -14,7 +14,7 @@ from pathlib import Path
 # === CONFIG ===
 # Change this path to your current FW output directory
 fw_dir = Path(r"D:\Quezon_City\data\outputs\floyd_warshall")
-prefix = "fw_dijkstra"   # or "fw_dijkstra", "fw_aco", etc.
+prefix = "fw_jps"   # or "fw_astar", "fw_aco", etc.
 
 # === Load files ===
 D_path = fw_dir / f"{prefix}_D.npy"
@@ -57,7 +57,7 @@ if n <= 20:
     print("\n🧩 Full FW Matrix (after APSP):")
     print(np.round(FW, 1))
 else:
-    print(f"\n⚙️ Matrix too large ({n}x{n}). Showing top-left 10x10 slice:")
+    print(f"\nMatrix too large ({n}x{n}). Showing top-left 10x10 slice:")
     print("\nD (Result):")
     print(np.round(D[:10, :10], 1))
     print("\nFW (Floyd–Warshall result):")

@@ -6,12 +6,12 @@
     "Buffer_m":2000,
     "Spacing_m":500,
     "MergeRadius_m":495,
-    "n_points":49,
+    "n_points":53,
     "MatrixShape":[
-      49,
-      49
+      53,
+      53
     ],
-    "Time_ms":18926.32
+    "Time_ms":19589.97
   },
   {
     "Algorithm":"JPS",
@@ -20,11 +20,11 @@
     "Buffer_m":2000,
     "Spacing_m":500,
     "MergeRadius_m":495,
-    "n_points":47,
+    "n_points":53,
     "MatrixShape":[
-      47,
-      47
+      53,
+      53
     ],
-    "Time_ms":926870.38
+    "Time_ms":275802.06
   }
 ]

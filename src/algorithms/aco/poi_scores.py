@@ -10,7 +10,7 @@ import time
 # <<< END ADDED
 
 
-UPDATE_MODE = True  # Set to True to reclassify only unclassified rows
+UPDATE_MODE = True # Set to True to reclassify only unclassified rows
 
 base_dir = Path(r"D:\Quezon_City\data\processed")
 input_path = base_dir / "qc_pois_final_scored.geojson"
@@ -263,7 +263,7 @@ if not UPDATE_MODE:
 
     # Insert OSM Way
     print("⬇ Downloading OSM Way...")
-    osm_extra = download_osm_way(670398505)
+    osm_extra = download_osm_way(1376146823)
 
     if osm_extra is not None:
         print(f"  → Downloaded with {len(osm_extra.columns)} columns")
